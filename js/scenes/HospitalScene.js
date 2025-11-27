@@ -1,0 +1,99 @@
+class HospitalScene extends Phaser.Scene{
+
+    telephoneOn = false;
+    correctNumber = 1;
+    ordineClick = false; //false se il paziente viene cliccato prima del telefono, true l'inverso
+    constructor(){
+        super({key: "HospitalScene"});
+    }
+    preload(){
+        this.load.image("convBox", "img/TextBoxLeft.png");
+        this.load.image("Phone", "img/Phone.png");
+        this.load.image("Paziente", "img/Paziente.png");
+    }
+    create(){
+
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+    
+    const box = this.add.graphics();
+    box.fillStyle(0xecf0f1, 1);
+    box.fillRoundedRect(centerX + 100, centerY - 100, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
+    box.lineStyle(2, 0x2c3e50, 1);
+    box.strokeRoundedRect(centerX + 100, centerY - 100, 400, 100, 0);
+
+    const infoPaziente = this.add.text(centerX + 300, centerY - 50, 'hai già constatato che\nil paziente non risponde', {
+        fontSize: '20px',
+        color: '#2c3e50',
+        align: 'center'
+    }).setOrigin(0.5);
+
+    const telephone = this.add.image(150, centerY, "Phone").setScale(0.3).setInteractive({useHandCursor: true});
+
+    telephone.on("pointerdown", () => {
+        
+        const optioncords = {x: centerX - centerX / 2 + 160, y: centerY}
+        this.phoneConvo = this.add.image(centerX - centerX / 2 + 150, centerY, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
+        
+        optioncords.y -= 49;
+        
+        this.optRect1 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 74%, 67%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
+        this.optRect1.setStrokeStyle(3, 0x000000);
+        this.option1 = this.add.text(optioncords.x, optioncords.y, "Opzione 1", {
+            fontSize: "20px",
+            color: '#2c3e50',
+            align: 'center'
+        }).setOrigin(0.5, 0.5);
+        
+        optioncords.y += 45;
+        
+        this.optRect2 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
+        this.optRect2.setStrokeStyle(3, 0x000000);
+        this.option2 = this.add.text(optioncords.x, optioncords.y, "Opzione 2", {
+            fontSize: "20px",
+            color: '#2c3e50',
+            align: 'center'
+        }).setOrigin(0.5, 0.5);
+
+        optioncords.y += 45;
+        this.optRect3 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
+        this.optRect3.setStrokeStyle(3, 0x000000);
+        this.option3 = this.add.text(optioncords.x, optioncords.y, "Opzione 3", {
+            fontSize: "20px",
+            color: '#2c3e50',
+            align: 'center'
+        }).setOrigin(0.5, 0.5);
+
+        this.optRect1.on("pointerdown", () => {
+            this.buttonChoice(1);
+        });
+
+        this.optRect2.on("pointerdown", () => {
+            this.buttonChoice(2);
+        });
+
+        this.optRect3.on("pointerdown", () => {
+            this.buttonChoice(3);
+        });
+
+    });
+
+    const patient = this.add.image(centerX, centerY + 200, "Paziente").setScale(0.6).setInteractive({useHandCursor: true});
+    patient.on("pointerdown", () => {
+        this.scene.start("PatientScene");
+    });
+
+    }
+    update(){
+
+    }
+
+    buttonChoice(Chosen_number){
+        if(this.correctNumber === Chosen_number){
+            this.scene.start("DialogScene");
+        }
+        else{
+            alert("Opzione incorretta, ritenta");
+        }
+    }
+}
