@@ -17,7 +17,7 @@ const config = {
     HospitalScene,
     DialogScene,
     PatientScene,
-    //CartScene,
+    CartScene,
     //EndScene
   ],
 
