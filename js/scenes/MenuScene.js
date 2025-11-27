@@ -3,7 +3,7 @@ class MenuScene extends Phaser.Scene{
         super({key : "MenuScene"});
     }
     preload(){
-        this.load.image("IconaMenu", "img/Menu.PNG");
+        this.load.image("IconaMenu", "img/Menu.png");
     }
     create(){
         const centerX = this.scale.width / 2;

@@ -1,6 +1,7 @@
 class HospitalScene extends Phaser.Scene{
 
-    telephoneOn = false;
+    convOn = false;
+    clickedCorOpt = false;
     correctNumber = 1;
     ordineClick = false; //false se il paziente viene cliccato prima del telefono, true l'inverso
     constructor(){
@@ -32,6 +33,13 @@ class HospitalScene extends Phaser.Scene{
 
     telephone.on("pointerdown", () => {
         
+        if(this.convOn){
+            this.deletePhoneConvo();
+            this.convOn = false;
+            return;
+        }
+
+        this.convOn = true;
         const optioncords = {x: centerX - centerX / 2 + 160, y: centerY}
         this.phoneConvo = this.add.image(centerX - centerX / 2 + 150, centerY, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
         
@@ -80,7 +88,11 @@ class HospitalScene extends Phaser.Scene{
 
     const patient = this.add.image(centerX, centerY + 200, "Paziente").setScale(0.6).setInteractive({useHandCursor: true});
     patient.on("pointerdown", () => {
-        this.scene.start("PatientScene");
+        if(this.clickedCorOpt){
+            this.scene.start("PatientScene");
+        }else{
+            alert("Non ancora, prima toccare il telefono")
+        }
     });
 
     }
@@ -90,10 +102,21 @@ class HospitalScene extends Phaser.Scene{
 
     buttonChoice(Chosen_number){
         if(this.correctNumber === Chosen_number){
-            this.scene.start("DialogScene");
+            this.clickedCorOpt = true;
         }
         else{
             alert("Opzione incorretta, ritenta");
         }
+        this.deletePhoneConvo();
+    };
+
+    deletePhoneConvo(){
+        this.optRect1.destroy();
+        this.optRect2.destroy();
+        this.optRect3.destroy();
+        this.phoneConvo.destroy();
+        this.option1.destroy();
+        this.option2.destroy();
+        this.option3.destroy();
     }
 }
