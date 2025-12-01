@@ -18,7 +18,7 @@ const config = {
     DialogScene,
     PatientScene,
     CartScene,
-    //EndScene
+    EndScene
   ],
 
   //scala in maniera automatica il "teatro"
