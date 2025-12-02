@@ -3,8 +3,7 @@ class CartScene extends Phaser.Scene{
         super({key: "CartScene"});
     }
 
-    points = 0
-    maxScore = 40;
+    usedItems = 2;
     gameEnded = false;
     patientCart = null;
     pointsText = null;
@@ -34,7 +33,7 @@ class CartScene extends Phaser.Scene{
         this.adrenalina = this.add.image(-550, - 550,  "Adrenalina").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
         this.nacl = this.add.image(-550, -550, "Nacl").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
 
-        this.pointsText = this.add.text(centerX, centerY * 0.10, this.points, {
+        this.pointsText = this.add.text(centerX, centerY * 0.10, gameState.score, {
             fontSize: "24px",
             color: "#2c3e50",
             fontFamily: "Arial"
@@ -75,24 +74,27 @@ class CartScene extends Phaser.Scene{
     }
         
     update(){
-        if(!this.gameEnded && this.points === this.maxScore){
+
+        if(!this.gameEnded && this.usedItems === 0){
             this.GameEnded = true;
             this.scene.start("EndScene");
         }
 
-        if(this.pickedAdrenaline && this.checkCollision(this.adrenalina, this.patientCart)){
+        if(!this.GameEnded && this.pickedAdrenaline && this.checkCollision(this.adrenalina, this.patientCart)){
             this.pickedAdrenaline = false;
             this.adrenalina.destroy();
             this.adrenalinaText.destroy();
-            this.points += 20;
-            this.pointsText.setText(this.points);
+            gameState.score += 20;
+            this.pointsText.setText(gameState.score);
+            this.usedItems --;
         }
-        if(this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)){
+        if(!this.GameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)){
             this.pickedNacl = false;
             this.nacl.destroy();
             this.naclText.destroy();
-            this.points += 20;
-            this.pointsText.setText(this.points);
+            gameState.score += 20;
+            this.pointsText.setText(gameState.score);
+            this.usedItems --;
         }
 
         if(this.pickedAdrenaline){
