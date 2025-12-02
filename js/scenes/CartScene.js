@@ -85,7 +85,7 @@ class CartScene extends Phaser.Scene{
             this.adrenalina.destroy();
             this.adrenalinaText.destroy();
             gameState.score += 20;
-            this.pointsText.setText(gameState.score);
+            this.pointsText.setText("score: " + gameState.score);
             this.usedItems --;
         }
         if(!this.GameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)){
@@ -93,7 +93,7 @@ class CartScene extends Phaser.Scene{
             this.nacl.destroy();
             this.naclText.destroy();
             gameState.score += 20;
-            this.pointsText.setText(gameState.score);
+            this.pointsText.setText("score: " + gameState.score);
             this.usedItems --;
         }
 
