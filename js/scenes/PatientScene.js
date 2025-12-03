@@ -1,5 +1,9 @@
 class PatientScene extends Phaser.Scene{
 
+
+    answer1Box = null;
+    answer2Box = null;
+    answer3Box = null;
     ordCounter = 0;
     constructor(){
         super({key: "PatientScene"})
@@ -20,9 +24,9 @@ class PatientScene extends Phaser.Scene{
         })
 
         const questionBox = this.createBox(this.scale.width * 0.58, centerY * 0.1 + 100, 400, 100);
-        const answer1Box = this.createBox(this.scale.width * 0.63, centerY * 0.4 + 130, 300, 50);
-        const answer2Box = this.createBox(this.scale.width * 0.63, centerY * 0.6 + 130, 300, 50);
-        const answer3Box = this.createBox(this.scale.width * 0.63, centerY * 0.8 + 130, 300, 50);
+        this.answer1Box = this.createBox(this.scale.width * 0.63, centerY * 0.4 + 130, 300, 50);
+        this.answer2Box = this.createBox(this.scale.width * 0.63, centerY * 0.6 + 130, 300, 50);
+        this.answer3Box = this.createBox(this.scale.width * 0.63, centerY * 0.8 + 130, 300, 50);
 
         this.add.text(this.scale.width * 0.58, centerY * 0.1 + 100, "Il paziente non risponde\n\n Come procedi?", {
             fontSize: "24px",
@@ -56,9 +60,12 @@ class PatientScene extends Phaser.Scene{
             if(this.ordCounter != 0){
                 this.ordCounter = 0;
                 alert("sbagliata sequenza");
+                this.setDefault();
             }else{
-                answer1Box.fillStyle(0xff0000);
-                this.ordCounter = 1
+                this.ordCounter = 1;
+                this.answer1Box.clear();
+                this.answer1Box.fillStyle(0x27ae60, 1);
+                this.answer1Box.fillRoundedRect(this.scale.width * 0.63, centerY * 0.4 + 130, 300, 50);
             }
         });
 
@@ -66,9 +73,12 @@ class PatientScene extends Phaser.Scene{
             if(this.ordCounter != 1){
                 this.ordCounter = 0;
                 alert("sbagliata sequenza");
+                this.setDefault();
             }else{
-                answer2Box.fillStyle(0x27ae60);
                 this.ordCounter = 2
+                this.answer2Box.clear();
+                this.answer2Box.fillStyle(0x27ae60, 1);
+                this.answer2Box.fillRoundedRect(this.scale.width * 0.63, centerY * 0.6 + 130, 300, 50);
             }
         });
 
@@ -77,8 +87,11 @@ class PatientScene extends Phaser.Scene{
                 this.ordCounter = 0;
                 alert("sbagliata sequenza");
             }else{
-                answer3Box.fillStyle(0x27ae60);
+                this.answer3Box.fillStyle(0x27ae60);
                 this.ordCounter = 3;
+                this.answer3Box.clear();
+                this.answer3Box.fillStyle(0x27ae60, 1);
+                this.answer3Box.fillRoundedRect(this.scale.width * 0.63, centerY * 0.8 + 130, 300, 50);
                 alert("andiamo a salvare il paziente");
                 this.scene.start("CartScene");
             }
@@ -87,6 +100,7 @@ class PatientScene extends Phaser.Scene{
     }
     update(){
 
+        
     }
     createBox(valueX, valueY, width, height){
         const box = this.add.graphics(valueX, valueY, width, height);
@@ -98,9 +112,10 @@ class PatientScene extends Phaser.Scene{
     }
 
     setDefault(){
-        answer1Box.fillStyle(0xecf0f1, 1);
-        answer2Box.fillStyle(0xecf0f1, 1);
-        answer3Box.fillStyle(0xecf0f1, 1);
+        this.answer1Box.clear();
+        this.answer1Box.fillStyle(0xecf0f1, 1);
+        this.answer2Box.fillStyle(0xecf0f1, 1);
+        this.answer3Box.fillStyle(0xecf0f1, 1);
     }
 
 }

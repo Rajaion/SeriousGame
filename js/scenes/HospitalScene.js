@@ -97,7 +97,7 @@ class HospitalScene extends Phaser.Scene{
 
     }
     update(){
-
+        
     }
 
     buttonChoice(Chosen_number){
