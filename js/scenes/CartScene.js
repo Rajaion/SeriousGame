@@ -40,7 +40,7 @@ class CartScene extends Phaser.Scene{
         this.adrenalina = this.add.image(-550, - 550,  "Adrenalina").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
         this.nacl = this.add.image(-550, -550, "Nacl").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
 
-        this.pointsText = this.add.text(centerX, centerY * 0.10, gameState.score, {
+        this.pointsText = this.add.text(centerX, centerY * 0.10,"Score: " + gameState.score, {
             fontSize: "24px",
             color: "#2c3e50",
             fontFamily: "Arial"
@@ -86,7 +86,7 @@ class CartScene extends Phaser.Scene{
             this.adrenalina.destroy();
             this.adrenalinaText.destroy();
             gameState.score += 20;
-            this.pointsText.setText("score: " + gameState.score);
+            this.pointsText.setText("Score: " + gameState.score);
             this.usedItems --;
             this.medicineOrder ++;
         }
@@ -95,14 +95,15 @@ class CartScene extends Phaser.Scene{
                 this.pickedNacl = false;
                 this.naclSpawn();
                 gameState.score -= 20;
-                this.pointsText.setText("score: " + gameState.score);
+                gameState.errors.Cart = gameState.errors.Cart + 1;
+                this.pointsText.setText("Score: " + gameState.score);
                 return;
             }
             this.pickedNacl = false;
             this.nacl.destroy();
             this.naclText.destroy();
             gameState.score += 20;
-            this.pointsText.setText("score: " + gameState.score);
+            this.pointsText.setText("Score: " + gameState.score);
             this.usedItems --;
         }
 
