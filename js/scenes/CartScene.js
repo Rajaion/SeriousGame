@@ -3,7 +3,8 @@ class CartScene extends Phaser.Scene{
         super({key: "CartScene"});
     }
 
-    usedItems = 2;
+    medicineOrder;
+    usedItems;
     gameEnded = false;
     patientCart = null;
     pointsText = null;
@@ -12,7 +13,8 @@ class CartScene extends Phaser.Scene{
     adrenalinaText = null;
     naclText = null;
     pickedAdrenaline = false;
-    pickedNacl = false;
+    cart = null;
+    pickedNacl;
 
     preload(){
         this.load.image("Cart", "img/Cart.png");
@@ -23,12 +25,17 @@ class CartScene extends Phaser.Scene{
     }
 
     create(){
+        this.gameEnded = false;
+        this.pickedNacl = false;
+        this.usedItems = 2;
+        this.medicineOrder = 0;
+
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
 
         this.add.image(centerX * 0.20, centerY, "Elettrocardiogramma").setScale(0.4);
         this.patientCart = this.add.image(centerX * 0.90, centerY * 1.40, "PatientCart").setScale(0.8).setInteractive({useHandCursor: "true"});
-        const cart = this.add.image(centerX * 1.60, centerY * 1.70, "Cart").setScale(0.5).setInteractive({useHandCursor: "true"});
+        this.cart = this.add.image(centerX * 1.60, centerY * 1.70, "Cart").setScale(0.5).setInteractive({useHandCursor: "true"});
 
         this.adrenalina = this.add.image(-550, - 550,  "Adrenalina").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
         this.nacl = this.add.image(-550, -550, "Nacl").setScale(0.15).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
@@ -51,16 +58,10 @@ class CartScene extends Phaser.Scene{
             fontFamily: "Arial"
         }).setOrigin(0.5, 0.5);
 
-        cart.on("pointerdown", () => {
-            this.adrenalina.x = cart.x + 30;
-            this.adrenalina.y = cart.y;
-            this.adrenalinaText.x = this.adrenalina.x;
-            this.adrenalinaText.y = this.adrenalina.y - 50;
-            this.nacl.x = cart.x - 30;
-            this.nacl.y = cart.y;
-            this.naclText.x = this.nacl.x;
-            this.naclText.y = this.nacl.y - 50;
-            cart.setInteractive({useHandCursor: false});
+        this.cart.on("pointerdown", () => {
+            this.adrenSpawn();
+            this.naclSpawn();
+            this.cart.setInteractive({useHandCursor: false});
         });
 
         this.adrenalina.on("pointerdown", () => {
@@ -87,8 +88,16 @@ class CartScene extends Phaser.Scene{
             gameState.score += 20;
             this.pointsText.setText("score: " + gameState.score);
             this.usedItems --;
+            this.medicineOrder ++;
         }
         if(!this.GameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)){
+            if(this.usedItems === 2){
+                this.pickedNacl = false;
+                this.naclSpawn();
+                gameState.score -= 20;
+                this.pointsText.setText("score: " + gameState.score);
+                return;
+            }
             this.pickedNacl = false;
             this.nacl.destroy();
             this.naclText.destroy();
@@ -110,6 +119,20 @@ class CartScene extends Phaser.Scene{
         const box2 = obj2.getBounds();
 
         return Phaser.Geom.Intersects.RectangleToRectangle(box1, box2); 
+    }
+
+    adrenSpawn(){
+        this.adrenalina.x = this.cart.x + 30;
+        this.adrenalina.y = this.cart.y;
+        this.adrenalinaText.x = this.adrenalina.x;
+        this.adrenalinaText.y = this.adrenalina.y - 50;
+    }
+
+    naclSpawn(){
+        this.nacl.x = this.cart.x - 30;
+        this.nacl.y = this.cart.y;
+        this.naclText.x = this.nacl.x;
+        this.naclText.y = this.nacl.y - 50;
     }
 
     moveObjAndText(obj, text){

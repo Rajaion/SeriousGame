@@ -15,10 +15,10 @@ const config = {
     MenuScene, 
     IntroScene,
     HospitalScene,
-    DialogScene,
     PatientScene,
     CartScene,
-    EndScene
+    EndScene,
+    ReviewScene,
   ],
 
   //scala in maniera automatica il "teatro"
