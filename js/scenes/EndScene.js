@@ -40,7 +40,11 @@ class EndScene extends Phaser.Scene{
 
             reviewButton.on("pointerout", () => {
                 reviewButton.setStyle({backgroundColor: "#27ae60"});
-             });
+            });
+
+            reviewButton.on("pointerdown", () => {
+                this.scene.start("ReviewScene");
+            });
 
             const patient = this.add.image(centerX, centerY - 200, "HappyPatient").setScale(0.7);
     }

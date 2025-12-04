@@ -1,7 +1,7 @@
 const gameState = {
   score: 0,
   maxScore: 100,
-  errors: [],
+  errors: {Hospital: 0, Patient: 0, Cart: 0},
   currentChoice: null,
 }
 

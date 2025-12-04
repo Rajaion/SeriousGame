@@ -4,6 +4,7 @@ class HospitalScene extends Phaser.Scene{
     clickedCorOpt = false;
     correctNumber = 1;
     ordineClick = false; //false se il paziente viene cliccato prima del telefono, true l'inverso
+    scoreText = null;
     constructor(){
         super({key: "HospitalScene"});
     }
@@ -23,13 +24,19 @@ class HospitalScene extends Phaser.Scene{
     box.lineStyle(2, 0x2c3e50, 1);
     box.strokeRoundedRect(centerX + 100, centerY - 100, 400, 100, 0);
 
+    this.scoreText = this.add.text(centerX, 50, "Score: " + gameState.score, {
+        fontSize: "20px",
+        align: "center",
+        
+    }).setOrigin(0.5);
+
     const infoPaziente = this.add.text(centerX + 300, centerY - 50, 'hai già constatato che\nil paziente non risponde', {
         fontSize: '20px',
         color: '#2c3e50',
         align: 'center'
     }).setOrigin(0.5);
 
-    const telephone = this.add.image(150, centerY, "Phone").setScale(0.3).setInteractive({useHandCursor: true});
+    const telephone = this.add.image(150, centerY - 10, "Phone").setScale(0.5).setInteractive({useHandCursor: true});
 
     telephone.on("pointerdown", () => {
         
@@ -91,7 +98,10 @@ class HospitalScene extends Phaser.Scene{
         if(this.clickedCorOpt){
             this.scene.start("PatientScene");
         }else{
-            alert("Non ancora, prima toccare il telefono")
+            gameState.errors.Hospital ++;
+            gameState.score -= 2;
+            this.scoreText.setText("Score:" + gameState.score)
+            alert("Non ancora, prima interagire con il telefono")
         }
     });
 
@@ -105,6 +115,9 @@ class HospitalScene extends Phaser.Scene{
             this.clickedCorOpt = true;
         }
         else{
+            gameState.errors.Hospital ++;
+            gameState.score -= 5;
+            this.scoreText.setText("Score: " + gameState.score)
             alert("Opzione incorretta, ritenta");
         }
         this.deletePhoneConvo();
