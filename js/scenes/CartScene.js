@@ -65,11 +65,19 @@ class CartScene extends Phaser.Scene{
         });
 
         this.adrenalina.on("pointerdown", () => {
-            this.pickedAdrenaline = !this.pickedAdrenaline;
+            this.pickedAdrenaline = true;
         });
 
         this.nacl.on("pointerdown", () => {
-            this.pickedNacl = !this.pickedNacl;
+            this.pickedNacl = true;
+        });
+
+        this.adrenalina.on("pointerup", () => {
+            this.pickedAdrenaline = false;
+        });
+
+        this.nacl.on("pointerup", () => {
+            this.pickedNacl = false;
         })
         
     }
@@ -108,11 +116,9 @@ class CartScene extends Phaser.Scene{
         }
 
         if(this.pickedAdrenaline){
-            this.pickedNacl = false;
             this.moveObjAndText(this.adrenalina, this.adrenalinaText);
         }
         if(this.pickedNacl){
-            this.adrenalina = false;
             this.moveObjAndText(this.nacl, this.naclText);
         }
     }
