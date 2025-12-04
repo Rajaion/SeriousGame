@@ -108,12 +108,12 @@ class CartScene extends Phaser.Scene{
         }
 
         if(this.pickedAdrenaline){
-            this.moveObjAndText(this.adrenalina, this.adrenalinaText);
             this.pickedNacl = false;
+            this.moveObjAndText(this.adrenalina, this.adrenalinaText);
         }
         if(this.pickedNacl){
-            this.moveObjAndText(this.nacl, this.naclText);
             this.adrenalina = false;
+            this.moveObjAndText(this.nacl, this.naclText);
         }
     }
 
