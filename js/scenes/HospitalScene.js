@@ -40,6 +40,11 @@ class HospitalScene extends Phaser.Scene{
 
     telephone.on("pointerdown", () => {
         
+        if(this.clickedCorOpt){
+             telephone.setInteractive({useHandCursor: false});
+            return;
+        }
+
         if(this.convOn){
             this.deletePhoneConvo();
             this.convOn = false;
