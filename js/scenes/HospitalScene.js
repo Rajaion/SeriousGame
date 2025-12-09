@@ -1,5 +1,7 @@
 class HospitalScene extends Phaser.Scene{
 
+    centerX = null;
+    centerY = null;
     convOn = false;
     clickedCorOpt = false;
     correctNumber = 1;
@@ -15,31 +17,40 @@ class HospitalScene extends Phaser.Scene{
     }
     create(){
 
-    const centerX = this.scale.width / 2;
-    const centerY = this.scale.height / 2;
+    this.centerX = this.scale.width / 2;
+    this.centerY = this.scale.height / 2;
     
     const box = this.add.graphics();
     box.fillStyle(0xecf0f1, 1);
-    box.fillRoundedRect(centerX + 100, centerY - 100, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
+    box.fillRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
     box.lineStyle(2, 0x2c3e50, 1);
-    box.strokeRoundedRect(centerX + 100, centerY - 100, 400, 100, 0);
+    box.strokeRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0);
 
-    this.scoreText = this.add.text(centerX, 50, "Score: " + gameState.score, {
+    this.scoreText = this.add.text(this.centerX, 50, "Score: " + gameState.score, {
         fontSize: "20px",
         align: "center",
         
-    }).setOrigin(0.5);
+    }).setOrigin(0.5);this
 
-    const infoPaziente = this.add.text(centerX + 300, centerY - 50, 'hai già constatato che\nil paziente non risponde', {
+    const wrongChoice = this.add.text(this.centerX, this.centerY, "WrongChoice", {
+        
+    });
+
+    const infoPaziente = this.add.text(this.centerX + 300, this.centerY - 50, 'hai già constatato che\nil paziente non risponde', {
         fontSize: '20px',
         color: '#2c3e50',
         align: 'center'
     }).setOrigin(0.5);
 
-    const telephone = this.add.image(150, centerY - 10, "Phone").setScale(0.5).setInteractive({useHandCursor: true});
+    const telephone = this.add.image(200, this.centerY - 30, "Phone").setScale(0.5).setInteractive({useHandCursor: true});
 
     telephone.on("pointerdown", () => {
         
+        if(this.clickedCorOpt){
+            return;
+            telephone.setInteractive({useHandCursor: false});
+        }
+
         if(this.convOn){
             this.deletePhoneConvo();
             this.convOn = false;
@@ -47,8 +58,8 @@ class HospitalScene extends Phaser.Scene{
         }
 
         this.convOn = true;
-        const optioncords = {x: centerX - centerX / 2 + 160, y: centerY}
-        this.phoneConvo = this.add.image(centerX - centerX / 2 + 150, centerY, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
+        const optioncords = {x: this.centerX - this.centerX / 2 + 160, y: this.centerY}
+        this.phoneConvo = this.add.image(this.centerX - this.centerX / 2 + 150, this.centerY, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
         
         optioncords.y -= 49;
         
@@ -93,7 +104,8 @@ class HospitalScene extends Phaser.Scene{
 
     });
 
-    const patient = this.add.image(centerX, centerY + 200, "Paziente").setScale(0.6).setInteractive({useHandCursor: true});
+    const patient = this.add.image(this.centerX, this.centerY + 200, "Paziente").setScale(0.6).setInteractive({useHandCursor: true});
+
     patient.on("pointerdown", () => {
         if(this.clickedCorOpt){
             this.scene.start("PatientScene");
@@ -111,17 +123,35 @@ class HospitalScene extends Phaser.Scene{
     }
 
     buttonChoice(Chosen_number){
-        if(this.correctNumber === Chosen_number){
+        if(this.correctNumber === Chosen_number ){
             this.clickedCorOpt = true;
         }
         else{
             gameState.errors.Hospital ++;
             gameState.score -= 5;
             this.scoreText.setText("Score: " + gameState.score)
-            alert("Opzione incorretta, ritenta");
+            this.clickedWrongChoice();
         }
         this.deletePhoneConvo();
     };
+
+    clickedWrongChoice(){
+        const wrongChoiceText = this.add.text(this.centerX, this.centerY - this.centerY / 3, "Careful,\n\nchoose the correct option", {
+            align: "center",
+            fontSize: "20px",
+            color: "ff0000",
+        }).setOrigin(0.5).setAlpha(0);
+
+        
+
+        this.tweens.add({
+            targets: wrongChoiceText,
+            alpha: 1,
+            duration: 1000,
+        });
+
+
+    }
 
     deletePhoneConvo(){
         this.optRect1.destroy();
