@@ -70,6 +70,8 @@ class HospitalScene extends Phaser.Scene{
             color: '#2c3e50',
             align: 'center'
         }).setOrigin(0.5, 0.5);
+
+        
         
         optioncords.y += 45;
         
