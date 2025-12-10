@@ -5,6 +5,7 @@ class HospitalScene extends Phaser.Scene{
     convOn = false;
     clickedCorOpt = false;
     correctNumber = 1;
+    wrongChoiceText;
     ordineClick = false; //false se il paziente viene cliccato prima del telefono, true l'inverso
     scoreText = null;
     constructor(){
@@ -30,11 +31,14 @@ class HospitalScene extends Phaser.Scene{
         fontSize: "20px",
         align: "center",
         
-    }).setOrigin(0.5);this
+    }).setOrigin(0.5);
 
-    const wrongChoice = this.add.text(this.centerX, this.centerY, "WrongChoice", {
-        
-    });
+    this.wrongChoiceText = this.add.text(this.centerX, this.centerY - this.centerY / 1.5, "Careful,\n\nchoose the correct option", {
+            align: "center",
+            fontSize: "20px",
+            color: "#ff0000",
+            padding: {x:15, Y:5}
+        }).setOrigin(0.5).setAlpha(0);
 
     const infoPaziente = this.add.text(this.centerX + 300, this.centerY - 50, 'hai già constatato che\nil paziente non risponde', {
         fontSize: '20px',
@@ -138,19 +142,15 @@ class HospitalScene extends Phaser.Scene{
     };
 
     clickedWrongChoice(){
-        const wrongChoiceText = this.add.text(this.centerX, this.centerY - this.centerY / 3, "Careful,\n\nchoose the correct option", {
-            align: "center",
-            fontSize: "20px",
-            color: "ff0000",
-        }).setOrigin(0.5).setAlpha(0);
 
-        
+        this.wrongChoiceText.setAlpha(1);
 
-        this.tweens.add({
-            targets: wrongChoiceText,
-            alpha: 1,
-            duration: 1000,
+        this.tweens.add({ //Aggiunge animazioni, fa scomparire la scritta in 2 secondi
+            targets: this.wrongChoiceText,
+            alpha: 0,
+            duration: 2000,
         });
+
 
 
     }
