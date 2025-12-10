@@ -116,15 +116,14 @@ class PatientScene extends Phaser.Scene{
     createBox(valueX, valueY, width, height){
         const box = this.add.graphics(valueX, valueY, width, height);
         box.fillStyle(0xecf0f1, 1);
-        box.fillRoundedRect(valueX, valueY, width, height, 5); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 5 (maggiore valore -> maggiore arrotondamento)
-        box.lineStyle(2, 0x2c3e50, 1);
+        box.fillRoundedRect(valueX, valueY, width, height, 5); 
         box.strokeRoundedRect(valueX, valueY, width , height, 5);
         return box;
     }
 
     setGreen(box, x, y, width, height){
         box.fillStyle(0x27ae60, 1);
-        box.fillRoundedRect(x, y, width, height, 1); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 5 (maggiore valore -> maggiore arrotondamento)
+        box.fillRoundedRect(x, y, width, height, 1); 
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(x, y. width, height, 1)
     }
@@ -138,7 +137,7 @@ class PatientScene extends Phaser.Scene{
     setEachDefault(box, x, y, width, height){
         box.clear();
         box.fillStyle(0xffffff, 1);
-        box.fillRoundedRect(x, y, width, height, 5); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 5 (maggiore valore -> maggiore arrotondamento)
+        box.fillRoundedRect(x, y, width, height, 5); 
         box.lineStyle(2, 0x000000, 1);
         box.strokeRoundedRect(x, y, width , height, 5);
     }

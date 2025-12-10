@@ -79,8 +79,9 @@ class HospitalScene extends Phaser.Scene{
         this.option1 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione1, {
             fontSize: "20px",
             color: '#2c3e50',
-            align: 'center'
-        }).setOrigin(0.5, 0.5);
+            align: 'center',
+            wordWrap: {width: 300, height: 30}
+        }).setOrigin(0.5);
 
         
         
@@ -91,8 +92,9 @@ class HospitalScene extends Phaser.Scene{
         this.option2 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione2, {
             fontSize: "20px",
             color: '#2c3e50',
-            align: 'center'
-        }).setOrigin(0.5, 0.5);
+            align: 'center',
+            wordWrap: {width: 300, height: 20}
+        }).setOrigin(0.5);
 
         optioncords.y += 45;
         this.optRect3 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
@@ -100,8 +102,9 @@ class HospitalScene extends Phaser.Scene{
         this.option3 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione3, {
             fontSize: "20px",
             color: '#2c3e50',
-            align: 'center'
-        }).setOrigin(0.5, 0.5);
+            align: 'center',
+            wordWrap: {width: 300, height: 20}
+        }).setOrigin(0.5);
 
         this.optRect1.on("pointerdown", () => {
             this.buttonChoice(1);

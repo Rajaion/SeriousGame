@@ -1,6 +1,6 @@
 Inserire qui dentro le rispettive opzioni del telefono: (Andare a capo con "/n")
 
-#Option1: Casella1
+#Option1: Andare a prendere adrenalina per il paziente
 #Option2: Casella2
 #Option3: Casella3
 
