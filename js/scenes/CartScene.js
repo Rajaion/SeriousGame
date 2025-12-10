@@ -6,6 +6,7 @@ class CartScene extends Phaser.Scene{
     medicineOrder;
     usedItems;
     gameEnded = false;
+    wrongMedicine = null;
     patientCart = null;
     pointsText = null;
     adrenalina = null;
@@ -33,6 +34,13 @@ class CartScene extends Phaser.Scene{
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
 
+        this.wrongMedicine = this.add.text(centerX, centerY * 0.3, "Attento!\nLe medicine devono essere date in ordine!", {
+            fontSize: "24px",
+            color: "#ff0000",
+            align: "center",
+            lineSpacing: -5
+        }).setOrigin(0.5).setAlpha(0);
+
         this.add.image(centerX * 0.20, centerY, "Elettrocardiogramma").setScale(0.4);
         this.patientCart = this.add.image(centerX * 0.90, centerY * 1.40, "PatientCart").setScale(0.8).setInteractive({useHandCursor: "true"});
         this.cart = this.add.image(centerX * 1.60, centerY * 1.70, "Cart").setScale(0.5).setInteractive({useHandCursor: "true"});
@@ -44,19 +52,19 @@ class CartScene extends Phaser.Scene{
             fontSize: "24px",
             color: "#2c3e50",
             fontFamily: "Arial"
-        })
+        }).setOrigin(0.5);
 
         this.adrenalinaText = this.add.text(-550, -550, "Adrenalina", {
             fontSize: "18px",
             color: "#2c3e50",
             fontFamily: "Arial"
-        }).setOrigin(0.5, 0.5);
+        }).setOrigin(0.5);
 
         this.naclText = this.add.text(-550, -550, "Nacl", {
             fontSize: "18px",
             color: "#2c3e50",
             fontFamily: "Arial"
-        }).setOrigin(0.5, 0.5);
+        }).setOrigin(0.5);
 
         this.cart.on("pointerdown", () => {
             this.adrenSpawn();
@@ -102,6 +110,7 @@ class CartScene extends Phaser.Scene{
             if(this.usedItems === 2){
                 this.pickedNacl = false;
                 this.naclSpawn();
+                this.clickedWrongChoice();
                 gameState.score -= 20;
                 gameState.errors.Cart = gameState.errors.Cart + 1;
                 this.pointsText.setText("Score: " + gameState.score);
@@ -142,6 +151,18 @@ class CartScene extends Phaser.Scene{
         this.nacl.y = this.cart.y;
         this.naclText.x = this.nacl.x;
         this.naclText.y = this.nacl.y - 50;
+    }
+
+    clickedWrongChoice(){
+
+        this.wrongMedicine.setAlpha(1);
+
+        this.tweens.add({ //Aggiunge animazioni, fa scomparire la scritta in 2 secondi
+            targets: this.wrongMedicine,
+            alpha: 0,
+            duration: 2000,
+        });
+
     }
 
     moveObjAndText(obj, text){

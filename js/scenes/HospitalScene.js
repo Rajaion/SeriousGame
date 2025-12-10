@@ -3,6 +3,9 @@ class HospitalScene extends Phaser.Scene{
     centerX = null;
     centerY = null;
     convOn = false;
+    opzione1 = "default";
+    opzione2 = "default";
+    opzione3 = "default";
     clickedCorOpt = false;
     correctNumber = 1;
     wrongChoiceText;
@@ -12,6 +15,8 @@ class HospitalScene extends Phaser.Scene{
         super({key: "HospitalScene"});
     }
     preload(){
+        this.load.text("phoneOptions", "text/Phone.txt")
+
         this.load.image("convBox", "img/TextBoxLeft.png");
         this.load.image("Phone", "img/Phone.png");
         this.load.image("Paziente", "img/Paziente.png");
@@ -26,6 +31,8 @@ class HospitalScene extends Phaser.Scene{
     box.fillRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
     box.lineStyle(2, 0x2c3e50, 1);
     box.strokeRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0);
+
+    this.getPhonetext(this.cache.text.get("phoneOptions"));
 
     this.scoreText = this.add.text(this.centerX, 50, "Score: " + gameState.score, {
         fontSize: "20px",
@@ -69,7 +76,7 @@ class HospitalScene extends Phaser.Scene{
         
         this.optRect1 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 74%, 67%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect1.setStrokeStyle(3, 0x000000);
-        this.option1 = this.add.text(optioncords.x, optioncords.y, "Opzione 1", {
+        this.option1 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione1, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center'
@@ -81,7 +88,7 @@ class HospitalScene extends Phaser.Scene{
         
         this.optRect2 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect2.setStrokeStyle(3, 0x000000);
-        this.option2 = this.add.text(optioncords.x, optioncords.y, "Opzione 2", {
+        this.option2 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione2, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center'
@@ -90,7 +97,7 @@ class HospitalScene extends Phaser.Scene{
         optioncords.y += 45;
         this.optRect3 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect3.setStrokeStyle(3, 0x000000);
-        this.option3 = this.add.text(optioncords.x, optioncords.y, "Opzione 3", {
+        this.option3 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione3, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center'
@@ -151,8 +158,31 @@ class HospitalScene extends Phaser.Scene{
             duration: 2000,
         });
 
+    }
 
+    getPhonetext(fullText){
+        
+        const opzioni = fullText.split("\n");
+        let i = 4; //const non cambia mentre let può
+        let riga = 0;
+        while(i!=0 || riga > opzioni.length - 1){
+            riga++;
+            if (opzioni[riga].substring(0, 9) === "#Option1:"){
+                this.opzione1 = opzioni[riga].substring(10);
+                i--;
+            }else if(opzioni[riga].substring(0, 9) === "#Option2:"){
+                this.opzione2 = opzioni[riga].substring(10);
+                i--;
+            }else if(opzioni[riga].substring(0, 9) === "#Option3:"){
+                this.opzione3 = opzioni[riga].substring(10);
+                i--;
+            }else if(opzioni[riga].substring(0, 15) === "#CorrectOption:"){
+                this.correctNumber = Number(opzioni[riga].substring(16));
+                i--;
+            }
 
+        }
+        console.log(this.correctNumber);
     }
 
     deletePhoneConvo(){

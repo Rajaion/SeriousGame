@@ -1,0 +1,9 @@
+Inserire qui dentro le rispettive opzioni del telefono: (Andare a capo con "/n")
+
+#Option1: Casella1
+#Option2: Casella2
+#Option3: Casella3
+
+Inserire qui sotto invece l'opzione corretta da scegliere per il telefono
+
+#CorrectOption: 3

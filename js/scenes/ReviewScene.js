@@ -13,9 +13,9 @@ class ReviewScene extends Phaser.Scene{
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2; 
 
-        this.createBox(centerX, centerY / 2, 450, 60);
+        this.createBox(centerX, centerY * 0.3, 450, 60);
 
-        this.add.text(centerX, centerY / 2, "Vediamo gli errori fatti:", {
+        this.add.text(centerX, centerY * 0.3, "Vediamo gli errori fatti:", {
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
@@ -36,14 +36,14 @@ class ReviewScene extends Phaser.Scene{
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            wordWrap: {width: 550}
            }).setOrigin(0.5);
         }else{
             this.add.text(centerX, centerY / 2 + 100, "\nAttento, dovevi prima scegliere la opzione corretta da telefono \n per poi cliccare sul paziente ", {
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            wordWrap: {width: 550}
            }).setOrigin(0.5);
         }
 
@@ -53,7 +53,7 @@ class ReviewScene extends Phaser.Scene{
                 fontSize: "24px",
                 color: "#e22222ff",
                 align: "center",
-                padding: {x:30, y:20}
+                padding: {x:30, y:20},
            }).setOrigin(0.5);
 
         if(gameState.errors.Patient === 0){
@@ -61,14 +61,15 @@ class ReviewScene extends Phaser.Scene{
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            padding: {x:30, y:20},
+            wordWrap: {width: 650}
            }).setOrigin(0.5);  
         }else{
             this.add.text(centerX, centerY / 2 + 200, "\nLa sequenza corretta è x, altrimenti (spiegare qui motivo ecc...)", {
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            wordWrap: {width: 700}
            }).setOrigin(0.5);    
         }
 
@@ -86,14 +87,14 @@ class ReviewScene extends Phaser.Scene{
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            wordWrap: {width: 700},
            }).setOrigin(0.5);  
         }else{
             this.add.text(centerX, centerY / 2 + 300, "\nSbagliato, l'ordine corretto era Adrenalina -> Nacl", {
             fontSize: "24px",
             color: "#000000ff",
             align: "center",
-            padding: {x:30, y:20}
+            wordWrap: {width: 700}
            }).setOrigin(0.5);    
         }
 
