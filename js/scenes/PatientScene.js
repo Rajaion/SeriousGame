@@ -8,6 +8,7 @@ class PatientScene extends Phaser.Scene{
     cords1 = null;
     cords2 = null;
     cords3 = null;
+    goNextText;
     constructor(){
         super({key: "PatientScene"})
     }
@@ -43,6 +44,12 @@ class PatientScene extends Phaser.Scene{
             align: "center",
             padding: {x:30, y:15}
         });
+
+        this.goNextText = this.add.text(centerX * 1.5, centerY * 1.8, "Corretto!\nOra andiamo a dare le medicine al paziente!", {
+            fontSize: "20px",
+            color: "#000000ff",
+            align: "center"
+        }).setOrigin(0.5).setAlpha(0);
 
         const text1 = this.add.text(this.scale.width * 0.655, centerY * 0.4 + 130, "Valutazione GAS", {
             fontSize: "22px",
@@ -94,8 +101,10 @@ class PatientScene extends Phaser.Scene{
                 alert("sbagliata sequenza");
             }else{
                 this.setGreen(this.answer3Box, this.scale.width * 0.63, centerY * 0.8 + 130, 300, 50);
-                alert("andiamo a salvare il paziente");
-                this.scene.start("CartScene");
+                this.goNextText.setAlpha(1);
+                this.time.delayedCall(3500, () =>{
+                    this.scene.start("CartScene");
+                })
             }
         });
 
