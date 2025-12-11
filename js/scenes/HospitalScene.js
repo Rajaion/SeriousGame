@@ -76,20 +76,18 @@ class HospitalScene extends Phaser.Scene{
         
         this.optRect1 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 74%, 67%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect1.setStrokeStyle(3, 0x000000);
-        this.option1 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione1, {
+        this.option1 = this.add.text(optioncords.x, optioncords.y + 10, this.opzione1, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center',
             wordWrap: {width: 300, height: 30}
         }).setOrigin(0.5);
 
-        
-        
         optioncords.y += 45;
         
         this.optRect2 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect2.setStrokeStyle(3, 0x000000);
-        this.option2 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione2, {
+        this.option2 = this.add.text(optioncords.x, optioncords.y + 10, this.opzione2, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center',
@@ -99,7 +97,7 @@ class HospitalScene extends Phaser.Scene{
         optioncords.y += 45;
         this.optRect3 = this.add.rectangle(optioncords.x, optioncords.y, 300, 40, "hsla(180, 9%, 59%, 1.00)", 0, 20).setInteractive({useHandCursor: true});
         this.optRect3.setStrokeStyle(3, 0x000000);
-        this.option3 = this.add.text(optioncords.x, optioncords.y + 15, this.opzione3, {
+        this.option3 = this.add.text(optioncords.x, optioncords.y + 10, this.opzione3, {
             fontSize: "20px",
             color: '#2c3e50',
             align: 'center',
