@@ -40,9 +40,9 @@ class HospitalScene extends Phaser.Scene{
         
     }).setOrigin(0.5);
 
-    this.wrongChoiceText = this.add.text(this.centerX, this.centerY - this.centerY / 1.5, "Careful,\n\nchoose the correct option", {
+    this.wrongChoiceText = this.add.text(this.centerX, this.centerY - this.centerY / 1.5, "Careful,\nchoose the correct option", {
             align: "center",
-            fontSize: "20px",
+            fontSize: "28px",
             color: "#ff0000",
             padding: {x:15, Y:5}
         }).setOrigin(0.5).setAlpha(0);
@@ -126,10 +126,8 @@ class HospitalScene extends Phaser.Scene{
         if(this.clickedCorOpt){
             this.scene.start("PatientScene");
         }else{
-            gameState.errors.Hospital ++;
-            gameState.score -= 2;
             this.scoreText.setText("Score:" + gameState.score)
-            alert("Non ancora, prima interagire con il telefono")
+            this.clickedOption("Interagire prima con il telefono", false)
         }
     });
 
@@ -140,25 +138,32 @@ class HospitalScene extends Phaser.Scene{
 
     buttonChoice(Chosen_number){
         if(this.correctNumber === Chosen_number ){
+            this.clickedOption("Corretto!\nOra andiamo a fare un check-up sul paziente", true)
             this.clickedCorOpt = true;
         }
         else{
             gameState.errors.Hospital ++;
             gameState.score -= 5;
             this.scoreText.setText("Score: " + gameState.score)
-            this.clickedWrongChoice();
+            this.clickedOption("Attenzione,\nscegliere l'opzione corretta", false);
         }
         this.deletePhoneConvo();
     };
 
-    clickedWrongChoice(){
+    clickedOption(info, win){ //info è il testo da far vedere, mentre win è un boolean che serve per capire se è stata presa l'opzione giusta o no
+
+        if(win){
+            this.wrongChoiceText.setColor("#167e30ff");
+        }
+
+        this.wrongChoiceText.setText(info)
 
         this.wrongChoiceText.setAlpha(1);
 
         this.tweens.add({ //Aggiunge animazioni, fa scomparire la scritta in 2 secondi
             targets: this.wrongChoiceText,
             alpha: 0,
-            duration: 2000,
+            duration: 3000,
         });
 
     }
@@ -168,7 +173,7 @@ class HospitalScene extends Phaser.Scene{
         const opzioni = fullText.split("\n");
         let i = 4; //const non cambia mentre let può
         let riga = 0;
-        while(i!=0 || riga > opzioni.length - 1){
+        while(i!=0){
             riga++;
             if (opzioni[riga].substring(0, 9) === "#Option1:"){
                 this.opzione1 = opzioni[riga].substring(10);

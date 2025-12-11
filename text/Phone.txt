@@ -1,9 +1,9 @@
-Inserire qui dentro le rispettive opzioni del telefono: (Andare a capo con "/n")
+Inserire dopo i rispettivi ":" le rispettive opzioni da mostrare sul telefono:
 
-#Option1: Andare a prendere adrenalina per il paziente
-#Option2: Casella2
-#Option3: Casella3
+#Option1: Chiamare i medici
+#Option2: Allertare l'ospedale
+#Option3: Altra opzione
 
-Inserire qui sotto invece l'opzione corretta da scegliere per il telefono
+Inserire qui sotto invece l'opzione corretta da scegliere per il telefono (da 1 a 3)
 
 #CorrectOption: 3

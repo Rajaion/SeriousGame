@@ -15,7 +15,7 @@ class IntroScene extends Phaser.Scene{
         box.fillStyle(0xecf0f1, 1);
         box.fillRoundedRect(centerX - 300, centerY - 200, 600, 300, 20); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
         box.lineStyle(2, 0x2c3e50, 1);
-        box.strokeRoundedRect(centerX - 300, centerY - 200, 600, 300, 10);
+        box.strokeRoundedRect(centerX - 300, centerY - 200, 600, 300, 20);
 
         this.add.text(centerX, centerY - 150, '🚨', {
             fontSize: "64px"
