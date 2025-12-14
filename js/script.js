@@ -6,12 +6,20 @@ const gameState = {
 }
 
 const config = {
- type: Phaser.AUTO,
+    type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT,              // Adatta allo schermo
-        autoCenter: Phaser.Scale.CENTER_BOTH, // Centra
-        width: 1280,   // Larghezza base (proporzione 16:9)
-        height: 720    // Altezza base
+        mode: Phaser.Scale.FIT,              // Mantiene proporzioni
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Centrato
+        width: 1280,   // Larghezza base
+        height: 720,   // Altezza base (16:9)
+        min: {
+            width: 800,   // ← Larghezza minima (non diventa troppo piccolo)
+            height: 450
+        },
+        max: {
+            width: 1920,  // Larghezza massima
+            height: 1080
+        }
     },
     backgroundColor: '#5bc0de',
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, ReviewScene, EndScene],
