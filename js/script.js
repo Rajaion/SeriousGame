@@ -12,14 +12,6 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH, // Centrato
         width: 1280,   // Larghezza base
         height: 720,   // Altezza base (16:9)
-        min: {
-            width: 800,   // ← Larghezza minima (non diventa troppo piccolo)
-            height: 450
-        },
-        max: {
-            width: 1920,  // Larghezza massima
-            height: 1080
-        }
     },
     backgroundColor: '#5bc0de',
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, ReviewScene, EndScene],
