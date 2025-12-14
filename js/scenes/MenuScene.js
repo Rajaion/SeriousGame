@@ -9,15 +9,15 @@ class MenuScene extends Phaser.Scene{
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
 
-        this.add.image(centerX, centerY - 100, 'IconaMenu').setScale(0.5);
+        this.add.image(centerX, centerY * 0.8, 'IconaMenu').setScale(0.5);
 
-        this.add.text(centerX, centerY + 50, 'Emergenza medica', {
+        this.add.text(centerX, centerY * 1.2 , 'Emergenza medica', {
             fontSize: "48px",
             color: "#2c3e50",
             fontFamily: "Arial"
         }).setOrigin(0.5);
     
-        const startButton = this.add.text(centerX, centerY + 130, "Start", {
+        const startButton = this.add.text(centerX, centerY * 1.4, "Start", {
             fontSize: "32px",
             color: "#ffffff",
             backgroundColor: "#302121",

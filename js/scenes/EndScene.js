@@ -24,14 +24,12 @@ class EndScene extends Phaser.Scene{
                 fontSize: "24px",
                 color: "#000000ff",
                 align: "center",
-                padding: {x:30, y:15}
             }).setOrigin(0.5);
 
             const reviewButton = this.add.text(centerX, centerY + 210, "Vediamo gli errori", {
                 fontSize: "24px",
                 color: "#ffffff",
                 backgroundColor: "rgba(52, 219, 108, 1)",
-                padding: {x:30, y:15},
             }).setOrigin(0.5).setInteractive({useHandCursor: true});
             
             reviewButton.on("pointerover", () => {
