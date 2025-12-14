@@ -6,26 +6,15 @@ const gameState = {
 }
 
 const config = {
-  type: Phaser.CANVAS,
-  width: 1024,
-  height: 768,
-  parent: "game-container",
-  backgroundColor: "#43b2bc",
-  scene: [ //tutte le varie scene del wireFrame
-    MenuScene, 
-    IntroScene,
-    HospitalScene,
-    PatientScene,
-    CartScene,
-    EndScene,
-    ReviewScene,
-  ],
-
-  //scala in maniera automatica il "teatro"
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
+ type: Phaser.AUTO,
+    scale: {
+        mode: Phaser.Scale.FIT,              // Adatta allo schermo
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Centra
+        width: 1280,   // Larghezza base (proporzione 16:9)
+        height: 720    // Altezza base
+    },
+    backgroundColor: '#5bc0de',
+    scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, ReviewScene, EndScene],
 
   physics:{
     default: "arcade", //tipo di fisica stile giochi arcade (non sofisticata)
