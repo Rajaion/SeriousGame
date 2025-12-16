@@ -10,7 +10,7 @@ const config = {
     parent: 'game-wrapper', 
 
     scale: {
-        mode: Phaser.Scale.ENVELOP,              // Mantiene proporzioni
+        mode: Phaser.Scale.RESIZE,              // Mantiene proporzioni
         autoCenter: Phaser.Scale.CENTER_BOTH, // Centrato
         width: 1920,   // Larghezza base
         height: 1080,   // Altezza base (16:9)
@@ -22,5 +22,9 @@ const config = {
     default: "arcade", //tipo di fisica stile giochi arcade (non sofisticata)
   },
 };
+
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
 
 const game = new Phaser.Game(config);
