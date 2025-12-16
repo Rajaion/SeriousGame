@@ -4,31 +4,36 @@
     <meta charset="utf-8" />
     <title>Serious Game - Emergenza Medica</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #34495e;
-        }
-        
-        body { 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        canvas {
-            display: block !important;
-            margin: 0 auto !important;
-            position: relative !important;
-        }
-    </style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html,
+    body {
+        background-color: #34495e;
+        height: 100%;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    body {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    #game-wrapper {
+        height: 100%;
+        width: 100%;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
 </head>
 <body>
 

@@ -8,7 +8,20 @@ class IntroScene extends Phaser.Scene{
     }
     create(){
         const centerX = this.scale.width / 2;
-        const centerY = this.scale.height / 2;
+        const centerY = this.scale.height / 2;        
+
+        const {width, height} = this.scale;
+        const safeMargin = width * 0.05;
+        this.safeArea = new Phaser.Geom.Rectangle(
+            safeMargin,
+            0,
+            width - safeMargin * 2,
+            height
+        );
+
+        const bg = this.add.rectangle(
+            width / 2 , height / 2, this.safeArea.width, height, 0x10f2ccff
+        ); //rettangolo della scena
 
         //Introduzione
         const box = this.add.graphics();
@@ -51,6 +64,7 @@ class IntroScene extends Phaser.Scene{
         startButton.on("pointerdown", () => {
             this.scene.start("HospitalScene")
         });
+
     }
     update(){
 

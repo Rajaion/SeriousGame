@@ -7,11 +7,13 @@ const gameState = {
 
 const config = {
     type: Phaser.AUTO,
+    parent: 'game-wrapper', 
+
     scale: {
-        mode: Phaser.Scale.FIT,              // Mantiene proporzioni
+        mode: Phaser.Scale.ENVELOP,              // Mantiene proporzioni
         autoCenter: Phaser.Scale.CENTER_BOTH, // Centrato
-        width: 1280,   // Larghezza base
-        height: 720,   // Altezza base (16:9)
+        width: 1920,   // Larghezza base
+        height: 1080,   // Altezza base (16:9)
     },
     backgroundColor: '#5bc0de',
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, ReviewScene, EndScene],
