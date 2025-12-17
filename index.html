@@ -1,51 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <meta charset="utf-8" />
-    <title>Serious Game - Emergenza Medica</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Emergenza Medica</title>
     <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html,
-    body {
-        background-color: #34495e;
-        height: 100%;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    body {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    #game-wrapper {
-        height: 100%;
-        width: 100%;
-    }
-
-    canvas {
-        display: block;
-    }
-</style>
-
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #4D5B8C;
+        }
+        
+        #game-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-
-    <div id="game-wrapper">
-        <!-- Phaser inserirà il canvas qui -->
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
     
 
     <!-- Carica tutte le scene -->
-
+    <div id="game-container"></div>
     <script src="js/scenes/MenuScene.js"></script>
     <script src="js/scenes/IntroScene.js"></script>
     <script src="js/scenes/HospitalScene.js"></script>

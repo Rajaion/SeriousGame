@@ -1,30 +1,22 @@
-const gameState = {
-  score: 0,
-  maxScore: 100,
-  errors: {Hospital: 0, Patient: 0, Cart: 0},
-  currentChoice: null,
-}
-
 const config = {
     type: Phaser.AUTO,
-    parent: 'game-wrapper', 
-
+    parent: 'game-container', // ID del div contenitore
     scale: {
-        mode: Phaser.Scale.RESIZE,              // Mantiene proporzioni
-        autoCenter: Phaser.Scale.CENTER_BOTH, // Centrato
-        width: 1920,   // Larghezza base
-        height: 1080,   // Altezza base (16:9)
+        mode: Phaser.Scale.FIT, // Adatta il gioco mantenendo le proporzioni
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Centra sempre
+        width: 1080, // Larghezza base di design
+        height: 1920, // Altezza base di design (formato mobile verticale)
+        min: {
+            width: 360,
+            height: 640
+        },
+        max: {
+            width: 1920,
+            height: 2560
+        }
     },
-    backgroundColor: '#5bc0de',
-    scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, ReviewScene, EndScene],
-
-  physics:{
-    default: "arcade", //tipo di fisica stile giochi arcade (non sofisticata)
-  },
+    backgroundColor: '#4D5B8C',
+    scene: [MenuScene, IntroScene] // Le tue scene
 };
-
-window.addEventListener('resize', () => {
-    game.scale.resize(window.innerWidth, window.innerHeight);
-});
 
 const game = new Phaser.Game(config);
