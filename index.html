@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Emergenza Medica</title>
     <style>
         * {
@@ -16,19 +16,18 @@
             height: 100%;
             overflow: hidden;
             background-color: #4D5B8C;
+            position: fixed;
         }
         
         #game-container {
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         
         canvas {
             display: block;
-            margin: 0 auto;
+            width: 100% !important;
+            height: 100% !important;
         }
     </style>
 </head>
