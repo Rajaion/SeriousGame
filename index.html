@@ -5,31 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Emergenza Medica</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #4D5B8C;
-            position: fixed;
-        }
-        
-        #game-container {
-            width: 100%;
-            height: 100%;
-        }
-        
-        canvas {
-            display: block;
-            width: 100% !important;
-            height: 100% !important;
-        }
-    </style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #4D5B8C;
+        position: fixed;
+        touch-action: none;  /* Previene gesti touch indesiderati */
+    }
+    
+    #game-container {
+        width: 100%;
+        height: 100%;
+    }
+    
+    canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        image-rendering: -webkit-optimize-contrast;  /* Migliora rendering su Safari */
+        image-rendering: crisp-edges;
+    }
+</style>
 </head>
 <body>
 
