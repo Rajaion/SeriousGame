@@ -9,65 +9,52 @@ class MenuScene extends Phaser.Scene {
     }
     
     create() {
-        // Crea il contenuto iniziale
         this.createContent();
         
-        // Listener per ridimensionamento
-        this.scale.on('resize', this.resize, this);
+        // Usa scale event invece di resize
+        this.scale.on('resize', this.handleResize, this);
     }
     
-    resize(gameSize) {
-        const { width, height } = gameSize;
-        
-        // CONTROLLA che la scena sia attiva e la camera esista
-        if (!this.scene.isActive() || !this.cameras.main) {
-            return;
-        }
-        
-        // Aggiorna le dimensioni della camera
-        this.cameras.main.setViewport(0, 0, width, height);
-        
-        // Ricrea tutto il contenuto
-        this.createContent();
+    handleResize(gameSize) {
+        // Aspetta un frame prima di ricreare
+        this.time.delayedCall(50, () => {
+            if (this.scene.isActive()) {
+                this.createContent();
+            }
+        });
     }
     
     createContent() {
-        // Pulisci tutto
         if (this.children) {
             this.children.removeAll();
         }
         
-        const width = this.scale.width;
-        const height = this.scale.height;
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
         const centerX = width / 2;
         const centerY = height / 2;
         
-        // Background che copre tutto
+        // Background
         this.add.rectangle(centerX, centerY, width, height, 0x4D5B8C);
         
-        // Usa la dimensione minore per il calcolo
+        // Calcola dimensioni
         const minDim = Math.min(width, height);
-        
-        // Dimensioni responsive
         const iconSize = minDim * 0.35;
         const buttonWidth = minDim * 0.35;
         const buttonHeight = minDim * 0.08;
         const fontSize = Math.round(minDim * 0.04);
         
-        // Posizionamento
         const spacing = minDim * 0.15;
         const iconY = centerY - spacing / 2;
         const buttonY = centerY + spacing / 2;
         
         // Icona
-        const icona = this.add.image(centerX, iconY, 'IconaMenu')
+        this.add.image(centerX, iconY, 'IconaMenu')
             .setDisplaySize(iconSize, iconSize);
         
-        // Bottone grafico
+        // Bottone
         if (!this.graphics) {
             this.graphics = this.add.graphics();
-        } else {
-            this.graphics.clear();
         }
         
         const drawButton = (color) => {
@@ -93,10 +80,8 @@ class MenuScene extends Phaser.Scene {
             resolution: 2
         }).setOrigin(0.5);
         
-        // Rendi il testo interattivo
         startText.setInteractive({ useHandCursor: true });
         
-        // Crea area interattiva più grande
         const hitArea = new Phaser.Geom.Rectangle(
             -buttonWidth / 2,
             -buttonHeight / 2,
@@ -105,7 +90,6 @@ class MenuScene extends Phaser.Scene {
         );
         startText.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
         
-        // Eventi
         startText.on("pointerover", () => {
             drawButton(0xe0e0e0);
             startText.setColor("#2c3e50");
@@ -121,9 +105,7 @@ class MenuScene extends Phaser.Scene {
         });
     }
     
-    // Quando la scena viene messa in pausa/fermata
     shutdown() {
-        // Rimuovi il listener del resize
-        this.scale.off('resize', this.resize, this);
+        this.scale.off('resize', this.handleResize, this);
     }
 }

@@ -9,11 +9,11 @@ const config = {
     type: Phaser.AUTO,
     parent: 'game-container',
     scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.FIT,  // Torna a FIT per evitare problemi
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        resolution: window.devicePixelRatio  // CHIAVE per la nitidezza
+        width: 1920,  // Dimensioni base di design
+        height: 1080,
+        resolution: window.devicePixelRatio || 1  // Per nitidezza
     },
     backgroundColor: '#4D5B8C',
     render: {
@@ -25,3 +25,19 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+// Gestione resize con debounce
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        game.scale.refresh();
+    }, 100);
+});
+
+// Gestione cambio orientamento
+window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+        game.scale.refresh();
+    }, 200);
+});

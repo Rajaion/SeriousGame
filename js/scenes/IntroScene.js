@@ -5,23 +5,21 @@ class IntroScene extends Phaser.Scene {
     }
     
     preload() {
-        // Carica eventuali risorse qui
+        // Carica risorse
     }
     
     create() {
         this.createContent();
-        this.scale.on('resize', this.resize, this);
+        this.scale.on('resize', this.handleResize, this);
     }
     
-    resize(gameSize) {
-        const { width, height } = gameSize;
-        
-        if (!this.scene.isActive() || !this.cameras.main) {
-            return;
-        }
-        
-        this.cameras.main.setViewport(0, 0, width, height);
-        this.createContent();
+    handleResize(gameSize) {
+        // Aspetta un frame prima di ricreare
+        this.time.delayedCall(50, () => {
+            if (this.scene.isActive()) {
+                this.createContent();
+            }
+        });
     }
     
     createContent() {
@@ -29,56 +27,35 @@ class IntroScene extends Phaser.Scene {
             this.children.removeAll();
         }
         
-        const width = this.scale.width;
-        const height = this.scale.height;
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
         const centerX = width / 2;
         const centerY = height / 2;
         
-        // Determina orientamento
         const isPortrait = height > width;
         const minDim = Math.min(width, height);
-        const maxDim = Math.max(width, height);
-        
-        // Safe area
-        const safeMargin = width * 0.05;
-        this.safeArea = new Phaser.Geom.Rectangle(
-            safeMargin,
-            0,
-            width - safeMargin * 2,
-            height
-        );
         
         // Background
-        const bg = this.add.rectangle(
-            centerX, 
-            centerY, 
-            width, 
-            height, 
-            0xf2ccff
-        );
+        this.add.rectangle(centerX, centerY, width, height, 0xf2ccff);
         
-        // Calcolo dimensioni responsive MIGLIORATE
+        // Dimensioni box e font
         let boxWidth, boxHeight, iconSize, textFontSize, buttonFontSize;
         
         if (isPortrait) {
-            // VERTICALE
-            boxWidth = Math.min(this.safeArea.width * 0.9, 600);
+            boxWidth = Math.min(width * 0.85, 600);
             boxHeight = height * 0.45;
-            iconSize = Math.round(minDim * 0.08);
-            textFontSize = Math.max(16, Math.round(minDim * 0.025)); // Minimo 16px
-            buttonFontSize = Math.max(18, Math.round(minDim * 0.03)); // Minimo 18px
+            iconSize = Math.max(40, Math.round(minDim * 0.08));
+            textFontSize = Math.max(16, Math.round(minDim * 0.025));
+            buttonFontSize = Math.max(18, Math.round(minDim * 0.03));
         } else {
-            // ORIZZONTALE - usa formule diverse
             boxWidth = width * 0.7;
             boxHeight = height * 0.7;
-            iconSize = Math.round(height * 0.12);
-            textFontSize = Math.max(14, Math.round(height * 0.035)); // Minimo 14px
-            buttonFontSize = Math.max(16, Math.round(height * 0.045)); // Minimo 16px
+            iconSize = Math.max(35, Math.round(height * 0.12));
+            textFontSize = Math.max(16, Math.round(height * 0.045));
+            buttonFontSize = Math.max(18, Math.round(height * 0.055));
         }
         
-        const boxRadius = 20;
-        
-        // Box principale
+        // Box
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
         box.fillRoundedRect(
@@ -86,7 +63,7 @@ class IntroScene extends Phaser.Scene {
             centerY - boxHeight / 2, 
             boxWidth, 
             boxHeight, 
-            boxRadius
+            20
         );
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(
@@ -94,16 +71,16 @@ class IntroScene extends Phaser.Scene {
             centerY - boxHeight / 2, 
             boxWidth, 
             boxHeight, 
-            boxRadius
+            20
         );
         
-        // Icona emergenza
-        this.add.text(centerX, centerY - boxHeight * 0.3, '🚨\n', {
-            fontSize: `${iconSize * 0.9}px`,
+        // Icona
+        this.add.text(centerX, centerY - boxHeight * 0.3, '🚨', {
+            fontSize: `${iconSize}px`,
             resolution: 2
         }).setOrigin(0.5);
         
-        // Testo scenario
+        // Testo
         const scenarioText = `Sei un infermiere del pronto soccorso.\n\n` +
                            `Un paziente è appena arrivato in codice rosso.\n` +
                            `Devi agire velocemente e in modo corretto.\n\n` +
@@ -114,14 +91,14 @@ class IntroScene extends Phaser.Scene {
             color: "#2c3e50",
             align: "center",
             wordWrap: { width: boxWidth * 0.85 },
-            lineSpacing: isPortrait ? 8 : 4, // Più spazio in verticale
+            lineSpacing: isPortrait ? 8 : 4,
             resolution: 2
         }).setOrigin(0.5);
         
-        // Bottone "Inizia"
+        // Bottone
         const startButton = this.add.text(
             centerX, 
-            centerY + boxHeight * 0.49, 
+            centerY + boxHeight * 0.35, 
             "Inizia", 
             {
                 fontSize: `${buttonFontSize}px`,
@@ -134,7 +111,6 @@ class IntroScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
         
-        // Eventi bottone
         startButton.on("pointerover", () => {
             startButton.setStyle({ backgroundColor: "rgba(46, 137, 64, 0.93)" });
         });
@@ -149,10 +125,6 @@ class IntroScene extends Phaser.Scene {
     }
     
     shutdown() {
-        this.scale.off('resize', this.resize, this);
-    }
-    
-    update() {
-        // Update logic se necessario
+        this.scale.off('resize', this.handleResize, this);
     }
 }
