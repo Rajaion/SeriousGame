@@ -9,30 +9,22 @@ class IntroScene extends Phaser.Scene {
     }
     
     create() {
-        // Crea il contenuto iniziale
         this.createContent();
-        
-        // Listener per ridimensionamento
         this.scale.on('resize', this.resize, this);
     }
     
     resize(gameSize) {
         const { width, height } = gameSize;
         
-        // CONTROLLA che la scena sia attiva e la camera esista
         if (!this.scene.isActive() || !this.cameras.main) {
             return;
         }
         
-        // Aggiorna le dimensioni della camera
         this.cameras.main.setViewport(0, 0, width, height);
-        
-        // Ricrea tutto il contenuto
         this.createContent();
     }
     
     createContent() {
-        // Pulisci tutto
         if (this.children) {
             this.children.removeAll();
         }
@@ -42,8 +34,10 @@ class IntroScene extends Phaser.Scene {
         const centerX = width / 2;
         const centerY = height / 2;
         
-        // Usa la dimensione minore per calcoli responsive
+        // Determina orientamento
+        const isPortrait = height > width;
         const minDim = Math.min(width, height);
+        const maxDim = Math.max(width, height);
         
         // Safe area
         const safeMargin = width * 0.05;
@@ -63,9 +57,25 @@ class IntroScene extends Phaser.Scene {
             0xf2ccff
         );
         
-        // Dimensioni responsive per il box
-        const boxWidth = Math.min(this.safeArea.width * 0.9, 600);
-        const boxHeight = minDim * 0.5;
+        // Calcolo dimensioni responsive MIGLIORATE
+        let boxWidth, boxHeight, iconSize, textFontSize, buttonFontSize;
+        
+        if (isPortrait) {
+            // VERTICALE
+            boxWidth = Math.min(this.safeArea.width * 0.9, 600);
+            boxHeight = height * 0.45;
+            iconSize = Math.round(minDim * 0.08);
+            textFontSize = Math.max(16, Math.round(minDim * 0.025)); // Minimo 16px
+            buttonFontSize = Math.max(18, Math.round(minDim * 0.03)); // Minimo 18px
+        } else {
+            // ORIZZONTALE - usa formule diverse
+            boxWidth = width * 0.7;
+            boxHeight = height * 0.7;
+            iconSize = Math.round(height * 0.12);
+            textFontSize = Math.max(14, Math.round(height * 0.035)); // Minimo 14px
+            buttonFontSize = Math.max(16, Math.round(height * 0.045)); // Minimo 16px
+        }
+        
         const boxRadius = 20;
         
         // Box principale
@@ -88,9 +98,9 @@ class IntroScene extends Phaser.Scene {
         );
         
         // Icona emergenza
-        const iconSize = Math.round(minDim * 0.08);
-        this.add.text(centerX, centerY - boxHeight * 0.3, '🚨', {
-            fontSize: `${iconSize}px`
+        this.add.text(centerX, centerY - boxHeight * 0.3, '🚨\n', {
+            fontSize: `${iconSize * 0.9}px`,
+            resolution: 2
         }).setOrigin(0.5);
         
         // Testo scenario
@@ -99,25 +109,26 @@ class IntroScene extends Phaser.Scene {
                            `Devi agire velocemente e in modo corretto.\n\n` +
                            `Sei pronto?`;
         
-        const textFontSize = Math.round(minDim * 0.025);
         this.add.text(centerX, centerY, scenarioText, {
             fontSize: `${textFontSize}px`,
             color: "#2c3e50",
             align: "center",
-            wordWrap: { width: boxWidth * 0.85 }
+            wordWrap: { width: boxWidth * 0.85 },
+            lineSpacing: isPortrait ? 8 : 4, // Più spazio in verticale
+            resolution: 2
         }).setOrigin(0.5);
         
-        // Bottone "Let's go"
-        const buttonFontSize = Math.round(minDim * 0.03);
+        // Bottone "Inizia"
         const startButton = this.add.text(
             centerX, 
-            centerY + boxHeight * 0.35, 
+            centerY + boxHeight * 0.49, 
             "Inizia", 
             {
                 fontSize: `${buttonFontSize}px`,
                 color: "#ffffff",
                 backgroundColor: "rgba(52, 219, 108, 1)",
-                padding: { x: 30, y: 15 }
+                padding: { x: 30, y: 15 },
+                resolution: 2
             }
         )
         .setOrigin(0.5)
@@ -137,7 +148,6 @@ class IntroScene extends Phaser.Scene {
         });
     }
     
-    // Rimuovi listener quando la scena si ferma
     shutdown() {
         this.scale.off('resize', this.resize, this);
     }

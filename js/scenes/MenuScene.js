@@ -89,7 +89,8 @@ class MenuScene extends Phaser.Scene {
             fontSize: `${fontSize}px`,
             fontFamily: "Arial, sans-serif",
             fontStyle: "bold",
-            color: "#4D5B8C"
+            color: "#4D5B8C",
+            resolution: 2
         }).setOrigin(0.5);
         
         // Rendi il testo interattivo
