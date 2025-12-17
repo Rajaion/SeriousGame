@@ -10,81 +10,53 @@ class MenuScene extends Phaser.Scene {
     
     create() {
         this.createContent();
-        
-        // Listener per il ridimensionamento
         this.scale.on('resize', this.handleResize, this);
     }
     
     createContent() {
-        // Pulisci eventuali elementi precedenti
+        // Pulisci elementi precedenti
         this.children.removeAll();
         
         const { width, height } = this.scale;
         const centerX = width / 2;
         const centerY = height / 2;
         
-        // Calcola dimensioni responsive
-        const minDimension = Math.min(width, height);
-        const maxDimension = Math.max(width, height);
-        
         // Background
-        const bg = this.add.rectangle(
-            centerX, 
-            centerY, 
-            width, 
-            height, 
-            0x4D5B8C
-        );
+        this.add.rectangle(centerX, centerY, width, height, 0x4D5B8C);
         
-        // Dimensioni responsive basate sulla dimensione minima
-        const titleFontSize = Math.round(minDimension * 0.06);
-        const iconSize = Math.round(minDimension * 0.45);
-        const buttonWidth = Math.round(minDimension * 0.5);
-        const buttonHeight = Math.round(minDimension * 0.1);
-        const buttonFontSize = Math.round(minDimension * 0.05);
+        // Calcola dimensioni responsive basate sulla dimensione minore
+        const minDim = Math.min(width, height);
         
-        // Posizionamento dinamico
-        const titleY = centerY - (maxDimension * 0.35);
-        const iconY = centerY - (maxDimension * 0.05);
-        const buttonY = centerY + (maxDimension * 0.25);
-        
-        // Titolo
-        const title = this.add.text(centerX, titleY, 'Emergenza medica', {
-            fontSize: `${titleFontSize}px`,
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold",
-            color: "#2c3e50",
-            align: "center",
-            padding: { x: 20, y: 15 },
-            backgroundColor: '#f0f0f0',
-            stroke: '#888',
-            strokeThickness: 2
-        }).setOrigin(0.5);
-        
-        // Icona ospedale
-        const icona = this.add.image(centerX, iconY, 'IconaMenu')
+        // Icona (più grande, centrata)
+        const iconSize = minDim * 0.35;
+        const icona = this.add.image(centerX, centerY, 'IconaMenu')
             .setDisplaySize(iconSize, iconSize);
         
-        // Bottone grafico
+        // Bottone START sotto l'icona
+        const buttonWidth = minDim * 0.35;
+        const buttonHeight = minDim * 0.08;
+        const buttonY = centerY + (iconSize / 2) + (buttonHeight * 2);
+        
+        // Disegna il bottone
         this.graphics = this.add.graphics();
         
         const drawButton = (color) => {
             this.graphics.clear();
             this.graphics.fillStyle(color, 1);
             this.graphics.fillRoundedRect(
-                centerX - buttonWidth / 2, 
-                buttonY - buttonHeight / 2, 
-                buttonWidth, 
-                buttonHeight, 
+                centerX - buttonWidth / 2,
+                buttonY - buttonHeight / 2,
+                buttonWidth,
+                buttonHeight,
                 buttonHeight / 2
             );
         };
         
         drawButton(0xffffff);
         
-        // Testo del bottone
-        const startText = this.add.text(centerX, buttonY, "Start", {
-            fontSize: `${buttonFontSize}px`,
+        // Testo START
+        const startText = this.add.text(centerX, buttonY, "START", {
+            fontSize: `${Math.round(minDim * 0.04)}px`,
             fontFamily: "Arial, sans-serif",
             fontStyle: "bold",
             color: "#4D5B8C"
@@ -92,24 +64,22 @@ class MenuScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
         
-        // Area interattiva più grande
+        // Area cliccabile più grande
         const hitArea = new Phaser.Geom.Rectangle(
-            -buttonWidth / 2, 
-            -buttonHeight / 2, 
-            buttonWidth, 
+            -buttonWidth / 2,
+            -buttonHeight / 2,
+            buttonWidth,
             buttonHeight
         );
         startText.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
         
-        // Eventi
+        // Eventi hover
         startText.on("pointerover", () => {
-            drawButton(0xDFE6F0);
-            startText.setColor("#2c3e50");
+            drawButton(0xe0e0e0);
         });
         
         startText.on("pointerout", () => {
             drawButton(0xffffff);
-            startText.setColor("#4D5B8C");
         });
         
         startText.on("pointerdown", () => {
@@ -117,8 +87,7 @@ class MenuScene extends Phaser.Scene {
         });
     }
     
-    handleResize(gameSize) {
-        // Ricrea tutto il contenuto con le nuove dimensioni
+    handleResize() {
         this.createContent();
     }
 }
