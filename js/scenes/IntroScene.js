@@ -64,7 +64,7 @@ class IntroScene extends Phaser.Scene {
             "🚨",
             {
                 fontSize: `${120 * scale}px`,
-                resolution: window.devicePixelRatio
+                resolution: window.devicePixelRatio || 2 
             }
         ).setOrigin(0.5);
 
@@ -84,7 +84,7 @@ class IntroScene extends Phaser.Scene {
                 align: "center",
                 wordWrap: { width: boxWidth * 0.9 },
                 lineSpacing: 4 * scale,
-                resolution: window.devicePixelRatio
+                resolution: window.devicePixelRatio || 2 
             }
         ).setOrigin(0.5);
 
