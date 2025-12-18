@@ -23,6 +23,7 @@ class CartScene extends Phaser.Scene{
         this.load.image("Adrenalina", "img/Adrenalina.png");
         this.load.image("Nacl", "img/Nacl.png");
         this.load.image("PatientCart", "img/PatientCart.png");
+        this.load.image("Sfondo", "img/Mattone.png")
     }
 
     create(){
@@ -40,6 +41,8 @@ class CartScene extends Phaser.Scene{
             align: "center",
             lineSpacing: -5
         }).setOrigin(0.5).setAlpha(0);
+
+        this.add.image(0, 0, "Sfondo").setOrigin(0, 0)
 
         this.add.image(centerX * 0.20, centerY, "Elettrocardiogramma").setScale(0.4);
         this.patientCart = this.add.image(centerX * 0.90, centerY * 1.40, "PatientCart").setScale(0.8).setInteractive({useHandCursor: "true"});
