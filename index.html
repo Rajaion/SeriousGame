@@ -1,48 +1,57 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Emergenza Medica</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Serious Game - Emergenza Medica</title>
     <style>
     * {
+        box-sizing: border-box;
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
-    
-    html, body {
-        width: 100%;
+
+    html,
+    body {
+        background-color: #34495e;
         height: 100%;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height per mobile */
         overflow: hidden;
-        background-color: #4D5B8C;
-        position: fixed;
-        touch-action: none;  /* Previene gesti touch indesiderati */
-    }
-    
-    #game-container {
         width: 100%;
-        height: 100%;
+        position: fixed;
+        touch-action: none; /* Previene zoom e scroll */
     }
-    
+
+    body {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    #game-wrapper {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
     canvas {
         display: block;
-        width: 100% !important;
-        height: 100% !important;
-        image-rendering: -webkit-optimize-contrast;  /* Migliora rendering su Safari */
-        image-rendering: crisp-edges;
+        touch-action: none;
     }
-</style>
+    </style>
 </head>
 <body>
-
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+    <div id="game-wrapper"></div>
     
-
-    <!-- Carica tutte le scene -->
-    <div id="game-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
     <script src="js/scenes/MenuScene.js"></script>
     <script src="js/scenes/IntroScene.js"></script>
     <script src="js/scenes/HospitalScene.js"></script>
@@ -50,8 +59,6 @@
     <script src="js/scenes/CartScene.js"></script>
     <script src="js/scenes/EndScene.js"></script>
     <script src="js/scenes/ReviewScene.js"></script>
-    
-    <!-- Configurazione principale -->
     <script src="js/script.js"></script>
 </body>
 </html>

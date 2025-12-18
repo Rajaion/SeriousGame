@@ -81,7 +81,7 @@ class IntroScene extends Phaser.Scene {
         }).setOrigin(0.5);
         
         // Testo
-        const scenarioText = `Sei un infermiere del pronto soccorso.\n\n` +
+        const scenarioText = `\nSei un infermiere del pronto soccorso.\n` +
                            `Un paziente è appena arrivato in codice rosso.\n` +
                            `Devi agire velocemente e in modo corretto.\n\n` +
                            `Sei pronto?`;
@@ -90,7 +90,7 @@ class IntroScene extends Phaser.Scene {
             fontSize: `${textFontSize}px`,
             color: "#2c3e50",
             align: "center",
-            wordWrap: { width: boxWidth * 0.85 },
+            wordWrap: { width: boxWidth * 0.90 },
             lineSpacing: isPortrait ? 8 : 4,
             resolution: 2
         }).setOrigin(0.5);

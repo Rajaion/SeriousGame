@@ -7,37 +7,32 @@ const gameState = {
 
 const config = {
     type: Phaser.AUTO,
-    parent: 'game-container',
+    parent: 'game-wrapper',
     scale: {
-        mode: Phaser.Scale.FIT,  // Torna a FIT per evitare problemi
+        mode: Phaser.Scale.RESIZE, 
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1920,  // Dimensioni base di design
-        height: 1080,
-        resolution: window.devicePixelRatio || 1  // Per nitidezza
+        width: window.innerWidth,
+        height: window.innerHeight
     },
-    backgroundColor: '#4D5B8C',
-    render: {
-        pixelArt: false,
-        antialias: true,
-        roundPixels: false
-    },
-    scene: [MenuScene, IntroScene, CartScene, EndScene, HospitalScene, PatientScene, ReviewScene] // Le tue scene
+    scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, EndScene, ReviewScene],
+    backgroundColor: '#34495e'
 };
 
 const game = new Phaser.Game(config);
 
-// Gestione resize con debounce
+// Gestione resize finestra
 let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        game.scale.refresh();
+        game.scale.resize(window.innerWidth, window.innerHeight);
     }, 100);
 });
 
-// Gestione cambio orientamento
+// Gestione cambio orientamento (importante per mobile)
 window.addEventListener('orientationchange', () => {
     setTimeout(() => {
+        game.scale.resize(window.innerWidth, window.innerHeight);
         game.scale.refresh();
     }, 200);
 });
