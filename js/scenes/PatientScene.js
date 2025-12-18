@@ -14,7 +14,7 @@ class PatientScene extends Phaser.Scene{
     }
     preload(){
         this.load.image("ReloadButton", "img/ReloadButton.png");
-        this.load.image("PatientCloseUp", "img/PatientCloseUp.jpg");
+        this.load.image("PatientCloseUp", "img/PatientCloseUp.png");
     }
     create(){
         this.ordCounter = 0;
@@ -22,55 +22,55 @@ class PatientScene extends Phaser.Scene{
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
 
-        this.cords1 = {x: this.scale.width * 0.63, y: centerY * 0.4 + 130, width: 300, height: 50};
-        this.cords2 = {x: this.scale.width * 0.63, y: centerY * 0.6 + 130, width: 300, height: 50}
-        this.cords3 = {x: this.scale.width * 0.63, y: centerY * 0.8 + 130, width: 300, height: 50}
+        this.cords1 = {x: this.scale.width * 0.80, y: this.scale.height * 0.5, width: 500, height: 70};
+        this.cords2 = {x: this.scale.width * 0.80, y: this.scale.height * 0.6, width: 500, height: 70}
+        this.cords3 = {x: this.scale.width * 0.80, y: this.scale.height * 0.7, width: 500, height: 70}
 
-        const ReloadButton = this.add.image(this.scale.width * 0.1, this.scale.height * 0.9, "ReloadButton").setScale(0.6).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true});
-        const Patient = this.add.image(this.scale.width * 0.3, this.centerY, "PatientCloseUp").setScale(0.5).setOrigin(0.5, 0.5);
+        const ReloadButton = this.add.image(this.scale.width * 0.80, this.scale.height * 0.85, "ReloadButton").setScale(0.5).setOrigin(0.5, 0.5).setInteractive({useHandCursor: true}).setDepth(10);
+        const Patient = this.add.image(this.scale.width * 0.3, this.scale.height * 0.5, "PatientCloseUp").setScale(0.7).setOrigin(0.5, 0.5);
 
         ReloadButton.on("pointerdown", () => {
             this.scene.start("HospitalScene");
         })
 
-        const questionBox = this.createBox(this.scale.width * 0.58, centerY * 0.1 + 100, 400, 100);
+        const questionBox = this.createBox(this.scale.width * 0.80, this.scale.height * 0.3, 600, 140);
         this.answer1Box = this.createBox(this.cords1.x, this.cords1.y, this.cords1.width, this.cords1.height);
         this.answer2Box = this.createBox(this.cords2.x, this.cords2.y, this.cords2.width, this.cords2.height);
         this.answer3Box = this.createBox(this.cords3.x, this.cords3.y, this.cords3.width, this.cords3.height);
 
-        this.add.text(this.scale.width * 0.58, centerY * 0.1 + 100, "Il paziente non risponde\n\n Come procedi?", {
-            fontSize: "24px",
+        this.add.text(this.scale.width * 0.80, this.scale.height * 0.3, "Il paziente non risponde\n\n Come procedi?", {
+            fontSize: "40px",
             color: "#000000ff",
             align: "center",
             padding: {x:30, y:15}
-        });
+        }).setOrigin(0.5);
 
-        this.goNextText = this.add.text(centerX * 1.5, centerY * 1.8, "Corretto!\nOra andiamo a dare le medicine al paziente!", {
-            fontSize: "20px",
+        this.goNextText = this.add.text(this.cords1.x, this.scale.height * 0.4, "Corretto!\nOra andiamo a dare le medicine al paziente!", {
+            fontSize: "38px",
             color: "#000000ff",
             align: "center"
         }).setOrigin(0.5).setAlpha(0);
 
-        const text1 = this.add.text(this.scale.width * 0.655, centerY * 0.4 + 130, "Valutazione GAS", {
-            fontSize: "22px",
+        const text1 = this.add.text(this.cords1.x, this.scale.height * 0.5, "Valutazione GAS", {
+            fontSize: "38px",
             color: "#000000ff",
             align: "center",
             padding: {x:30, y:15}
-        }).setInteractive({useHandCursor: "true"});
+        }).setInteractive({useHandCursor: "true"}).setOrigin(0.5);
 
-        const text2 = this.add.text(this.scale.width * 0.615, centerY * 0.6 + 130, "Inizi le compressioni", {
-            fontSize: "22px",
+        const text2 = this.add.text(this.cords1.x, this.scale.height * 0.6, "Inizi le compressioni", {
+            fontSize: "38px",
             color: "#000000ff",
             align: "center",
             padding: {x:30, y:15}
-        }).setInteractive({useHandCursor: "true"});
+        }).setInteractive({useHandCursor: "true"}).setOrigin(0.5);
         
-        const text3 = this.add.text(this.scale.width * 0.62, centerY * 0.8 + 130, "libiri le vie aeree", {
-            fontSize: "22px",
+        const text3 = this.add.text(this.cords1.x, this.scale.height * 0.7, "libiri le vie aeree", {
+            fontSize: "38px",
             color: "#000000ff",
             align: "center",
             padding: {x:30, y:15}
-        }).setInteractive({useHandCursor: "true"});
+        }).setInteractive({useHandCursor: "true"}).setOrigin(0.5);
         
         text1.on("pointerdown", ()=> {
             if(this.ordCounter != 0){
@@ -79,7 +79,7 @@ class PatientScene extends Phaser.Scene{
                 this.setDefault();
             }else{
                 this.ordCounter = 1;
-                this.setGreen(this.answer1Box, this.scale.width * 0.63, centerY * 0.4 + 130, 300, 50)
+                this.setGreen(this.answer1Box, this.cords1.x, this.cords1.y , this.cords1.width, this.cords1.height)
             }
         });
 
@@ -90,7 +90,7 @@ class PatientScene extends Phaser.Scene{
                 alert("sbagliata sequenza");
             }else{
                 this.ordCounter = 2
-                this.setGreen(this.answer2Box, this.scale.width * 0.63, centerY * 0.6 + 130, 300, 50)
+                this.setGreen(this.answer2Box, this.cords2.x, this.cords2.y, this.cords2.width, this.cords2.height)
             }
         });
 
@@ -100,7 +100,7 @@ class PatientScene extends Phaser.Scene{
                 this.setDefault();
                 alert("sbagliata sequenza");
             }else{
-                this.setGreen(this.answer3Box, this.scale.width * 0.63, centerY * 0.8 + 130, 300, 50);
+                this.setGreen(this.answer3Box, this.cords3.x, this.cords3.y, this.cords3.width, this.cords3.height);
                 this.goNextText.setAlpha(1);
                 this.time.delayedCall(3500, () =>{
                     this.scene.start("CartScene");
@@ -114,18 +114,18 @@ class PatientScene extends Phaser.Scene{
         
     }
     createBox(valueX, valueY, width, height){
-        const box = this.add.graphics(valueX, valueY, width, height);
+        const box = this.add.graphics(valueX - width / 2, valueY - height / 2, width, height);
         box.fillStyle(0xecf0f1, 1);
-        box.fillRoundedRect(valueX, valueY, width, height, 5); 
-        box.strokeRoundedRect(valueX, valueY, width , height, 5);
+        box.fillRoundedRect(valueX - width / 2, valueY - height / 2, width, height, 5); 
+        //box.strokeRoundedRect(valueX, valueY, width , height, 5);
         return box;
     }
 
     setGreen(box, x, y, width, height){
         box.fillStyle(0x27ae60, 1);
-        box.fillRoundedRect(x, y, width, height, 1); 
+        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 1); 
         box.lineStyle(2, 0x2c3e50, 1);
-        box.strokeRoundedRect(x, y. width, height, 1)
+        box.strokeRoundedRect(x - width / 2, y - height / 2, height, 1)
     }
 
     setDefault(){
@@ -137,9 +137,9 @@ class PatientScene extends Phaser.Scene{
     setEachDefault(box, x, y, width, height){
         box.clear();
         box.fillStyle(0xffffff, 1);
-        box.fillRoundedRect(x, y, width, height, 5); 
+        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 5); 
         box.lineStyle(2, 0x000000, 1);
-        box.strokeRoundedRect(x, y, width , height, 5);
+        box.strokeRoundedRect(x - width / 2, y - height / 2, width , height, 5);
     }
 
 }

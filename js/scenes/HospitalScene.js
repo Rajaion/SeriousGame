@@ -17,26 +17,24 @@ class HospitalScene extends Phaser.Scene{
     preload(){
         this.load.text("phoneOptions", "text/Phone.txt")
 
+        this.load.image("Ospedale", "img/Ospedale.png");
         this.load.image("convBox", "img/TextBoxLeft.png");
-        this.load.image("Phone", "img/Phone.png");
+        this.load.image("Phone", "img/Telefono.png");
         this.load.image("Paziente", "img/Paziente.png");
     }
     create(){
 
     this.centerX = this.scale.width / 2;
     this.centerY = this.scale.height / 2;
-    
-    const box = this.add.graphics();
-    box.fillStyle(0xecf0f1, 1);
-    box.fillRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
-    box.lineStyle(2, 0x2c3e50, 1);
-    box.strokeRoundedRect(this.centerX + 100, this.centerY - 100, 400, 100, 0);
+
+    this.add.image(0, 0, "Ospedale").setOrigin(0, 0);
 
     this.getPhonetext(this.cache.text.get("phoneOptions"));
 
     this.scoreText = this.add.text(this.centerX, 50, "Score: " + gameState.score, {
-        fontSize: "20px",
+        fontSize: "35px",
         align: "center",
+        color: "rgba(255, 0, 0, 1)"
         
     }).setOrigin(0.5);
 
@@ -47,13 +45,21 @@ class HospitalScene extends Phaser.Scene{
             padding: {x:15, Y:5}
         }).setOrigin(0.5).setAlpha(0);
 
-    const infoPaziente = this.add.text(this.centerX + 300, this.centerY - 50, 'hai già constatato che\nil paziente non risponde', {
-        fontSize: '20px',
+        const box = this.add.graphics();
+        box.fillStyle(0xecf0f1, 1);
+        box.fillRoundedRect(this.centerX * 1.7 - 200, this.centerY * 0.3 - 50, 400, 100, 0); //disegna rettangolo nella posizione 600x e 300y con angolo arrotondati di 10 (maggiore valore -> maggiore arrotondamento)
+        box.lineStyle(2, 0x2c3e50, 1);
+        box.strokeRoundedRect(this.centerX * 1.7 - 200, this.centerY * 0.3 - 50, 400, 100, 0);
+
+    const infoPaziente = this.add.text(this.centerX * 1.7, this.centerY * 0.3, 'Hai già constatato che\nil paziente non risponde', {
+        fontSize: '24px',
         color: '#2c3e50',
         align: 'center'
     }).setOrigin(0.5);
 
-    const telephone = this.add.image(200, this.centerY - 30, "Phone").setScale(0.5).setInteractive({useHandCursor: true});
+
+
+    const telephone = this.add.image(this.centerX * 1.7, this.centerY, "Phone").setScale(0.3).setInteractive({useHandCursor: true});
 
     telephone.on("pointerdown", () => {
         
@@ -69,8 +75,8 @@ class HospitalScene extends Phaser.Scene{
         }
 
         this.convOn = true;
-        const optioncords = {x: this.centerX - this.centerX / 2 + 160, y: this.centerY}
-        this.phoneConvo = this.add.image(this.centerX - this.centerX / 2 + 150, this.centerY, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
+        const optioncords = {x: this.centerX * 1.35, y: this.centerY *0.8}
+        this.phoneConvo = this.add.image(this.centerX * 1.35, this.centerY * 0.78, "convBox").setScale(1.0).setOrigin(0.5, 0.5);
         
         optioncords.y -= 49;
         
@@ -118,7 +124,7 @@ class HospitalScene extends Phaser.Scene{
 
     });
 
-    const patient = this.add.image(this.centerX, this.centerY + 200, "Paziente").setScale(0.6).setInteractive({useHandCursor: true});
+    const patient = this.add.rectangle(this.centerX * 0.8, this.centerY * 1.1, 400, 400).setAlpha(1).setInteractive({useHandCursor: true});
 
     patient.on("pointerdown", () => {
         if(this.clickedCorOpt){

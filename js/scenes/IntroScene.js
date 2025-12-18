@@ -3,159 +3,147 @@ class IntroScene extends Phaser.Scene {
     constructor() {
         super({ key: "IntroScene" });
     }
-    
-    preload() {
-        // Carica risorse
-    }
-    
+
+    preload() {}
+
     create() {
         this.createContent();
-        this.scale.on('resize', this.handleResize, this);
+        this.scale.on("resize", this.handleResize, this);
     }
-    
-    handleResize(gameSize) {
+
+    handleResize() {
         this.time.delayedCall(50, () => {
             if (this.scene.isActive()) {
                 this.createContent();
             }
         });
     }
-    
+
     createContent() {
-        // Pulisci tutto
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.children) {
-            this.children.removeAll();
-        }
 
         const width = this.scale.width;
         const height = this.scale.height;
         const centerX = width / 2;
         const centerY = height / 2;
 
-        // Background - STESSO COLORE DELLA MENUSCENE
+        const scaleX = width / 1920;
+        const scaleY = height / 1080;
+        const scale = Math.min(scaleX, scaleY);
+
+        this.children.removeAll();
+
         this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
 
-        // CREA CONTAINER con coordinate fisse (riferimento 1920x1080)
-        this.mainContainer = this.add.container(0, 0);
+        const refCenterX = centerX;
+        const refCenterY = centerY;
 
-        const refCenterX = 960;  // Centro di 1920
-        const refCenterY = 540;  // Centro di 1080
+        const boxWidth = 1344 * scale;
+        const boxHeight = 756 * scale;
 
-        // Dimensioni di riferimento per il box
-        const boxWidth = 1344;   // 70% di 1920
-        const boxHeight = 756;   // 70% di 1080
-
-        // Box con grafica
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
         box.fillRoundedRect(
-            refCenterX - boxWidth / 2, 
-            refCenterY - boxHeight / 2, 
-            boxWidth, 
-            boxHeight, 
-            20
+            refCenterX - boxWidth / 2,
+            refCenterY - boxHeight / 2,
+            boxWidth,
+            boxHeight,
+            20 * scale
         );
-        box.lineStyle(2, 0x2c3e50, 1);
+        box.lineStyle(2 * scale, 0x2c3e50, 1);
         box.strokeRoundedRect(
-            refCenterX - boxWidth / 2, 
-            refCenterY - boxHeight / 2, 
-            boxWidth, 
-            boxHeight, 
-            20
+            refCenterX - boxWidth / 2,
+            refCenterY - boxHeight / 2,
+            boxWidth,
+            boxHeight,
+            20 * scale
         );
-        
-        // Icona emoji
-        const icon = this.add.text(refCenterX, refCenterY - boxHeight * 0.3, '🚨', {
-            fontSize: '130px',
-            resolution: 2
-        }).setOrigin(0.5);
-        
-        // Testo scenario
-        const scenarioText = `\nSei un infermiere del pronto soccorso.\n` +
-                           `Un paziente è appena arrivato in codice rosso.\n` +
-                           `Devi agire velocemente e in modo corretto.\n\n` +
-                           `Sei pronto?`;
-        
-        const textContent = this.add.text(refCenterX, refCenterY, scenarioText, {
-            fontSize: '50px',  
-            color: "#2c3e50",
-            align: "center",
-            wordWrap: { width: boxWidth * 0.90 },
-            lineSpacing: 4,
-            resolution: 8
-        }).setOrigin(0.5);
-        
-        // Bottone "Inizia"
-        const buttonBg = this.add.graphics();
-        const buttonWidth = 200;
-        const buttonHeight = 70;
+
+        const icon = this.add.text(
+            refCenterX,
+            refCenterY - boxHeight * 0.4,
+            "🚨",
+            {
+                fontSize: `${120 * scale}px`,
+                resolution: window.devicePixelRatio
+            }
+        ).setOrigin(0.5);
+
+        const scenarioText =
+            "\nSei un infermiere del pronto soccorso.\n" +
+            "Un paziente è appena arrivato in codice rosso.\n" +
+            "Devi agire velocemente e in modo corretto.\n\n" +
+            "Sei pronto?";
+
+        const textContent = this.add.text(
+            refCenterX,
+            refCenterY,
+            scenarioText,
+            {
+                fontSize: `${60 * scale}px`,
+                color: "#2c3e50",
+                align: "center",
+                wordWrap: { width: boxWidth * 0.9 },
+                lineSpacing: 4 * scale,
+                resolution: window.devicePixelRatio
+            }
+        ).setOrigin(0.5);
+
+        const buttonWidth = 300 * scale;
+        const buttonHeight = 70 * scale;
         const buttonX = refCenterX - buttonWidth / 2;
-        const buttonY = refCenterY + boxHeight * 0.35 - buttonHeight / 2;
-        
-        const drawButton = (color) => {
+        const buttonY = refCenterY + boxHeight * 0.50 - buttonHeight / 2;
+
+        const buttonBg = this.add.graphics();
+
+        const drawButton = color => {
             buttonBg.clear();
             buttonBg.fillStyle(color, 1);
-            buttonBg.fillRoundedRect(buttonX, buttonY, buttonWidth, buttonHeight, 10);
+            buttonBg.fillRoundedRect(
+                buttonX,
+                buttonY,
+                buttonWidth,
+                buttonHeight,
+                10 * scale,
+                40
+            );
         };
-        
-        drawButton(0x34DB6C); // Verde iniziale
-        
+
+        drawButton(0x34db6c);
+
         const startButton = this.add.text(
-            refCenterX, 
-            refCenterY + boxHeight * 0.35, 
-            "Inizia", 
+            refCenterX,
+            refCenterY + boxHeight * 0.50,
+            "Inizia",
             {
-                fontSize: '59px', // ~5.5% di 1080
+                fontSize: `${60 * scale}px`,
                 color: "#ffffff",
                 fontFamily: "Arial, sans-serif",
                 fontStyle: "bold",
-                resolution: 2
+                resolution: window.devicePixelRatio
             }
         )
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
-        
+
         startButton.on("pointerover", () => {
-            drawButton(0x2E8940); // Verde scuro
+            drawButton(0x2e8940);
             startButton.setScale(1.05);
         });
-        
+
         startButton.on("pointerout", () => {
-            drawButton(0x34DB6C); // Verde normale
+            drawButton(0x34db6c);
             startButton.setScale(1);
         });
-        
+
         startButton.on("pointerdown", () => {
-            drawButton(0x27ae60); // Verde click
+            drawButton(0x27ae60);
             this.time.delayedCall(100, () => {
                 this.scene.start("HospitalScene");
             });
         });
-        
-        // Aggiungi tutto al container
-        this.mainContainer.add([box, buttonBg, icon, textContent, startButton]);
-
-        // SCALA il container per adattarlo allo schermo
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY); // Mantieni proporzioni
-
-        this.mainContainer.setScale(scale);
-
-        // Centra il container scalato
-        this.mainContainer.setPosition(
-            centerX - (960 * scale),
-            centerY - (540 * scale)
-        );
     }
-    
+
     shutdown() {
-        this.scale.off('resize', this.handleResize, this);
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
+        this.scale.off("resize", this.handleResize, this);
     }
 }
