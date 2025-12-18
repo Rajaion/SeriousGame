@@ -14,7 +14,6 @@ class IntroScene extends Phaser.Scene {
     }
     
     handleResize(gameSize) {
-        // Aspetta un frame prima di ricreare
         this.time.delayedCall(50, () => {
             if (this.scene.isActive()) {
                 this.createContent();
@@ -23,88 +22,96 @@ class IntroScene extends Phaser.Scene {
     }
     
     createContent() {
+        // Pulisci tutto
+        if (this.mainContainer) {
+            this.mainContainer.destroy();
+        }
         if (this.children) {
             this.children.removeAll();
         }
-        
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
+
+        const width = this.scale.width;
+        const height = this.scale.height;
         const centerX = width / 2;
         const centerY = height / 2;
-        
-        const isPortrait = height > width;
-        const minDim = Math.min(width, height);
-        
-        // Background
-        this.add.rectangle(centerX, centerY, width, height, 0xf2ccff);
-        
-        // Dimensioni box e font
-        let boxWidth, boxHeight, iconSize, textFontSize, buttonFontSize;
-        
-        if (isPortrait) {
-            boxWidth = Math.min(width * 0.85, 600);
-            boxHeight = height * 0.45;
-            iconSize = Math.max(40, Math.round(minDim * 0.08));
-            textFontSize = Math.max(16, Math.round(minDim * 0.025));
-            buttonFontSize = Math.max(18, Math.round(minDim * 0.03));
-        } else {
-            boxWidth = width * 0.7;
-            boxHeight = height * 0.7;
-            iconSize = Math.max(35, Math.round(height * 0.12));
-            textFontSize = Math.max(16, Math.round(height * 0.045));
-            buttonFontSize = Math.max(18, Math.round(height * 0.055));
-        }
-        
-        // Box
+
+        // Background - STESSO COLORE DELLA MENUSCENE
+        this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
+
+        // CREA CONTAINER con coordinate fisse (riferimento 1920x1080)
+        this.mainContainer = this.add.container(0, 0);
+
+        const refCenterX = 960;  // Centro di 1920
+        const refCenterY = 540;  // Centro di 1080
+
+        // Dimensioni di riferimento per il box
+        const boxWidth = 1344;   // 70% di 1920
+        const boxHeight = 756;   // 70% di 1080
+
+        // Box con grafica
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
         box.fillRoundedRect(
-            centerX - boxWidth / 2, 
-            centerY - boxHeight / 2, 
+            refCenterX - boxWidth / 2, 
+            refCenterY - boxHeight / 2, 
             boxWidth, 
             boxHeight, 
             20
         );
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(
-            centerX - boxWidth / 2, 
-            centerY - boxHeight / 2, 
+            refCenterX - boxWidth / 2, 
+            refCenterY - boxHeight / 2, 
             boxWidth, 
             boxHeight, 
             20
         );
         
-        // Icona
-        this.add.text(centerX, centerY - boxHeight * 0.3, '🚨', {
-            fontSize: `${iconSize}px`,
+        // Icona emoji
+        const icon = this.add.text(refCenterX, refCenterY - boxHeight * 0.3, '🚨', {
+            fontSize: '130px',
             resolution: 2
         }).setOrigin(0.5);
         
-        // Testo
+        // Testo scenario
         const scenarioText = `\nSei un infermiere del pronto soccorso.\n` +
                            `Un paziente è appena arrivato in codice rosso.\n` +
                            `Devi agire velocemente e in modo corretto.\n\n` +
                            `Sei pronto?`;
         
-        this.add.text(centerX, centerY, scenarioText, {
-            fontSize: `${textFontSize}px`,
+        const textContent = this.add.text(refCenterX, refCenterY, scenarioText, {
+            fontSize: '50px',  
             color: "#2c3e50",
             align: "center",
             wordWrap: { width: boxWidth * 0.90 },
-            lineSpacing: isPortrait ? 8 : 4,
-            resolution: 2
+            lineSpacing: 4,
+            resolution: 8
         }).setOrigin(0.5);
         
-        // Bottone
+        // Bottone "Inizia"
+        const buttonBg = this.add.graphics();
+        const buttonWidth = 200;
+        const buttonHeight = 70;
+        const buttonX = refCenterX - buttonWidth / 2;
+        const buttonY = refCenterY + boxHeight * 0.35 - buttonHeight / 2;
+        
+        const drawButton = (color) => {
+            buttonBg.clear();
+            buttonBg.fillStyle(color, 1);
+            buttonBg.fillRoundedRect(buttonX, buttonY, buttonWidth, buttonHeight, 10);
+        };
+        
+        drawButton(0x34DB6C); // Verde iniziale
+        
         const startButton = this.add.text(
-            centerX, 
-            centerY + boxHeight * 0.35, 
+            refCenterX, 
+            refCenterY + boxHeight * 0.35, 
             "Inizia", 
             {
-                fontSize: `${buttonFontSize}px`,
+                fontSize: '59px', // ~5.5% di 1080
                 color: "#ffffff",
-                backgroundColor: "rgba(52, 219, 108, 1)",
-                padding: { x: 30, y: 15 },
+                fontFamily: "Arial, sans-serif",
+                fontStyle: "bold",
                 resolution: 2
             }
         )
@@ -112,19 +119,43 @@ class IntroScene extends Phaser.Scene {
         .setInteractive({ useHandCursor: true });
         
         startButton.on("pointerover", () => {
-            startButton.setStyle({ backgroundColor: "rgba(46, 137, 64, 0.93)" });
+            drawButton(0x2E8940); // Verde scuro
+            startButton.setScale(1.05);
         });
         
         startButton.on("pointerout", () => {
-            startButton.setStyle({ backgroundColor: "rgba(52, 219, 108, 1)" });
+            drawButton(0x34DB6C); // Verde normale
+            startButton.setScale(1);
         });
         
         startButton.on("pointerdown", () => {
-            this.scene.start("HospitalScene");
+            drawButton(0x27ae60); // Verde click
+            this.time.delayedCall(100, () => {
+                this.scene.start("HospitalScene");
+            });
         });
+        
+        // Aggiungi tutto al container
+        this.mainContainer.add([box, buttonBg, icon, textContent, startButton]);
+
+        // SCALA il container per adattarlo allo schermo
+        const scaleX = width / 1920;
+        const scaleY = height / 1080;
+        const scale = Math.min(scaleX, scaleY); // Mantieni proporzioni
+
+        this.mainContainer.setScale(scale);
+
+        // Centra il container scalato
+        this.mainContainer.setPosition(
+            centerX - (960 * scale),
+            centerY - (540 * scale)
+        );
     }
     
     shutdown() {
         this.scale.off('resize', this.handleResize, this);
+        if (this.mainContainer) {
+            this.mainContainer.destroy();
+        }
     }
 }
