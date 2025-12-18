@@ -6,16 +6,23 @@ const gameState = {
 }
 
 const config = {
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,  // Forza WebGL invece di AUTO
     parent: 'game-wrapper',
     scale: {
-        mode: Phaser.Scale.RESIZE, 
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
+        width: window.innerWidth * window.devicePixelRatio,   // ← Moltiplica per pixel ratio
+        height: window.innerHeight * window.devicePixelRatio,  // ← Moltiplica per pixel ratio
+        zoom: 1 / window.devicePixelRatio  // ← Poi scala indietro
     },
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, EndScene, ReviewScene],
-    backgroundColor: '#34495e'
+    backgroundColor: '#34495e',
+    render: {
+        antialias: true,
+        roundPixels: false,
+        pixelArt: false
+    },
+    autoResize: true
 };
 
 const game = new Phaser.Game(config);
