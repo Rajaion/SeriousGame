@@ -88,7 +88,7 @@ class HospitalScene extends Phaser.Scene {
         const patientX = 768;   // 0.8 * 960
         const patientY = 594;   // 1.1 * 540
         
-        const infoBoxX = 1632;  // 1.7 * 960
+        const infoBoxX = 1550;  // 
         const infoBoxY = 162;   // 0.3 * 540
 
         // Box info paziente
@@ -216,7 +216,7 @@ class HospitalScene extends Phaser.Scene {
     const optSpacing = 95;  // Spaziatura tra opzioni
 
     // Opzione 1
-    const optRect1 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0x6dd5c3, 1)
+    const optRect1 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0x999999, 1)
         .setInteractive({ useHandCursor: true });
     optRect1.setStrokeStyle(4, 0x000000);
 

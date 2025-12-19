@@ -106,6 +106,18 @@ class MenuScene extends Phaser.Scene {
             centerX - (960 * scale),
             centerY - (540 * scale)
         );
+
+        const borderWidth = 1920 * scale;
+        const borderHeight = 1080 * scale;
+
+        this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+        centerX - borderWidth / 2,
+        centerY - borderHeight / 2,
+        borderWidth,
+        borderHeight
+    );
     }
 
     shutdown() {

@@ -92,7 +92,7 @@ class CartScene extends Phaser.Scene {
         const patientCartX = 864;   // 0.90 * 960
         const patientCartY = 756;   // 1.40 * 540
 
-        const cartX = 1536;     // 1.60 * 960
+        const cartX = 1650;     // 1.60 * 960
         const cartY = 918;      // 1.70 * 540
 
         // Elettrocardiogramma
