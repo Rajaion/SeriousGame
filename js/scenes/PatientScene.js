@@ -42,6 +42,7 @@ class PatientScene extends Phaser.Scene {
 
         // Background
         this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
+        this.add.rectangle(centerX, centerY, width*0.95, height * 0.95)
 
         // Calcola scala
         const scaleX = width / 1920;
@@ -81,18 +82,18 @@ class PatientScene extends Phaser.Scene {
         // Box domanda
         const questionBox = this.add.graphics();
         questionBox.fillStyle(0xecf0f1, 1);
-        questionBox.fillRoundedRect(questionX - 300, questionY - 70, 600, 140, 5);
+        questionBox.fillRoundedRect(questionX - 400, questionY - 70, 800, 140, 5);
         questionBox.lineStyle(2, 0x2c3e50, 1);
-        questionBox.strokeRoundedRect(questionX - 300, questionY - 70, 600, 140, 5);
+        questionBox.strokeRoundedRect(questionX - 400, questionY - 70, 800, 140, 5);
 
         // Box risposte
         this.answer1Box = this.add.graphics();
         this.answer2Box = this.add.graphics();
         this.answer3Box = this.add.graphics();
 
-        this.drawAnswerBox(this.answer1Box, answer1X, answer1Y, 500, 70);
-        this.drawAnswerBox(this.answer2Box, answer2X, answer2Y, 500, 70);
-        this.drawAnswerBox(this.answer3Box, answer3X, answer3Y, 500, 70);
+        this.drawAnswerBox(this.answer1Box, answer1X, answer1Y, 650, 70);
+        this.drawAnswerBox(this.answer2Box, answer2X, answer2Y, 650, 70);
+        this.drawAnswerBox(this.answer3Box, answer3X, answer3Y, 650, 70);
 
         // Bottone reload
         const reloadButton = this.add.image(reloadX, reloadY, "ReloadButton")
@@ -116,7 +117,6 @@ class PatientScene extends Phaser.Scene {
             centerY - (refCenterY * scale)
         );
 
-        // TESTI FUORI DAL CONTAINER (per qualità)
         const minFontSize = 18;
         const questionFontSize = Math.max(minFontSize, 40 * scale);
         const answerFontSize = Math.max(minFontSize, 38 * scale);
@@ -140,7 +140,7 @@ class PatientScene extends Phaser.Scene {
         // Testo domanda
         const questionText = this.add.text(questionTextX, questionTextY, 
             "Il paziente non risponde\nCome procedi?", {
-            fontSize: `${questionFontSize}px`,
+            fontSize: `${questionFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
             fontFamily: "Arial, sans-serif",
@@ -149,7 +149,7 @@ class PatientScene extends Phaser.Scene {
         // Testo feedback
         this.goNextText = this.add.text(answer1TextX, feedbackTextY, 
             "Corretto!\nOra andiamo a dare le medicine al paziente!", {
-            fontSize: `${feedbackFontSize}px`,
+            fontSize: `${feedbackFontSize * 0.7}px`,
             color: "#27ae60",
             align: "center",
             fontFamily: "Arial, sans-serif",
@@ -158,21 +158,21 @@ class PatientScene extends Phaser.Scene {
 
         // Testi risposte
         const text1 = this.add.text(answer1TextX, answer1TextY, "Valutazione GAS", {
-            fontSize: `${answerFontSize}px`,
+            fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
             fontFamily: "Arial, sans-serif"
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        const text2 = this.add.text(answer2TextX, answer2TextY, "Inizi le compressioni", {
-            fontSize: `${answerFontSize}px`,
+        const text2 = this.add.text(answer2TextX, answer2TextY, "Inizia le compressioni", {
+            fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
             fontFamily: "Arial, sans-serif"
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         const text3 = this.add.text(answer3TextX, answer3TextY, "Libera le vie aeree", {
-            fontSize: `${answerFontSize}px`,
+            fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
             fontFamily: "Arial, sans-serif"
@@ -199,7 +199,7 @@ class PatientScene extends Phaser.Scene {
                 this.setDefault();
             } else {
                 this.ordCounter = 1;
-                this.setGreen(this.answer1Box, answer1X, answer1Y, 500, 70);
+                this.setGreen(this.answer1Box, answer1X, answer1Y, 650, 70);
             }
         });
 
@@ -211,7 +211,7 @@ class PatientScene extends Phaser.Scene {
                 this.setDefault();
             } else {
                 this.ordCounter = 2;
-                this.setGreen(this.answer2Box, answer2X, answer2Y, 500, 70);
+                this.setGreen(this.answer2Box, answer2X, answer2Y, 650, 70);
             }
         });
 
@@ -222,7 +222,7 @@ class PatientScene extends Phaser.Scene {
                 this.showError();
                 this.setDefault();
             } else {
-                this.setGreen(this.answer3Box, answer3X, answer3Y, 500, 70);
+                this.setGreen(this.answer3Box, answer3X, answer3Y, 650, 70);
                 this.goNextText.setAlpha(1);
                 this.time.delayedCall(3500, () => {
                     this.scene.start("CartScene");
