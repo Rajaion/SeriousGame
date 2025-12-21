@@ -22,6 +22,7 @@ class MenuScene extends Phaser.Scene {
         // Pulisci tutto
         if (this.mainContainer) {
             this.mainContainer.destroy();
+            this.sceneBorder.destroy();
         }
 
         const width = this.scale.width;
@@ -29,8 +30,27 @@ class MenuScene extends Phaser.Scene {
         const centerX = width / 2;
         const centerY = height / 2;
 
-        // Background
-        this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
+        // SCALA il container per adattarlo allo schermo
+        const scaleX = width / 1920;
+        const scaleY = height / 1080;
+        const scale = Math.min(scaleX, scaleY); // Mantieni proporzioni
+
+        const borderWidth = 1920 * scale;
+        const borderHeight = 1080 * scale;
+
+        this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight
+        );
+        this.sceneBorder.fillStyle(1, 0xffffff, 1);
+        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight);
 
         // CREA TUTTO nel container con coordinate fisse (come se fosse 1920x1080)
         this.mainContainer = this.add.container(0, 0);
@@ -94,11 +114,6 @@ class MenuScene extends Phaser.Scene {
         // Aggiungi tutto al container
         this.mainContainer.add([buttonGraphics, icona, title, startText]);
 
-        // SCALA il container per adattarlo allo schermo
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY); // Mantieni proporzioni
-
         this.mainContainer.setScale(scale);
 
         // Centra il container scalato
@@ -107,17 +122,6 @@ class MenuScene extends Phaser.Scene {
             centerY - (540 * scale)
         );
 
-        const borderWidth = 1920 * scale;
-        const borderHeight = 1080 * scale;
-
-        this.sceneBorder = this.add.graphics();
-        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(
-        centerX - borderWidth / 2,
-        centerY - borderHeight / 2,
-        borderWidth,
-        borderHeight
-    );
     }
 
     shutdown() {

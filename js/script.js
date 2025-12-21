@@ -8,6 +8,7 @@ const gameState = {
 const config = {
     type: Phaser.AUTO,
     parent: 'game-wrapper',
+    backgroundColor: '#000000' ,
     scale: {
         mode: Phaser.Scale.RESIZE, 
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -15,8 +16,6 @@ const config = {
         height: window.innerHeight
     },
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, EndScene, ReviewScene],
-    backgroundColor: '#34495e',
-    resolution: window.devicePixelRatio || 1
 };
 
 const game = new Phaser.Game(config);
