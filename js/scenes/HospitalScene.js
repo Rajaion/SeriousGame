@@ -16,7 +16,7 @@ class HospitalScene extends Phaser.Scene {
     
     preload() {
         this.load.text("phoneOptions", "text/Phone.txt");
-        this.load.image("Ospedale", "img/Ospedale.png");
+        this.load.image("Ospedale", "img/Ospedale.jpg");
         this.load.image("convBox", "img/TextBoxLeft.png");
         this.load.image("Phone", "img/Telefono.png");
         this.load.image("Paziente", "img/Paziente.png");
@@ -100,7 +100,7 @@ class HospitalScene extends Phaser.Scene {
 
         // Telefono
         const telephone = this.add.image(phoneX, phoneY * 0.8, "Phone")
-            .setScale(0.2)
+            .setScale(0.4)
             .setInteractive({ useHandCursor: true });
 
         // Area paziente (invisibile ma interattiva)

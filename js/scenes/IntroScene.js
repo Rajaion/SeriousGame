@@ -30,15 +30,41 @@ class IntroScene extends Phaser.Scene {
         const scaleY = height / 1080;
         const scale = Math.min(scaleX, scaleY);
 
-        this.children.removeAll();
+        const borderWidth = 1920 * scale;
+        const borderHeight = 1080 * scale;
 
-        this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
+        this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+        centerX - borderWidth / 2,
+        centerY - borderHeight / 2,
+        borderWidth,
+        borderHeight
+        );
+
+        this.children.removeAll();
 
         const refCenterX = centerX;
         const refCenterY = centerY;
 
-        const boxWidth = 1344 * scale;
-        const boxHeight = 756 * scale;
+        const boxWidth = 1700 * scale;
+        const boxHeight = 800 * scale;
+
+        this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight
+        );
+        this.sceneBorder.fillStyle(0xffbb8f, 1);
+        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight,
+            0
+        );
 
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
@@ -63,8 +89,7 @@ class IntroScene extends Phaser.Scene {
             refCenterY - boxHeight * 0.4,
             "🚨",
             {
-                fontSize: `${120 * scale}px`,
-                resolution: window.devicePixelRatio || 2 
+                fontSize: `${120 * scale}px`, 
             }
         ).setOrigin(0.5);
 
@@ -79,12 +104,11 @@ class IntroScene extends Phaser.Scene {
             refCenterY,
             scenarioText,
             {
-                fontSize: `${60 * scale}px`,
+                fontSize: `${70 * scale}px`,
                 color: "#2c3e50",
                 align: "center",
-                wordWrap: { width: boxWidth * 0.9 },
-                lineSpacing: 4 * scale,
-                resolution: window.devicePixelRatio || 2 
+                wordWrap: { width: boxWidth * 1 },
+                lineSpacing: 4 * scale, 
             }
         ).setOrigin(0.5);
 
@@ -141,18 +165,6 @@ class IntroScene extends Phaser.Scene {
                 this.scene.start("HospitalScene");
             });
         });
-
-            const borderWidth = 1920 * scale;
-    const borderHeight = 1080 * scale;
-
-    this.sceneBorder = this.add.graphics();
-    this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-    this.sceneBorder.strokeRect(
-        centerX - borderWidth / 2,
-        centerY - borderHeight / 2,
-        borderWidth,
-        borderHeight
-    );
     }
 
     shutdown() {

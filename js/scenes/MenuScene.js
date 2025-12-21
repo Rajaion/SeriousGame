@@ -4,7 +4,7 @@ class MenuScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("IconaMenu", "img/Menu.png");
+        this.load.image("IconaMenu", "img/Menu.jpg");
     }
 
     create() {
@@ -46,11 +46,13 @@ class MenuScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-        this.sceneBorder.fillStyle(1, 0xffffff, 1);
+        this.sceneBorder.fillStyle(0xffbb8f, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
-            borderHeight);
+            borderHeight,
+            0
+        );
 
         // CREA TUTTO nel container con coordinate fisse (come se fosse 1920x1080)
         this.mainContainer = this.add.container(0, 0);
@@ -61,12 +63,12 @@ class MenuScene extends Phaser.Scene {
 
         // Icona
         const icona = this.add.image(refCenterX, refCenterY * 1, 'IconaMenu')
-            .setScale(0.5);
+            .setScale(0.7);
 
         // Titolo
         const title = this.add.text(refCenterX, refCenterY * 0.35, 'Emergenza medica', {
             fontSize: '77px',
-            color: "#2c3e50",
+            color: "#020202ff",
             fontFamily: "Arial, sans-serif",
             fontStyle: "bold"
         }).setOrigin(0.5);
@@ -83,14 +85,17 @@ class MenuScene extends Phaser.Scene {
         };
 
         // Testo bottone
-        const startText = this.add.text(refCenterX, refCenterY * 1.6, "Start", {
+        const startText = this.add.text(refCenterX * 0.99, refCenterY * 1.6, "Start", {
             fontSize: '40px',
-            color: "#ffffff",
+            color: "#000000ff",
             fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontStyle: "bold",
+            align: "center",
+            
         })
         .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
+        .setInteractive({ useHandCursor: true })
+        ;
 
         startText.removeAllListeners();
 
