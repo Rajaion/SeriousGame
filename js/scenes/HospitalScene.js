@@ -243,15 +243,15 @@ class HospitalScene extends Phaser.Scene {
     const minFontSize = 40 * scale;
     const optionFontSize = Math.max(minFontSize, 60 * scale); // Font più grande
 
-    // Calcola posizioni reali dei testi
-    const opt1TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt1TextY = centerY + ((780 - refCenterY) * scale);
+// Calcola posizioni reali dei testi - ALLINEATE AI RETTANGOLI
+const opt1TextX = centerX + ((convBoxX - refCenterX) * scale);
+const opt1TextY = centerY + ((750 - refCenterY) * scale);  // ← 750 invece di 780
 
-    const opt2TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt2TextY = centerY + ((875 - refCenterY) * scale);
+const opt2TextX = centerX + ((convBoxX - refCenterX) * scale);
+const opt2TextY = centerY + ((845 - refCenterY) * scale);  // ← 750+95 invece di 875
 
-    const opt3TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt3TextY = centerY + ((975 - refCenterY) * scale);
+const opt3TextX = centerX + ((convBoxX - refCenterX) * scale);
+const opt3TextY = centerY + ((940 - refCenterY) * scale);  // ← 750+95+95 invece di 975
 
     const option1Text = this.add.text(opt1TextX, opt1TextY, 
         this.opzione1, {
