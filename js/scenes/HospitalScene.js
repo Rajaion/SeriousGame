@@ -94,7 +94,7 @@ class HospitalScene extends Phaser.Scene {
         // Box info paziente
         const infoBox = this.add.graphics();
         infoBox.fillStyle(0xecf0f1, 1);
-        infoBox.fillRoundedRect(infoBoxX  - 300, infoBoxY - 75, 600, 150, 0);
+        infoBox.fillRoundedRect(infoBoxX - 300, infoBoxY - 75, 600, 150, 0);
         infoBox.lineStyle(2, 0x2c3e50, 1);
         infoBox.strokeRoundedRect(infoBoxX - 300, infoBoxY - 75, 600, 150, 0);
 
@@ -125,11 +125,11 @@ class HospitalScene extends Phaser.Scene {
 
         // TESTI FUORI DAL CONTAINER
         this.textElements = [];
-        const minFontSize = 16;
+        const minFontSize = 40 * scale;
         
         // Calcola posizioni reali
         const scoreTextX = centerX;
-        const scoreTextY = centerY + ((50 - refCenterY) * scale);
+        const scoreTextY = centerY + ((32 - refCenterY) * scale);
         
         const infoTextX = centerX + ((infoBoxX - refCenterX) * scale);
         const infoTextY = centerY + ((infoBoxY - refCenterY) * scale);
@@ -138,26 +138,26 @@ class HospitalScene extends Phaser.Scene {
         const wrongTextY = centerY + ((centerY / 1.5 - refCenterY) * scale);
 
         // Score text
-        const scoreFontSize = Math.max(minFontSize, 35 * scale);
+        const scoreFontSize = Math.max(minFontSize, 26 * scale);
         this.scoreText = this.add.text(scoreTextX, scoreTextY, 
             "Score: " + gameState.score, {
             fontSize: `${scoreFontSize}px`,
             align: "center",
-            color: "rgba(255, 0, 0, 1)",
-            fontFamily: "Arial, sans-serif",
+            color: "#000000ff",
+            fontFamily: "Poppins",
             fontStyle: "bold"
         }).setOrigin(0.5);
         this.textElements.push(this.scoreText);
 
         // Info paziente text
-        const infoFontSize = Math.max(minFontSize, 20 * scale) * 0.8;
+        const infoFontSize = Math.max(minFontSize, 60 * scale) * 0.8;
         const infoPaziente = this.add.text(infoTextX, infoTextY, 
             'Il paziente non risponde', {
             fontSize: `${infoFontSize}px`,
             color: '#2c3e50',
             align: 'center',
-            fontFamily: "Arial, sans-serif",
-            wordWrap: {width: scale * 400, height: scale * 75}
+            fontFamily: "Poppins",
+            wordWrap: {width: scale * 410, height: scale * 75}
         }).setOrigin(0.5);
         this.textElements.push(infoPaziente);
 
@@ -169,7 +169,7 @@ class HospitalScene extends Phaser.Scene {
             fontSize: `${wrongFontSize}px`,
             color: "#ff0000",
             padding: { x: 15, y: 5 },
-            fontFamily: "Arial, sans-serif"
+            fontFamily: "Poppins"
         }).setOrigin(0.5).setAlpha(0);
         this.textElements.push(this.wrongChoiceText);
 
@@ -236,8 +236,8 @@ class HospitalScene extends Phaser.Scene {
     this.mainContainer.add([optRect1, optRect2, optRect3]);
 
     // TESTI opzioni (fuori dal container per qualità)
-    const minFontSize = 16;
-    const optionFontSize = Math.max(minFontSize, 25 * scale); // Font più grande
+    const minFontSize = 40 * scale;
+    const optionFontSize = Math.max(minFontSize, 60 * scale); // Font più grande
 
     // Calcola posizioni reali dei testi
     const opt1TextX = centerX + ((convBoxX - refCenterX) * scale);
@@ -255,7 +255,7 @@ class HospitalScene extends Phaser.Scene {
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Poppins",
         fontStyle: "bold"
     }).setOrigin(0.5);
 
@@ -265,7 +265,7 @@ class HospitalScene extends Phaser.Scene {
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Poppins",
         fontStyle: "bold"
     }).setOrigin(0.5);
 
@@ -275,7 +275,7 @@ class HospitalScene extends Phaser.Scene {
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Poppins",
         fontStyle: "bold"
     }).setOrigin(0.5);
 
