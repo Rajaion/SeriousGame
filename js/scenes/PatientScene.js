@@ -30,8 +30,6 @@ class PatientScene extends Phaser.Scene {
         // Reset counter
         this.ordCounter = 0;
 
-
-
         const width = this.scale.width;
         const height = this.scale.height;
         const centerX = width / 2;
@@ -54,7 +52,7 @@ class PatientScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-        
+
         this.sceneBorder.fillStyle(0xffbb8f, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
@@ -156,7 +154,7 @@ class PatientScene extends Phaser.Scene {
             fontSize: `${questionFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
-            fontFamily: "Arial, sans-serif",
+            fontFamily: "Poppins",
         }).setOrigin(0.5);
 
         // Testo feedback
@@ -165,8 +163,8 @@ class PatientScene extends Phaser.Scene {
             fontSize: `${feedbackFontSize * 0.7}px`,
             color: "#27ae60",
             align: "center",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontFamily: "Poppins",
+            resolution: 2
         }).setOrigin(0.5).setAlpha(0);
 
         // Testi risposte
@@ -174,21 +172,24 @@ class PatientScene extends Phaser.Scene {
             fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
-            fontFamily: "Arial, sans-serif"
+            fontFamily: "Poppins",
+            resolution: 2
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         const text2 = this.add.text(answer2TextX, answer2TextY, "Inizia le compressioni", {
             fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
-            fontFamily: "Arial, sans-serif"
+            fontFamily: "Poppins",
+            resolution: 2
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         const text3 = this.add.text(answer3TextX, answer3TextY, "Libera le vie aeree", {
             fontSize: `${answerFontSize * 0.7}px`,
             color: "#000000",
             align: "center",
-            fontFamily: "Arial, sans-serif"
+            fontFamily: "Poppins",
+            resolution: 2
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         // Salva coordinate per i box (scalate)
@@ -261,9 +262,9 @@ class PatientScene extends Phaser.Scene {
     }
 
     setDefault() {
-        this.drawAnswerBox(this.answer1Box, 1536, 540, 500, 70);
-        this.drawAnswerBox(this.answer2Box, 1536, 648, 500, 70);
-        this.drawAnswerBox(this.answer3Box, 1536, 756, 500, 70);
+        this.drawAnswerBox(this.answer1Box, 1500, 540, 650, 70);
+        this.drawAnswerBox(this.answer2Box, 1500, 648, 650, 70);
+        this.drawAnswerBox(this.answer3Box, 1500, 756, 650, 70);
     }
 
     showError() {
@@ -275,8 +276,8 @@ class PatientScene extends Phaser.Scene {
             fontSize: `${Math.max(18, 40 * Math.min(this.scale.width / 1920, this.scale.height / 1080))}px`,
             color: "#e74c3c",
             align: "center",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontFamily: "Poppins",
+            fontStyle: "bold",
         }).setOrigin(0.5);
 
         this.time.delayedCall(2000, () => {
