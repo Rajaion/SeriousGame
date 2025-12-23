@@ -25,29 +25,43 @@ class PatientScene extends Phaser.Scene {
     
     createContent() {
         // Pulisci tutto
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.children) {
-            this.children.removeAll();
-        }
+        this.children.removeAll();
         
         // Reset counter
         this.ordCounter = 0;
+
+
 
         const width = this.scale.width;
         const height = this.scale.height;
         const centerX = width / 2;
         const centerY = height / 2;
 
-        // Background
-        this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
-        this.add.rectangle(centerX, centerY, width*0.95, height * 0.95)
-
         // Calcola scala
         const scaleX = width / 1920;
         const scaleY = height / 1080;
         const scale = Math.min(scaleX, scaleY);
+
+        const borderWidth = 1920 * scale;
+        const borderHeight = 1080 * scale;
+
+        // Background
+                this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight
+        );
+        
+        this.sceneBorder.fillStyle(0xffbb8f, 1);
+        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight,
+            0
+        );
 
         // CONTAINER per elementi grafici
         this.mainContainer = this.add.container(0, 0);
@@ -60,24 +74,23 @@ class PatientScene extends Phaser.Scene {
         const patientX = 576;  // 30% di 1920
         const patientY = 540;
 
-        const questionX = 1536; // 80% di 1920
+        const questionX = 1500;
         const questionY = 324;  // 30% di 1080
 
-        const answer1X = 1536;
+        const answer1X = 1500;
         const answer1Y = 540;   // 50% di 1080
 
-        const answer2X = 1536;
+        const answer2X = 1500;
         const answer2Y = 648;   // 60% di 1080
 
-        const answer3X = 1536;
+        const answer3X = 1500;
         const answer3Y = 756;   // 70% di 1080
 
-        const reloadX = 1536;
+        const reloadX = 1500;
         const reloadY = 918;    // 85% di 1080
 
         // Immagine paziente
-        const patient = this.add.image(patientX, patientY, "PatientCloseUp")
-            .setScale(0.7);
+        const patient = this.add.image(patientX, patientY, "PatientCloseUp").setScale(0.65);
 
         // Box domanda
         const questionBox = this.add.graphics();
@@ -117,10 +130,10 @@ class PatientScene extends Phaser.Scene {
             centerY - (refCenterY * scale)
         );
 
-        const minFontSize = 18;
-        const questionFontSize = Math.max(minFontSize, 40 * scale);
-        const answerFontSize = Math.max(minFontSize, 38 * scale);
-        const feedbackFontSize = Math.max(minFontSize, 38 * scale);
+        const minFontSize = 60 * scale;
+        const questionFontSize = Math.max(minFontSize, 70 * scale);
+        const answerFontSize = Math.max(minFontSize, 60 * scale);
+        const feedbackFontSize = Math.max(minFontSize, 60 * scale);
 
         // Calcola posizioni reali dei testi
         const questionTextX = centerX + ((questionX - refCenterX) * scale);

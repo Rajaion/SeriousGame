@@ -9,6 +9,8 @@ class HospitalScene extends Phaser.Scene {
     wrongChoiceText;
     ordineClick = false;
     scoreText = null;
+    bottomTextSpace = null;
+    bottomText = "Interagire con il telefono";
     
     constructor() {
         super({ key: "HospitalScene" });
@@ -130,6 +132,9 @@ class HospitalScene extends Phaser.Scene {
         // Calcola posizioni reali
         const scoreTextX = centerX;
         const scoreTextY = centerY + ((32 - refCenterY) * scale);
+
+        const bottomTextSpaceX = centerX;
+        const bottomTextSpaceY = centerY + ((refCenterY - 38) * scale);
         
         const infoTextX = centerX + ((infoBoxX - refCenterX) * scale);
         const infoTextY = centerY + ((infoBoxY - refCenterY) * scale);
@@ -138,15 +143,25 @@ class HospitalScene extends Phaser.Scene {
         const wrongTextY = centerY + ((centerY / 1.5 - refCenterY) * scale);
 
         // Score text
-        const scoreFontSize = Math.max(minFontSize, 26 * scale);
+        const scoreFontSize = Math.max(minFontSize, 50 * scale);
         this.scoreText = this.add.text(scoreTextX, scoreTextY, 
             "Score: " + gameState.score, {
             fontSize: `${scoreFontSize}px`,
             align: "center",
             color: "#000000ff",
             fontFamily: "Poppins",
-            fontStyle: "bold"
+            resolution: 2
         }).setOrigin(0.5);
+        this.textElements.push(this.scoreText);
+
+        this.bottomTextSpace = this.add.text(bottomTextSpaceX, bottomTextSpaceY, 
+            this.bottomText , {
+            fontSize: `${scoreFontSize}px`,
+            align: "center",
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            resolution: 2
+        }).setOrigin(0.5, 0.5);
         this.textElements.push(this.scoreText);
 
         // Info paziente text
@@ -157,21 +172,10 @@ class HospitalScene extends Phaser.Scene {
             color: '#2c3e50',
             align: 'center',
             fontFamily: "Poppins",
-            wordWrap: {width: scale * 410, height: scale * 75}
+            wordWrap: {width: scale * 410, height: scale * 75},
+            resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(infoPaziente);
-
-        // Wrong choice text
-        const wrongFontSize = Math.max(minFontSize, 24 * scale);
-        this.wrongChoiceText = this.add.text(wrongTextX, wrongTextY, 
-            "Careful,\nchoose the correct option", {
-            align: "center",
-            fontSize: `${wrongFontSize}px`,
-            color: "#ff0000",
-            padding: { x: 15, y: 5 },
-            fontFamily: "Poppins"
-        }).setOrigin(0.5).setAlpha(0);
-        this.textElements.push(this.wrongChoiceText);
 
         // EVENTI TELEFONO
         telephone.removeAllListeners();
@@ -210,25 +214,25 @@ class HospitalScene extends Phaser.Scene {
     const convBoxY = 900;   // In basso (83% di 1080)
 
     // Posizioni opzioni - partendo da 780px (72% di 1080)
-    let optY = 780;
+    let optY = 750;
     const optWidth = 600;   // Larghezza aumentata
     const optHeight = 80;   // Altezza aumentata
     const optSpacing = 95;  // Spaziatura tra opzioni
 
     // Opzione 1
-    const optRect1 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0x999999, 1)
+    const optRect1 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect1.setStrokeStyle(4, 0x000000);
 
     // Opzione 2
     optY += optSpacing;
-    const optRect2 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0x999999, 1)
+    const optRect2 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect2.setStrokeStyle(4, 0x000000);
 
     // Opzione 3
     optY += optSpacing;
-    const optRect3 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0x999999, 1)
+    const optRect3 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect3.setStrokeStyle(4, 0x000000);
 
@@ -241,42 +245,45 @@ class HospitalScene extends Phaser.Scene {
 
     // Calcola posizioni reali dei testi
     const opt1TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt1TextY = centerY + ((810 - refCenterY) * scale);
+    const opt1TextY = centerY + ((780 - refCenterY) * scale);
 
     const opt2TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt2TextY = centerY + ((905 - refCenterY) * scale);
+    const opt2TextY = centerY + ((875 - refCenterY) * scale);
 
     const opt3TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt3TextY = centerY + ((1005 - refCenterY) * scale);
+    const opt3TextY = centerY + ((975 - refCenterY) * scale);
 
     const option1Text = this.add.text(opt1TextX, opt1TextY, 
         this.opzione1, {
-        fontSize: `${optionFontSize * 0.7}px`,
+        fontSize: `${optionFontSize * 0.8}px`,
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
-        fontStyle: "bold"
+        fontStyle: "bold",
+        resolution: 2
     }).setOrigin(0.5);
 
     const option2Text = this.add.text(opt2TextX, opt2TextY, 
         this.opzione2, {
-        fontSize: `${optionFontSize * 0.7}px`,
+        fontSize: `${optionFontSize * 0.8}px`,
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
-        fontStyle: "bold"
+        fontStyle: "bold",
+        resolution: 2
     }).setOrigin(0.5);
 
     const option3Text = this.add.text(opt3TextX, opt3TextY, 
         this.opzione3, {
-        fontSize: `${optionFontSize * 0.7}px`,
+        fontSize: `${optionFontSize * 0.8}px`,
         color: '#2c3e50',
         align: 'center',
         wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
-        fontStyle: "bold"
+        fontStyle: "bold",
+        resolution: 2
     }).setOrigin(0.5);
 
     // Salva riferimenti per cleanup
@@ -303,32 +310,25 @@ class HospitalScene extends Phaser.Scene {
 
     buttonChoice(chosenNumber) {
         if (this.correctNumber === chosenNumber) {
-            this.clickedOption("Corretto!\nOra andiamo a fare un check-up sul paziente", true);
+            this.clickedOption("Corretto! Ora clickare sul paziente per un check-up!", true);
             this.clickedCorOpt = true;
         } else {
             gameState.errors.Hospital++;
             gameState.score -= 5;
             this.scoreText.setText("Score: " + gameState.score);
-            this.clickedOption("Attenzione,\nscegliere l'opzione corretta", false);
+            this.clickedOption("Attenzione, scegliere l'opzione corretta", false);
         }
         this.deletePhoneConvo();
     }
 
     clickedOption(info, win) {
         if (win) {
-            this.wrongChoiceText.setColor("#167e30ff");
+            this.bottomTextSpace.setColor("#167e30ff");   
         } else {
-            this.wrongChoiceText.setColor("#ff0000");
+            this.bottomTextSpace.setColor("#ff0000");
         }
-
-        this.wrongChoiceText.setText(info);
-        this.wrongChoiceText.setAlpha(1);
-
-        this.tweens.add({
-            targets: this.wrongChoiceText,
-            alpha: 0,
-            duration: 3000,
-        });
+        this.bottomTextSpace.setText(info);
+        this.bottomText = info;
     }
 
     getPhonetext(fullText) {
