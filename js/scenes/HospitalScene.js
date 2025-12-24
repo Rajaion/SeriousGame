@@ -118,13 +118,6 @@ class HospitalScene extends Phaser.Scene {
             patientArea
         ]);
 
-        // Scala il container
-        this.mainContainer.setScale(scale);
-        this.mainContainer.setPosition(
-            centerX - (refCenterX * scale),
-            centerY - (refCenterY * scale)
-        );
-
         // TESTI FUORI DAL CONTAINER
         this.textElements = [];
         const minFontSize = 40 * scale;
@@ -206,6 +199,13 @@ class HospitalScene extends Phaser.Scene {
                 this.clickedOption("Interagire prima con il telefono", false);
             }
         });
+
+        // Scala il container
+        this.mainContainer.setScale(scale);
+        this.mainContainer.setPosition(
+            centerX - (refCenterX * scale),
+            centerY - (refCenterY * scale)
+        );
     }
 
     showPhoneConvo(scale) {
@@ -213,78 +213,80 @@ class HospitalScene extends Phaser.Scene {
     this.bottomText = "Selezionare l'opzione giusta tra le 3";
     this.bottomTextSpace.setText(this.bottomText);
 
-    // Posizioni di riferimento per la conversazione - IN BASSO A DESTRA
-    const convBoxX = 1536;  // Coordinata X di riferimento (1920x1080)
-    const convBoxY = 900;   // In basso (83% di 1080)
+    const width = this.scale.width;
+    const height = this.scale.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    const refCenterX = 960;
+    const refCenterY = 540;
 
-    // Posizioni opzioni - partendo da 780px (72% di 1080)
-    let optY = 750;
-    const optWidth = 600;   // Larghezza aumentata
-    const optHeight = 80;   // Altezza aumentata
-    const optSpacing = 95;  // Spaziatura tra opzioni
+    // Posizioni di riferimento per la conversazione (coordinate 1920x1080)
+    const convBoxX = 1536;
+    
+    // Posizioni opzioni nel container
+    const startOptY = 750;
+    const optWidth = 600;
+    const optHeight = 80;
+    const optSpacing = 95;
 
     // Opzione 1
-    const optRect1 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
+    const opt1Y = startOptY;
+    const optRect1 = this.add.rectangle(convBoxX, opt1Y - optHeight/2, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect1.setStrokeStyle(4, 0x000000);
 
     // Opzione 2
-    optY += optSpacing;
-    const optRect2 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
+    const opt2Y = startOptY + optSpacing;
+    const optRect2 = this.add.rectangle(convBoxX, opt2Y - optHeight/2, optWidth , optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect2.setStrokeStyle(4, 0x000000);
 
     // Opzione 3
-    optY += optSpacing;
-    const optRect3 = this.add.rectangle(convBoxX, optY, optWidth, optHeight, 0xffffff, 1)
+    const opt3Y = startOptY + (optSpacing * 2);
+    const optRect3 = this.add.rectangle(convBoxX, opt3Y - optHeight/2, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect3.setStrokeStyle(4, 0x000000);
 
-    // Calcola posizioni reali dei testi
-    const opt1TextX = convBoxX;
-    const opt1TextY =  (780);
-
-    const opt2TextX = convBoxX;
-    const opt2TextY = ((780 + 95));
-
-    const opt3TextX = convBoxX;
-    const opt3TextY = (975);
-
-    const option1Text = this.add.text(opt1TextX, opt1TextY, 
+    // TESTI - coordinate nel container (NON scalate)
+    const option1Text = this.add.text(convBoxX, opt1Y, 
         this.opzione1, {
-        fontSize: `60px`,
+        fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
+        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
     }).setOrigin(0.5);
 
-    const option2Text = this.add.text(opt2TextX, opt2TextY, 
+    const option2Text = this.add.text(convBoxX, opt2Y, 
         this.opzione2, {
-        fontSize: `60px`,
+        fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
+        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
     }).setOrigin(0.5);
 
-    const option3Text = this.add.text(opt3TextX, opt3TextY, 
+    const option3Text = this.add.text(convBoxX, opt3Y, 
         this.opzione3, {
-        fontSize: `60px`,
+        fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
+        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
     }).setOrigin(0.5);
 
-    // Aggiungi rettangoli al container
+    // Aggiungi TUTTO al container (così viene scalato insieme)
     this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
 
     // Salva riferimenti per cleanup
-   this.optRect1 = optRect1;
+    this.optRect1 = optRect1;
     this.optRect2 = optRect2;
     this.optRect3 = optRect3;
     this.option1 = option1Text;
