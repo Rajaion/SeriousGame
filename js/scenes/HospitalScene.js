@@ -192,7 +192,7 @@ class HospitalScene extends Phaser.Scene {
             }
 
             this.convOn = true;
-            this.showPhoneConvo(scale, centerX, centerY, refCenterX, refCenterY);
+            this.showPhoneConvo(scale);
         });
 
         // EVENTI PAZIENTE
@@ -208,7 +208,11 @@ class HospitalScene extends Phaser.Scene {
         });
     }
 
-    showPhoneConvo(scale, centerX, centerY, refCenterX, refCenterY) {
+    showPhoneConvo(scale) {
+    // Aggiornare le info del testo sotto
+    this.bottomText = "Selezionare l'opzione giusta tra le 3";
+    this.bottomTextSpace.setText(this.bottomText);
+
     // Posizioni di riferimento per la conversazione - IN BASSO A DESTRA
     const convBoxX = 1536;  // Coordinata X di riferimento (1920x1080)
     const convBoxY = 900;   // In basso (83% di 1080)
@@ -236,29 +240,21 @@ class HospitalScene extends Phaser.Scene {
         .setInteractive({ useHandCursor: true });
     optRect3.setStrokeStyle(4, 0x000000);
 
-    // Aggiungi rettangoli al container
-    this.mainContainer.add([optRect1, optRect2, optRect3]);
-
-    // TESTI opzioni (fuori dal container per qualità)
-    const minFontSize = 40 * scale;
-    const optionFontSize = Math.max(minFontSize, 60 * scale); // Font più grande
-
     // Calcola posizioni reali dei testi
-    const opt1TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt1TextY =  (780 * scale);
+    const opt1TextX = convBoxX;
+    const opt1TextY =  (780);
 
-    const opt2TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt2TextY = ((780 + 95)  * scale);
+    const opt2TextX = convBoxX;
+    const opt2TextY = ((780 + 95));
 
-    const opt3TextX = centerX + ((convBoxX - refCenterX) * scale);
-    const opt3TextY = (975 * scale);
+    const opt3TextX = convBoxX;
+    const opt3TextY = (975);
 
     const option1Text = this.add.text(opt1TextX, opt1TextY, 
         this.opzione1, {
-        fontSize: `${optionFontSize * 0.8}px`,
+        fontSize: `60px`,
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
@@ -266,10 +262,9 @@ class HospitalScene extends Phaser.Scene {
 
     const option2Text = this.add.text(opt2TextX, opt2TextY, 
         this.opzione2, {
-        fontSize: `${optionFontSize * 0.8}px`,
+        fontSize: `60px`,
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
@@ -277,14 +272,16 @@ class HospitalScene extends Phaser.Scene {
 
     const option3Text = this.add.text(opt3TextX, opt3TextY, 
         this.opzione3, {
-        fontSize: `${optionFontSize * 0.8}px`,
+        fontSize: `60px`,
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * scale },
         fontFamily: "Poppins",
         fontStyle: "bold",
         resolution: 2
     }).setOrigin(0.5);
+
+    // Aggiungi rettangoli al container
+    this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
 
     // Salva riferimenti per cleanup
    this.optRect1 = optRect1;
