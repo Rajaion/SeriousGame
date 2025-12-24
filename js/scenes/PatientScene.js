@@ -8,6 +8,7 @@ class PatientScene extends Phaser.Scene {
     preload() {
         this.load.image("ReloadButton", "img/ReloadButton.png");
         this.load.image("PatientCloseUp", "img/PatientCloseUp.png");
+        this.load.image("Arrow", "img/Arrow.png");
     }
     
     create() {
@@ -53,7 +54,7 @@ class PatientScene extends Phaser.Scene {
             borderHeight
         );
 
-        this.sceneBorder.fillStyle(0xffbb8f, 1);
+        this.sceneBorder.fillStyle(0x000055, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
@@ -90,6 +91,9 @@ class PatientScene extends Phaser.Scene {
         // Immagine paziente
         const patient = this.add.image(patientX, patientY, "PatientCloseUp").setScale(0.65);
 
+        //immagine freccia
+        const arrow = this.add.image(questionX, questionY + 130, "Arrow").setScale(4);
+
         // Box domanda
         const questionBox = this.add.graphics();
         questionBox.fillStyle(0xecf0f1, 1);
@@ -113,6 +117,7 @@ class PatientScene extends Phaser.Scene {
 
         // Aggiungi elementi grafici al container
         this.mainContainer.add([
+            arrow,
             patient,
             questionBox,
             this.answer1Box,

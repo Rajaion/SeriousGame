@@ -46,7 +46,7 @@ class MenuScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-        this.sceneBorder.fillStyle(0xffbb8f, 1);
+        this.sceneBorder.fillStyle(0x2c3e50, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
@@ -67,57 +67,66 @@ class MenuScene extends Phaser.Scene {
 
         // Titolo
         const title = this.add.text(refCenterX, refCenterY * 0.35, 'Emergenza medica', {
-            fontSize: '77px',
-            color: "#020202ff",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontSize: '60px',
+            color: "#ff0000ff",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
         }).setOrigin(0.5);
 
         // Bottone
         const buttonGraphics = this.add.graphics();
-        buttonGraphics.fillStyle(0x3CFA80, 1);
-        buttonGraphics.fillRoundedRect(refCenterX - 125, refCenterY * 1.6 - 37.5, 250, 75, 20);
+        buttonGraphics.fillStyle(0x3498db, 1);
+        buttonGraphics.fillRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+        buttonGraphics.lineStyle(3, 0x000000, 1);
+        buttonGraphics.strokeRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+
+        // Sfondo Titolo
+        const titleBackground = this.add.graphics();
+        titleBackground.fillStyle(0xffffff, 1);
+        titleBackground.fillRoundedRect(refCenterX - 310, refCenterY * 0.35 - 37.5, 620, 75, 20);
+        titleBackground.lineStyle(3, 0x000000, 1);
+        titleBackground.strokeRoundedRect(refCenterX - 310, refCenterY * 0.35 - 37.5, 620, 75, 20);
 
         const drawButton = (color) => {
             buttonGraphics.clear();
             buttonGraphics.fillStyle(color, 1);
-            buttonGraphics.fillRoundedRect(refCenterX - 125, refCenterY * 1.6 - 37.5, 250, 75, 20);
+            buttonGraphics.fillRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+            buttonGraphics.lineStyle(3, 0x000000, 1);
+            buttonGraphics.strokeRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
         };
 
         // Testo bottone
         const startText = this.add.text(refCenterX * 0.99, refCenterY * 1.6, "Start", {
-            fontSize: '40px',
+            fontSize: '60px',
             color: "#000000ff",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold",
+            fontFamily: "Poppins",
             align: "center",
-            
+            resolution: 2
         })
         .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
-        ;
+        .setInteractive({ useHandCursor: true });
 
         startText.removeAllListeners();
 
         startText.on("pointerover", () => {
-            drawButton(0x3DFB3F);
+            drawButton(0x5DADE2);
             startText.setScale(1.05);
         });
 
         startText.on("pointerout", () => {
-            drawButton(0x3CFA80);
+            drawButton(0x3498db);
             startText.setScale(1);
         });
 
         startText.on("pointerdown", () => {
-            drawButton(0x2ecc71);
+            drawButton(0x2980b9);
             this.time.delayedCall(100, () => {
                 this.scene.start("IntroScene");
             });
         });
 
         // Aggiungi tutto al container
-        this.mainContainer.add([buttonGraphics, icona, title, startText]);
+        this.mainContainer.add([icona, buttonGraphics, titleBackground, title, startText]);
 
         this.mainContainer.setScale(scale);
 

@@ -42,6 +42,7 @@ class IntroScene extends Phaser.Scene {
         const boxWidth = 1700 * scale;
         const boxHeight = 800 * scale;
 
+        //Bordo della scena 
         this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
         this.sceneBorder.strokeRect(
@@ -50,7 +51,7 @@ class IntroScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-        this.sceneBorder.fillStyle(0xffbb8f, 1);
+        this.sceneBorder.fillStyle(0x000055, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
@@ -78,7 +79,7 @@ class IntroScene extends Phaser.Scene {
 
         const icon = this.add.text(
             refCenterX,
-            refCenterY - boxHeight * 0.4,
+            refCenterY - boxHeight * 0.3,
             "🚨",
             {
                 fontSize: `${120 * scale}px`, 
@@ -86,21 +87,20 @@ class IntroScene extends Phaser.Scene {
         ).setOrigin(0.5);
 
         const scenarioText =
-            "\nSei un infermiere del pronto soccorso.\n" +
-            "Un paziente è appena arrivato in codice rosso.\n" +
-            "Devi agire velocemente e in modo corretto.\n\n" +
-            "Sei pronto?";
+            "\nSei un infermiere del pronto soccorso e un paziente è appena arrivato in codice rosso.\n" +
+            "Devi agire velocemente e in modo corretto.\n\n";
 
         const textContent = this.add.text(
-            refCenterX,
+            refCenterX - 10,
             refCenterY,
             scenarioText,
             {
                 fontSize: `${70 * scale}px`,
+                fontFamily: "Poppins",
                 color: "#2c3e50",
-                align: "center",
-                wordWrap: { width: boxWidth * 1 },
+                wordWrap: { width: boxWidth * 0.9 },
                 lineSpacing: 4 * scale, 
+                resolution: 3
             }
         ).setOrigin(0.5);
 
@@ -133,7 +133,7 @@ class IntroScene extends Phaser.Scene {
             {
                 fontSize: `${60 * scale}px`,
                 color: "#ffffff",
-                fontFamily: "Arial, sans-serif",
+                fontFamily: "Poppins",
                 fontStyle: "bold",
                 resolution: window.devicePixelRatio
             }
