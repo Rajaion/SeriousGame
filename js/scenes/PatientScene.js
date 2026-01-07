@@ -1,8 +1,22 @@
 class PatientScene extends Phaser.Scene {
-    
     constructor() {
         super({ key: "PatientScene" });
         this.ordCounter = 0;
+        this.answerBoxes = [];
+        this.answerTexts = [];
+        
+        // Configurazione posizioni (riferimento 1920x1080)
+        this.refPositions = {
+            refCenter: { x: 960, y: 540 },
+            patient: { x: 576, y: 540 },
+            question: { x: 1500, y: 324 },
+            answers: [
+                { x: 1500, y: 540, text: "Valutazione GAS" },
+                { x: 1500, y: 648, text: "Inizia le compressioni" },
+                { x: 1500, y: 756, text: "Libera le vie aeree" }
+            ],
+            reload: { x: 1500, y: 918 }
+        };
     }
     
     preload() {
@@ -16,7 +30,7 @@ class PatientScene extends Phaser.Scene {
         this.scale.on('resize', this.handleResize, this);
     }
     
-    handleResize(gameSize) {
+    handleResize() {
         this.time.delayedCall(50, () => {
             if (this.scene.isActive()) {
                 this.createContent();
@@ -25,26 +39,40 @@ class PatientScene extends Phaser.Scene {
     }
     
     createContent() {
-        // Pulisci tutto
         this.children.removeAll();
-        
-        // Reset counter
         this.ordCounter = 0;
+        this.answerBoxes = [];
+        this.answerTexts = [];
 
+        const { width, height, centerX, centerY, scale } = this.getScreenMetrics();
+        const { borderWidth, borderHeight } = this.getBorderDimensions(scale);
+
+        this.createBackground(centerX, centerY, borderWidth, borderHeight);
+        this.createTopBottomBars(centerX, centerY, borderWidth, borderHeight, scale);
+        this.createGameContent(centerX, centerY, scale);
+    }
+
+    getScreenMetrics() {
         const width = this.scale.width;
         const height = this.scale.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        const scale = Math.min(width / 1920, height / 1080);
+        return {
+            width,
+            height,
+            centerX: width / 2,
+            centerY: height / 2,
+            scale
+        };
+    }
 
-        // Calcola scala
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY);
+    getBorderDimensions(scale) {
+        return {
+            borderWidth: 1920 * scale,
+            borderHeight: 1080 * scale
+        };
+    }
 
-        const borderWidth = 1920 * scale;
-        const borderHeight = 1080 * scale;
-
-        // Background
+    createBackground(centerX, centerY, borderWidth, borderHeight) {
         this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
         this.sceneBorder.strokeRect(
@@ -53,241 +81,189 @@ class PatientScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-
         this.sceneBorder.fillStyle(0x2c3e50, 1);
-        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
+        this.sceneBorder.fillRoundedRect(
+            centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
             borderHeight,
             0
         );
+    }
 
-        // Rettangolo in alto - scala anche l'altezza
-        const topBarHeight = 40 * scale;
-        const topTextSpace = this.add.graphics();
-        topTextSpace.fillStyle(0xffffff, 1);
-        topTextSpace.fillRoundedRect(
+    createTopBottomBars(centerX, centerY, borderWidth, borderHeight, scale) {
+        const barHeight = 40 * scale;
+        const barStyle = { fill: 0xffffff, stroke: 0x000000, strokeWidth: 2 * scale };
+
+        // Barra superiore
+        this.createBar(
             centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
-            topBarHeight,
-            0
-        );
-        topTextSpace.lineStyle(2 * scale, 0x000000, 1);
-        topTextSpace.strokeRoundedRect(
-            centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            topBarHeight,
-            0
+            barHeight,
+            barStyle
         );
 
-        // Rettangolo in basso - posizione corretta
-        const bottomBarHeight = 40 * scale;
-        const bottomTextSpace = this.add.graphics();
-        bottomTextSpace.fillStyle(0xffffff, 1);
-        bottomTextSpace.fillRoundedRect(
+        // Barra inferiore
+        this.createBar(
             centerX - borderWidth / 2,
-            centerY + borderHeight / 2 - bottomBarHeight,
+            centerY + borderHeight / 2 - barHeight,
             borderWidth,
-            bottomBarHeight,
-            0
+            barHeight,
+            barStyle
         );
-        bottomTextSpace.lineStyle(2 * scale, 0x000000, 1);
-        bottomTextSpace.strokeRoundedRect(
-            centerX - borderWidth / 2,
-            centerY + borderHeight / 2 - bottomBarHeight,
-            borderWidth,
-            bottomBarHeight,
-            0
-        );
+    }
 
-        // CONTAINER per elementi grafici
+    createBar(x, y, width, height, style) {
+        const bar = this.add.graphics();
+        bar.fillStyle(style.fill, 1);
+        bar.fillRoundedRect(x, y, width, height, 0);
+        bar.lineStyle(style.strokeWidth, style.stroke, 1);
+        bar.strokeRoundedRect(x, y, width, height, 0);
+    }
+
+    createGameContent(centerX, centerY, scale) {
+        const { refCenter } = this.refPositions;
         this.mainContainer = this.add.container(0, 0);
 
-        // Coordinate di riferimento (1920x1080)
-        const refCenterX = 960;
-        const refCenterY = 540;
+        // Elementi grafici
+        const patient = this.add.image(
+            this.refPositions.patient.x,
+            this.refPositions.patient.y,
+            "PatientCloseUp"
+        ).setScale(0.65);
 
-        // Posizioni di riferimento
-        const patientX = 576;  // 30% di 1920
-        const patientY = 540;
+        const arrow = this.add.image(
+            this.refPositions.question.x,
+            this.refPositions.question.y + 130,
+            "Arrow"
+        ).setScale(4);
 
-        const questionX = 1500;
-        const questionY = 324;  // 30% di 1080
+        const questionBox = this.createQuestionBox();
+        const reloadButton = this.createReloadButton();
 
-        const answer1X = 1500;
-        const answer1Y = 540;   // 50% di 1080
+        // Box e testi risposte
+        this.createAnswerBoxes();
+        this.createAnswerTexts(centerX, centerY, scale);
 
-        const answer2X = 1500;
-        const answer2Y = 648;   // 60% di 1080
+        // Testo domanda
+        this.createQuestionText(centerX, centerY, scale);
 
-        const answer3X = 1500;
-        const answer3Y = 756;   // 70% di 1080
-
-        const reloadX = 1500;
-        const reloadY = 918;    // 85% di 1080
-
-        // Immagine paziente
-        const patient = this.add.image(patientX, patientY, "PatientCloseUp").setScale(0.65);
-
-        //immagine freccia
-        const arrow = this.add.image(questionX, questionY + 130, "Arrow").setScale(4);
-
-        // Box domanda
-        const questionBox = this.add.graphics();
-        questionBox.fillStyle(0xecf0f1, 1);
-        questionBox.fillRoundedRect(questionX - 400, questionY - 70, 800, 140, 5);
-        questionBox.lineStyle(2, 0x2c3e50, 1);
-        questionBox.strokeRoundedRect(questionX - 400, questionY - 70, 800, 140, 5);
-
-        // Box risposte
-        this.answer1Box = this.add.graphics();
-        this.answer2Box = this.add.graphics();
-        this.answer3Box = this.add.graphics();
-
-        this.drawAnswerBox(this.answer1Box, answer1X, answer1Y, 650, 70);
-        this.drawAnswerBox(this.answer2Box, answer2X, answer2Y, 650, 70);
-        this.drawAnswerBox(this.answer3Box, answer3X, answer3Y, 650, 70);
-
-        // Bottone reload
-        const reloadButton = this.add.image(reloadX, reloadY, "ReloadButton")
-            .setScale(0.5)
-            .setInteractive({ useHandCursor: true });
-
-        // Aggiungi elementi grafici al container
+        // Aggiungi al container
         this.mainContainer.add([
             arrow,
             patient,
             questionBox,
-            this.answer1Box,
-            this.answer2Box,
-            this.answer3Box,
+            ...this.answerBoxes,
             reloadButton
         ]);
 
-        // Scala il container
+        // Scala e posiziona container
         this.mainContainer.setScale(scale);
         this.mainContainer.setPosition(
-            centerX - (refCenterX * scale),
-            centerY - (refCenterY * scale)
+            centerX - (refCenter.x * scale),
+            centerY - (refCenter.y * scale)
         );
 
-        const minFontSize = 60 * scale;
-        const questionFontSize = Math.max(minFontSize, 70 * scale);
-        const answerFontSize = Math.max(minFontSize, 60 * scale);
-        const feedbackFontSize = Math.max(minFontSize, 60 * scale);
+        // Setup eventi
+        this.setupEvents(reloadButton, scale);
+    }
 
-        // Calcola posizioni reali dei testi
-        const questionTextX = centerX + ((questionX - refCenterX) * scale);
-        const questionTextY = centerY + ((questionY - refCenterY) * scale);
+    createQuestionBox() {
+        const { question } = this.refPositions;
+        const box = this.add.graphics();
+        box.fillStyle(0xecf0f1, 1);
+        box.fillRoundedRect(question.x - 400, question.y - 70, 800, 140, 5);
+        box.lineStyle(2, 0x2c3e50, 1);
+        box.strokeRoundedRect(question.x - 400, question.y - 70, 800, 140, 5);
+        return box;
+    }
 
-        const answer1TextX = centerX + ((answer1X - refCenterX) * scale);
-        const answer1TextY = centerY + ((answer1Y - refCenterY) * scale);
+    createReloadButton() {
+        const { reload } = this.refPositions;
+        return this.add.image(reload.x, reload.y, "ReloadButton")
+            .setScale(0.5)
+            .setInteractive({ useHandCursor: true });
+    }
 
-        const answer2TextX = centerX + ((answer2X - refCenterX) * scale);
-        const answer2TextY = centerY + ((answer2Y - refCenterY) * scale);
+    createAnswerBoxes() {
+        const boxSize = { width: 650, height: 70 };
+        this.refPositions.answers.forEach((answer, index) => {
+            const box = this.add.graphics();
+            this.drawAnswerBox(box, answer.x, answer.y, boxSize.width, boxSize.height);
+            this.answerBoxes.push(box);
+        });
+    }
 
-        const answer3TextX = centerX + ((answer3X - refCenterX) * scale);
-        const answer3TextY = centerY + ((answer3Y - refCenterY) * scale);
-
-        const feedbackTextY = centerY + ((432 - refCenterY) * scale); // 40% di 1080
-
-        // Testo domanda
-        const questionText = this.add.text(questionTextX, questionTextY, 
-            "Il paziente non risponde\nCome procedi?", {
-            fontSize: `${questionFontSize * 0.7}px`,
-            color: "#000000",
-            align: "center",
-            fontFamily: "Poppins",
-        }).setOrigin(0.5);
-
-        // Testo feedback
-        this.goNextText = this.add.text(answer1TextX, feedbackTextY, 
-            "Corretto!\nOra andiamo a dare le medicine al paziente!", {
-            fontSize: `${feedbackFontSize * 0.7}px`,
-            color: "#27ae60",
-            align: "center",
-            fontFamily: "Poppins",
-            resolution: 2
-        }).setOrigin(0.5).setAlpha(0);
-
-        // Testi risposte
-        const text1 = this.add.text(answer1TextX, answer1TextY, "Valutazione GAS", {
-            fontSize: `${answerFontSize * 0.7}px`,
+    createAnswerTexts(centerX, centerY, scale) {
+        const { refCenter } = this.refPositions;
+        const fontSize = Math.max(60 * scale, 60 * scale) * 0.7;
+        const textStyle = {
+            fontSize: `${fontSize}px`,
             color: "#000000",
             align: "center",
             fontFamily: "Poppins",
             resolution: 2
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        const text2 = this.add.text(answer2TextX, answer2TextY, "Inizia le compressioni", {
-            fontSize: `${answerFontSize * 0.7}px`,
-            color: "#000000",
-            align: "center",
-            fontFamily: "Poppins",
-            resolution: 2
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        const text3 = this.add.text(answer3TextX, answer3TextY, "Libera le vie aeree", {
-            fontSize: `${answerFontSize * 0.7}px`,
-            color: "#000000",
-            align: "center",
-            fontFamily: "Poppins",
-            resolution: 2
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        // Salva coordinate per i box (scalate)
-        this.coords = {
-            answer1: { x: answer1TextX, y: answer1TextY, width: 500 * scale, height: 70 * scale },
-            answer2: { x: answer2TextX, y: answer2TextY, width: 500 * scale, height: 70 * scale },
-            answer3: { x: answer3TextX, y: answer3TextY, width: 500 * scale, height: 70 * scale }
         };
 
-        // Eventi
-        reloadButton.removeAllListeners();
+        this.refPositions.answers.forEach((answer, index) => {
+            const textX = centerX + ((answer.x - refCenter.x) * scale);
+            const textY = centerY + ((answer.y - refCenter.y) * scale);
+            
+            const text = this.add.text(textX, textY, answer.text, textStyle)
+                .setOrigin(0.5)
+                .setInteractive({ useHandCursor: true });
+            
+            this.answerTexts.push(text);
+        });
+    }
+
+    createQuestionText(centerX, centerY, scale) {
+        const { question, refCenter } = this.refPositions;
+        const fontSize = Math.max(60 * scale, 70 * scale) * 0.7;
+        const textX = centerX + ((question.x - refCenter.x) * scale);
+        const textY = centerY + ((question.y - refCenter.y) * scale);
+
+        this.add.text(textX, textY, "Il paziente non risponde\nCome procedi?", {
+            fontSize: `${fontSize}px`,
+            color: "#000000",
+            align: "center",
+            fontFamily: "Poppins"
+        }).setOrigin(0.5);
+    }
+
+    setupEvents(reloadButton, scale) {
         reloadButton.on("pointerdown", () => {
             this.scene.start("HospitalScene");
         });
 
-        text1.removeAllListeners();
-        text1.on("pointerdown", () => {
-            if (this.ordCounter != 0) {
-                this.ordCounter = 0;
-                this.showError();
-                this.setDefault();
-            } else {
-                this.ordCounter = 1;
-                this.setGreen(this.answer1Box, answer1X, answer1Y, 650, 70);
-            }
+        this.answerTexts.forEach((text, index) => {
+            text.on("pointerdown", () => {
+                this.handleAnswerClick(index, scale);
+            });
         });
+    }
 
-        text2.removeAllListeners();
-        text2.on("pointerdown", () => {
-            if (this.ordCounter != 1) {
-                this.ordCounter = 0;
-                this.showError();
-                this.setDefault();
-            } else {
-                this.ordCounter = 2;
-                this.setGreen(this.answer2Box, answer2X, answer2Y, 650, 70);
-            }
-        });
+    handleAnswerClick(index, scale) {
+        const { answers } = this.refPositions;
+        const answer = answers[index];
+        const boxSize = { width: 650, height: 70 };
 
-        text3.removeAllListeners();
-        text3.on("pointerdown", () => {
-            if (this.ordCounter != 2) {
-                this.ordCounter = 0;
-                this.showError();
-                this.setDefault();
-            } else {
-                this.setGreen(this.answer3Box, answer3X, answer3Y, 650, 70);
-                this.goNextText.setAlpha(1);
+        if (this.ordCounter !== index) {
+            this.ordCounter = 0;
+            this.showError(scale);
+            this.setDefault();
+        } else {
+            this.ordCounter = index + 1;
+            this.setGreen(this.answerBoxes[index], answer.x, answer.y, boxSize.width, boxSize.height);
+            
+            if (index === 2) {
+                // Ultima risposta corretta
                 this.time.delayedCall(3500, () => {
                     this.scene.start("CartScene");
                 });
             }
-        });
+        }
     }
 
     drawAnswerBox(box, x, y, width, height) {
@@ -307,40 +283,29 @@ class PatientScene extends Phaser.Scene {
     }
 
     setDefault() {
-        this.drawAnswerBox(this.answer1Box, 1500, 540, 650, 70);
-        this.drawAnswerBox(this.answer2Box, 1500, 648, 650, 70);
-        this.drawAnswerBox(this.answer3Box, 1500, 756, 650, 70);
+        const { answers } = this.refPositions;
+        const boxSize = { width: 650, height: 70 };
+        answers.forEach((answer, index) => {
+            this.drawAnswerBox(this.answerBoxes[index], answer.x, answer.y, boxSize.width, boxSize.height);
+        });
     }
 
-    showError() {
-        const width = this.scale.width;
-    const height = this.scale.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    
-    const scale = Math.min(width / 1920, height / 1080);
-    const borderHeight = 1080 * scale;
-    const bottomBarHeight = 40 * scale;
-    
-    // Calcola la posizione Y al centro del rettangolo in basso
-    const bottomBarCenterY = centerY + borderHeight / 2 - bottomBarHeight / 2;
-    
-    // Feedback visivo per errore
-    const errorText = this.add.text(
-        centerX, 
-        bottomBarCenterY, 
-        "Sequenza sbagliata!", {
-        fontSize: `${Math.max(18, 40 * scale)}px`,
-        color: "#e74c3c",
-        align: "center",
-        fontFamily: "Poppins",
-        fontStyle: "bold",
-        resolution: 2
-    }).setOrigin(0.5);
+    showError(scale) {
+        const { width, height, centerX, centerY } = this.getScreenMetrics();
+        const borderHeight = 1080 * scale;
+        const bottomBarHeight = 40 * scale;
+        const bottomBarCenterY = centerY + borderHeight / 2 - bottomBarHeight / 2;
 
-        this.time.delayedCall(2000, () => {
-            errorText.destroy();
-        });
+        const errorText = this.add.text(centerX, bottomBarCenterY, "Sequenza sbagliata!", {
+            fontSize: `${Math.max(18, 40 * scale)}px`,
+            color: "#e74c3c",
+            align: "center",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
+
+        this.time.delayedCall(2000, () => errorText.destroy());
     }
 
     shutdown() {

@@ -77,7 +77,7 @@ class IntroScene extends Phaser.Scene {
             20 * scale
         );
 
-        const icon = this.add.text(
+        this.add.text(
             refCenterX,
             refCenterY - boxHeight * 0.3,
             "🚨",
@@ -122,9 +122,18 @@ class IntroScene extends Phaser.Scene {
                 10 * scale,
                 40
             );
+            buttonBg.lineStyle(3, 0x000000, 1);
+            buttonBg.strokeRoundedRect(
+                buttonX,
+                buttonY,
+                buttonWidth,
+                buttonHeight,
+                10 * scale,
+                40
+            );
         };
 
-        drawButton(0x34db6c);
+        drawButton(0x5DADE2);
 
         const startButton = this.add.text(
             refCenterX,
@@ -132,27 +141,27 @@ class IntroScene extends Phaser.Scene {
             "Inizia",
             {
                 fontSize: `${60 * scale}px`,
-                color: "#ffffff",
+                color: "#000000ff",
                 fontFamily: "Poppins",
                 fontStyle: "bold",
-                resolution: window.devicePixelRatio
+                resolution: 2
             }
         )
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
 
         startButton.on("pointerover", () => {
-            drawButton(0x2e8940);
+            drawButton(0x5DADE2);
             startButton.setScale(1.05);
         });
 
         startButton.on("pointerout", () => {
-            drawButton(0x34db6c);
+            drawButton(0x3498db);
             startButton.setScale(1);
         });
 
         startButton.on("pointerdown", () => {
-            drawButton(0x27ae60);
+            drawButton(0x5DADE2);
             this.time.delayedCall(100, () => {
                 this.scene.start("HospitalScene");
             });

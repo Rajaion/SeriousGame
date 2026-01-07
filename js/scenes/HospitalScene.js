@@ -131,9 +131,6 @@ class HospitalScene extends Phaser.Scene {
         
         const infoTextX = centerX + ((infoBoxX - refCenterX) * scale);
         const infoTextY = centerY + ((infoBoxY - refCenterY) * scale);
-        
-        const wrongTextX = centerX;
-        const wrongTextY = centerY + ((centerY / 1.5 - refCenterY) * scale);
 
         // Score text
         const scoreFontSize = Math.max(minFontSize, 50 * scale);
