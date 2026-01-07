@@ -18,10 +18,10 @@ class CartScene extends Phaser.Scene {
     pickedNacl = false;
 
     preload() {
-        this.load.image("Cart", "img/Cart.png");
+        this.load.image("Cart", "img/Cart.jpeg");
         this.load.image("Elettrocardiogramma", "img/Elettrocardiogramma.png");
         this.load.image("Adrenalina", "img/Adrenalina.png");
-        this.load.image("Nacl", "img/Nacl.png");
+        this.load.image("Nacl", "img/Nacl.jpeg");
         this.load.image("Sfondo", "img/Mattone.png");
     }
 

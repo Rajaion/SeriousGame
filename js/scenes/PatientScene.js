@@ -7,7 +7,7 @@ class PatientScene extends Phaser.Scene {
     
     preload() {
         this.load.image("ReloadButton", "img/ReloadButton.png");
-        this.load.image("PatientCloseUp", "img/PatientCloseUp.png");
+        this.load.image("PatientCloseUp", "img/PatientCloseUp.jpeg");
         this.load.image("Arrow", "img/Arrow.png");
     }
     
@@ -45,7 +45,7 @@ class PatientScene extends Phaser.Scene {
         const borderHeight = 1080 * scale;
 
         // Background
-                this.sceneBorder = this.add.graphics();
+        this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
         this.sceneBorder.strokeRect(
             centerX - borderWidth / 2,
@@ -54,11 +54,51 @@ class PatientScene extends Phaser.Scene {
             borderHeight
         );
 
-        this.sceneBorder.fillStyle(0x000055, 1);
+        this.sceneBorder.fillStyle(0x2c3e50, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
             borderHeight,
+            0
+        );
+
+        // Rettangolo in alto - scala anche l'altezza
+        const topBarHeight = 40 * scale;
+        const topTextSpace = this.add.graphics();
+        topTextSpace.fillStyle(0xffffff, 1);
+        topTextSpace.fillRoundedRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            topBarHeight,
+            0
+        );
+        topTextSpace.lineStyle(2 * scale, 0x000000, 1);
+        topTextSpace.strokeRoundedRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            topBarHeight,
+            0
+        );
+
+        // Rettangolo in basso - posizione corretta
+        const bottomBarHeight = 40 * scale;
+        const bottomTextSpace = this.add.graphics();
+        bottomTextSpace.fillStyle(0xffffff, 1);
+        bottomTextSpace.fillRoundedRect(
+            centerX - borderWidth / 2,
+            centerY + borderHeight / 2 - bottomBarHeight,
+            borderWidth,
+            bottomBarHeight,
+            0
+        );
+        bottomTextSpace.lineStyle(2 * scale, 0x000000, 1);
+        bottomTextSpace.strokeRoundedRect(
+            centerX - borderWidth / 2,
+            centerY + borderHeight / 2 - bottomBarHeight,
+            borderWidth,
+            bottomBarHeight,
             0
         );
 
@@ -273,17 +313,30 @@ class PatientScene extends Phaser.Scene {
     }
 
     showError() {
-        // Feedback visivo per errore
-        const errorText = this.add.text(
-            this.coords.answer1.x, 
-            this.coords.answer1.y - 100, 
-            "Sequenza sbagliata!", {
-            fontSize: `${Math.max(18, 40 * Math.min(this.scale.width / 1920, this.scale.height / 1080))}px`,
-            color: "#e74c3c",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-        }).setOrigin(0.5);
+        const width = this.scale.width;
+    const height = this.scale.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    const scale = Math.min(width / 1920, height / 1080);
+    const borderHeight = 1080 * scale;
+    const bottomBarHeight = 40 * scale;
+    
+    // Calcola la posizione Y al centro del rettangolo in basso
+    const bottomBarCenterY = centerY + borderHeight / 2 - bottomBarHeight / 2;
+    
+    // Feedback visivo per errore
+    const errorText = this.add.text(
+        centerX, 
+        bottomBarCenterY, 
+        "Sequenza sbagliata!", {
+        fontSize: `${Math.max(18, 40 * scale)}px`,
+        color: "#e74c3c",
+        align: "center",
+        fontFamily: "Poppins",
+        fontStyle: "bold",
+        resolution: 2
+    }).setOrigin(0.5);
 
         this.time.delayedCall(2000, () => {
             errorText.destroy();
