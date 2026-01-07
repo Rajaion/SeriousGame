@@ -51,7 +51,7 @@ class IntroScene extends Phaser.Scene {
             borderWidth,
             borderHeight
         );
-        this.sceneBorder.fillStyle(0x000055, 1);
+        this.sceneBorder.fillStyle(0x2c3e50, 1);
         this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
             centerY - borderHeight / 2,
             borderWidth,
