@@ -221,16 +221,16 @@ class HospitalScene extends Phaser.Scene {
     // Opzione 1
     const opt1Y = startOptY;
     const optRect1 = this.add.graphics();
-    this.drawAnswerBox(optRect1, convBoxX, opt1Y - optHeight/2, optWidth, optHeight);
+    this.drawAnswerBox(optRect1, convBoxX, opt1Y, optWidth, optHeight);
     // Opzione 2
     const opt2Y = startOptY + optSpacing;
     const optRect2 = this.add.graphics();
-    this.drawAnswerBox(optRect2, convBoxX, opt2Y - optHeight/2, optWidth, optHeight);
+    this.drawAnswerBox(optRect2, convBoxX, opt2Y, optWidth, optHeight);
 
     // Opzione 3
     const opt3Y = startOptY + (optSpacing * 2);
     const optRect3 = this.add.graphics();
-    this.drawAnswerBox(optRect3, convBoxX, opt3Y - optHeight/2   , optWidth, optHeight);
+    this.drawAnswerBox(optRect3, convBoxX, opt3Y, optWidth, optHeight);
 
     // TESTI - coordinate nel container 
     const option1Text = this.add.text(convBoxX, startOptY, 
