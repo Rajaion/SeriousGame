@@ -88,7 +88,7 @@ class IntroScene extends Phaser.Scene {
 
         const scenarioText =
             "\nSei un infermiere del pronto soccorso e un paziente è appena arrivato in codice rosso.\n" +
-            "\nDevi agire velocemente e in modo corretto.";
+            "\n\nDevi agire velocemente e in modo corretto.";
 
         const textContent = this.add.text(
             refCenterX - 10,
