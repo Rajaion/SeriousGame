@@ -87,7 +87,7 @@ class HospitalScene extends Phaser.Scene {
     }
 
     createBackground(centerX, centerY, borderWidth, borderHeight, scale) {
-        // Background ospedale (non serve border come PatientScene, ma manteniamo struttura)
+        // Background ospedale 
         this.mainContainer = this.add.container(0, 0);
         const { refCenter } = this.refPositions;
 
@@ -289,7 +289,7 @@ class HospitalScene extends Phaser.Scene {
 
         // Testo opzione 1 - FUORI dal container con posizione scalata
         const opt1TextX = centerX + ((convBox.x - refCenter.x) * scale);
-        const opt1TextY = centerY + ((startOptY - refCenter.y) * scale);
+        const opt1TextY = centerY + ((startOptY + 20 - refCenter.y) * scale);
         this.option1 = this.add.text(opt1TextX, opt1TextY, this.opzione1, textStyle)
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });
@@ -297,7 +297,7 @@ class HospitalScene extends Phaser.Scene {
 
         // Testo opzione 2
         const opt2TextX = centerX + ((convBox.x - refCenter.x) * scale);
-        const opt2TextY = centerY + (((startOptY + optSpacing) - refCenter.y) * scale);
+        const opt2TextY = centerY + (((startOptY + 20 + optSpacing) - refCenter.y) * scale);
         this.option2 = this.add.text(opt2TextX, opt2TextY, this.opzione2, textStyle)
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });
@@ -305,7 +305,7 @@ class HospitalScene extends Phaser.Scene {
 
         // Testo opzione 3
         const opt3TextX = centerX + ((convBox.x - refCenter.x) * scale);
-        const opt3TextY = centerY + (((startOptY + (optSpacing * 2)) - refCenter.y) * scale);
+        const opt3TextY = centerY + (((startOptY + 20 +(optSpacing * 2)) - refCenter.y) * scale);
         this.option3 = this.add.text(opt3TextX, opt3TextY, this.opzione3, textStyle)
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });

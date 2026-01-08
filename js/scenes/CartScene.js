@@ -1,27 +1,39 @@
 class CartScene extends Phaser.Scene {
     constructor() {
         super({ key: "CartScene" });
+        
+        this.medicineOrder = 0;
+        this.usedItems = 2;
+        this.gameEnded = false;
+        this.wrongMedicine = null;
+        this.patientCart = null;
+        this.pointsText = null;
+        this.adrenalina = null;
+        this.nacl = null;
+        this.adrenalinaText = null;
+        this.naclText = null;
+        this.pickedAdrenaline = false;
+        this.cart = null;
+        this.pickedNacl = false;
+        this.instructionText = null;
+        this.bottomTextSpace = null;
+        this.bottomText = "Clicca sul carrello per prendere le medicine";
+        
+        // Configurazione posizioni (riferimento 1920x1080)
+        this.refPositions = {
+            refCenter: { x: 960, y: 540 },
+            elettro: { x: 192, y: 540 },
+            patientCart: { x: 864, y: 756 },
+            cart: { x: 1650, y: 918 },
+            instruction: { x: 960, y: 162 }  // Posizione box istruzioni
+        };
     }
 
-    medicineOrder;
-    usedItems;
-    gameEnded = false;
-    wrongMedicine = null;
-    patientCart = null;
-    pointsText = null;
-    adrenalina = null;
-    nacl = null;
-    adrenalinaText = null;
-    naclText = null;
-    pickedAdrenaline = false;
-    cart = null;
-    pickedNacl = false;
-
     preload() {
-        this.load.image("Cart", "img/Cart.jpeg");
+        this.load.image("Cart", "img/Cart.png");
         this.load.image("Elettrocardiogramma", "img/Elettrocardiogramma.png");
         this.load.image("Adrenalina", "img/Adrenalina.png");
-        this.load.image("Nacl", "img/Nacl.jpeg");
+        this.load.image("Nacl", "img/Nacl.png");
         this.load.image("Sfondo", "img/Mattone.png");
     }
 
@@ -30,7 +42,7 @@ class CartScene extends Phaser.Scene {
         this.scale.on('resize', this.handleResize, this);
     }
 
-    handleResize(gameSize) {
+    handleResize() {
         this.time.delayedCall(50, () => {
             if (this.scene.isActive()) {
                 this.createContent();
@@ -40,18 +52,9 @@ class CartScene extends Phaser.Scene {
 
     createContent() {
         // Pulisci tutto
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
-        if (this.children) {
-            this.children.removeAll();
-        }
-
+        this.children.removeAll();
+        this.textElements = [];
+        
         // Reset variabili
         this.gameEnded = false;
         this.pickedNacl = false;
@@ -59,22 +62,38 @@ class CartScene extends Phaser.Scene {
         this.usedItems = 2;
         this.medicineOrder = 0;
 
+        const { width, height, centerX, centerY, scale } = this.getScreenMetrics();
+        const { borderWidth, borderHeight } = this.getBorderDimensions(scale);
+
+        this.createBackground(centerX, centerY, borderWidth, borderHeight, scale);
+        this.createTopBottomBars(centerX, centerY, borderWidth, borderHeight, scale);
+        this.createGameContent(centerX, centerY, scale);
+        this.createTexts(centerX, centerY, scale);
+    }
+
+    getScreenMetrics() {
         const width = this.scale.width;
         const height = this.scale.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        const scale = Math.min(width / 1920, height / 1080);
+        return {
+            width,
+            height,
+            centerX: width / 2,
+            centerY: height / 2,
+            scale
+        };
+    }
 
-        // Calcola scala
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY);
+    getBorderDimensions(scale) {
+        return {
+            borderWidth: 1920 * scale,
+            borderHeight: 1080 * scale
+        };
+    }
 
-        // CONTAINER per elementi grafici
+    createBackground(centerX, centerY, borderWidth, borderHeight, scale) {
+        const { refCenter } = this.refPositions;
         this.mainContainer = this.add.container(0, 0);
-
-        // Coordinate di riferimento (1920x1080)
-        const refCenterX = 960;
-        const refCenterY = 540;
 
         // Immagine background
         const backGround = this.add.image(0, 0, "Sfondo").setOrigin(0, 0);
@@ -85,28 +104,21 @@ class CartScene extends Phaser.Scene {
         const backGroundScale = Math.max(backGroundScaleX, backGroundScaleY);
         backGround.setScale(backGroundScale);
 
-        // Posizioni di riferimento (1920x1080)
-        const elettroX = 192;    // 0.20 * 960
-        const elettroY = 540;
-
-        const patientCartX = 864;   // 0.90 * 960
-        const patientCartY = 756;   // 1.40 * 540
-
-        const cartX = 1650;     // 1.60 * 960
-        const cartY = 918;      // 1.70 * 540
-
         // Elettrocardiogramma
-        const elettro = this.add.image(elettroX, elettroY, "Elettrocardiogramma")
+        const { elettro } = this.refPositions;
+        const elettroImg = this.add.image(elettro.x, elettro.y, "Elettrocardiogramma")
             .setScale(0.4);
 
         // Area paziente (invisibile ma interattiva)
-        this.patientCart = this.add.rectangle(patientCartX, patientCartY, 500, 500)
+        const { patientCart: patientPos } = this.refPositions;
+        this.patientCart = this.add.rectangle(patientPos.x, patientPos.y, 500, 500)
             .setScale(0.8)
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
 
         // Carrello
-        this.cart = this.add.image(cartX, cartY, "Cart")
+        const { cart: cartPos } = this.refPositions;
+        this.cart = this.add.image(cartPos.x, cartPos.y, "Cart")
             .setScale(0.5)
             .setInteractive({ useHandCursor: true });
 
@@ -124,89 +136,159 @@ class CartScene extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setInteractive({ useHandCursor: true });
 
+        // Box istruzioni (come infoBox in HospitalScene)
+        const { instruction } = this.refPositions;
+        const instructionBox = this.add.graphics();
+        instructionBox.fillStyle(0xecf0f1, 1);
+        instructionBox.fillRoundedRect(instruction.x - 400, instruction.y - 75, 800, 150, 0);
+        instructionBox.lineStyle(2, 0x2c3e50, 1);
+        instructionBox.strokeRoundedRect(instruction.x - 400, instruction.y - 75, 800, 150, 0);
+
         // Aggiungi elementi al container
         this.mainContainer.add([
             backGround,
-            elettro,
+            elettroImg,
             this.patientCart,
             this.cart,
             this.adrenalina,
-            this.nacl
+            this.nacl,
+            instructionBox
         ]);
 
-        // Scala il container
+        // Scala e posiziona container
         this.mainContainer.setScale(scale);
         this.mainContainer.setPosition(
-            centerX - (refCenterX * scale),
-            centerY - (refCenterY * scale)
+            centerX - (refCenter.x * scale),
+            centerY - (refCenter.y * scale)
         );
 
         // Salva la scala per calcoli successivi
         this.currentScale = scale;
-        this.offsetX = centerX - (refCenterX * scale);
-        this.offsetY = centerY - (refCenterY * scale);
+        this.offsetX = centerX - (refCenter.x * scale);
+        this.offsetY = centerY - (refCenter.y * scale);
+    }
 
-        // TESTI FUORI DAL CONTAINER
-        this.textElements = [];
-        const minFontSize = 16;
+    createTopBottomBars(centerX, centerY, borderWidth, borderHeight, scale) {
+        const barHeight = 40 * scale;
+        const barStyle = { fill: 0xffffff, stroke: 0x000000, strokeWidth: 2 * scale };
 
-        // Calcola posizioni reali
+        // Barra superiore
+        this.createBar(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            barHeight,
+            barStyle
+        );
+
+        // Barra inferiore
+        this.createBar(
+            centerX - borderWidth / 2,
+            centerY + borderHeight / 2 - barHeight,
+            borderWidth,
+            barHeight,
+            barStyle
+        );
+    }
+
+    createBar(x, y, width, height, style) {
+        const bar = this.add.graphics();
+        bar.fillStyle(style.fill, 1);
+        bar.fillRoundedRect(x, y, width, height, 0);
+        bar.lineStyle(style.strokeWidth, style.stroke, 1);
+        bar.strokeRoundedRect(x, y, width, height, 0);
+    }
+
+    createGameContent(centerX, centerY, scale) {
+        // Setup eventi
+        this.setupEvents();
+    }
+
+    createTexts(centerX, centerY, scale) {
+        const { refCenter, instruction } = this.refPositions;
+        const minFontSize = 40 * scale;
+
+        // Score text - dentro il rettangolo superiore (come HospitalScene)
         const scoreTextX = centerX;
-        const scoreTextY = centerY + ((54 - refCenterY) * scale); // 0.10 * 540
-
-        const wrongTextX = centerX;
-        const wrongTextY = centerY + ((162 - refCenterY) * scale); // 0.30 * 540
-
-        // Score text
-        const scoreFontSize = Math.max(minFontSize, 35 * scale);
+        const scoreTextY = centerY - ((refCenter.y - 20) * scale);  // Posizione nel rettangolo superiore
+        const scoreFontSize = Math.max(minFontSize, 40 * scale);
+        
         this.pointsText = this.add.text(scoreTextX, scoreTextY,
             "Score: " + gameState.score, {
             fontSize: `${scoreFontSize}px`,
-            color: "#ff0000",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(this.pointsText);
 
-        // Wrong medicine text
-        const wrongFontSize = Math.max(minFontSize, 28 * scale);
-        this.wrongMedicine = this.add.text(wrongTextX, wrongTextY,
-            "Attento!\nLe medicine devono essere date in ordine!", {
-            fontSize: `${wrongFontSize}px`,
-            color: "#ff0000",
+        // Testo istruzioni dentro la box (come infoPaziente in HospitalScene)
+        const instructionTextX = centerX + ((instruction.x - refCenter.x) * scale);
+        const instructionTextY = centerY + ((instruction.y - refCenter.y) * scale);
+        const instructionFontSize = Math.max(minFontSize, 60 * scale) * 0.8;
+        
+        this.instructionText = this.add.text(instructionTextX, instructionTextY, 
+            "Somministra le medicine nell'ordine corretto", {
+            fontSize: `${instructionFontSize}px`,
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            wordWrap: {width: scale * 600},
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(this.instructionText);
+
+        // Testo in basso - dentro il rettangolo inferiore
+        const bottomTextSpaceX = centerX;
+        const bottomTextSpaceY = centerY + ((refCenter.y - 20) * scale);  // Posizione nel rettangolo inferiore
+        const bottomFontSize = Math.max(minFontSize, 40 * scale);
+        
+        this.bottomTextSpace = this.add.text(bottomTextSpaceX, bottomTextSpaceY, 
+            this.bottomText, {
+            fontSize: `${bottomFontSize}px`,
             align: "center",
-            lineSpacing: -5,
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
-        }).setOrigin(0.5).setAlpha(0);
-        this.textElements.push(this.wrongMedicine);
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            resolution: 2
+        }).setOrigin(0.5, 0.5);
+        this.textElements.push(this.bottomTextSpace);
 
         // Testi medicine (nascosti inizialmente)
         const medicineTextFontSize = Math.max(14, 22 * scale);
+        const hiddenX = -550;
+        const hiddenY = -550;
+        
         this.adrenalinaText = this.add.text(hiddenX, hiddenY, "Adrenalina", {
             fontSize: `${medicineTextFontSize}px`,
             color: "#2c3e50",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(this.adrenalinaText);
 
         this.naclText = this.add.text(hiddenX, hiddenY, "Nacl", {
             fontSize: `${medicineTextFontSize}px`,
             color: "#2c3e50",
-            fontFamily: "Arial, sans-serif",
-            fontStyle: "bold"
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(this.naclText);
+    }
 
-        // EVENTI
+    setupEvents() {
+        // EVENTI CARRELLO
         this.cart.removeAllListeners();
         this.cart.on("pointerdown", () => {
             this.adrenSpawn();
             this.naclSpawn();
             this.cart.disableInteractive();
+            this.showMessage("Trascina le medicine sul paziente nell'ordine corretto", false);
         });
 
+        // EVENTI ADRENALINA
         this.adrenalina.removeAllListeners();
         this.adrenalina.on("pointerdown", () => {
             this.pickedAdrenaline = true;
@@ -216,6 +298,7 @@ class CartScene extends Phaser.Scene {
             this.pickedAdrenaline = false;
         });
 
+        // EVENTI NACL
         this.nacl.removeAllListeners();
         this.nacl.on("pointerdown", () => {
             this.pickedNacl = true;
@@ -246,10 +329,12 @@ class CartScene extends Phaser.Scene {
             this.pointsText.setText("Score: " + gameState.score);
             this.usedItems--;
             this.medicineOrder++;
+            this.showMessage("Corretto! Ora somministra la seconda medicina", true);
         }
 
         if (!this.gameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)) {
             if (this.usedItems === 2) {
+                // Ordine sbagliato - Nacl prima di Adrenalina
                 this.pickedNacl = false;
                 this.naclSpawn();
                 this.clickedWrongChoice();
@@ -258,12 +343,14 @@ class CartScene extends Phaser.Scene {
                 this.pointsText.setText("Score: " + gameState.score);
                 return;
             }
+            // Ordine corretto - Nacl dopo Adrenalina
             this.pickedNacl = false;
             this.nacl.destroy();
             this.naclText.destroy();
             gameState.score += 20;
             this.pointsText.setText("Score: " + gameState.score);
             this.usedItems--;
+            this.showMessage("Perfetto! Hai completato tutte le somministrazioni!", true);
         }
 
         if (this.pickedAdrenaline) {
@@ -284,11 +371,6 @@ class CartScene extends Phaser.Scene {
     }
 
     adrenSpawn() {
-        // Calcola posizione reale rispetto al carrello nel container
-        const cartWorldPos = this.cart.getWorldTransformMatrix();
-        const cartX = cartWorldPos.tx;
-        const cartY = cartWorldPos.ty;
-
         // Posiziona adrenalina a destra del carrello
         this.adrenalina.x = this.cart.x + 30;
         this.adrenalina.y = this.cart.y;
@@ -300,11 +382,6 @@ class CartScene extends Phaser.Scene {
     }
 
     naclSpawn() {
-        // Calcola posizione reale rispetto al carrello nel container
-        const cartWorldPos = this.cart.getWorldTransformMatrix();
-        const cartX = cartWorldPos.tx;
-        const cartY = cartWorldPos.ty;
-
         // Posiziona nacl a sinistra del carrello
         this.nacl.x = this.cart.x - 30;
         this.nacl.y = this.cart.y;
@@ -316,13 +393,31 @@ class CartScene extends Phaser.Scene {
     }
 
     clickedWrongChoice() {
-        this.wrongMedicine.setAlpha(1);
+        // Usa il testo fisso in basso invece di wrongMedicine
+        this.showMessage("Attenzione! Le medicine devono essere date in ordine: prima Adrenalina, poi Nacl", false);
+    }
 
-        this.tweens.add({
-            targets: this.wrongMedicine,
-            alpha: 0,
-            duration: 2000,
-        });
+    showMessage(message, isSuccess) {
+        // Mostra messaggio nel testo in basso
+        if (this.bottomTextSpace) {
+            if (isSuccess) {
+                this.bottomTextSpace.setColor("#167e30ff");  // Verde
+            } else {
+                this.bottomTextSpace.setColor("#ff0000");  // Rosso
+            }
+            this.bottomTextSpace.setText(message);
+            this.bottomText = message;
+            
+            // Ripristina il colore dopo 3 secondi (se non è l'ultimo messaggio)
+            if (!isSuccess || !message.includes("completato")) {
+                this.time.delayedCall(3000, () => {
+                    if (this.bottomTextSpace) {
+                        this.bottomTextSpace.setColor("#000000ff");
+                        this.bottomTextSpace.setText(this.bottomText);
+                    }
+                });
+            }
+        }
     }
 
     moveObjAndText(obj, text) {

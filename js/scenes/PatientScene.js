@@ -4,12 +4,16 @@ class PatientScene extends Phaser.Scene {
         this.ordCounter = 0;
         this.answerBoxes = [];
         this.answerTexts = [];
+        this.instructionText = null;
+        this.bottomTextSpace = null;
+        this.bottomText = "Segui l'ordine corretto delle procedure";
         
         // Configurazione posizioni (riferimento 1920x1080)
         this.refPositions = {
             refCenter: { x: 960, y: 540 },
             patient: { x: 576, y: 540 },
             question: { x: 1500, y: 324 },
+            instruction: { x: 960, y: 162 },  // Posizione testo istruzioni in alto
             answers: [
                 { x: 1500, y: 540, text: "Valutazione GAS" },
                 { x: 1500, y: 648, text: "Inizia le compressioni" },
@@ -43,6 +47,7 @@ class PatientScene extends Phaser.Scene {
         this.ordCounter = 0;
         this.answerBoxes = [];
         this.answerTexts = [];
+        this.textElements = [];
 
         const { width, height, centerX, centerY, scale } = this.getScreenMetrics();
         const { borderWidth, borderHeight } = this.getBorderDimensions(scale);
@@ -50,6 +55,7 @@ class PatientScene extends Phaser.Scene {
         this.createBackground(centerX, centerY, borderWidth, borderHeight);
         this.createTopBottomBars(centerX, centerY, borderWidth, borderHeight, scale);
         this.createGameContent(centerX, centerY, scale);
+        this.createTexts(centerX, centerY, scale);  // Aggiungi creazione testi
     }
 
     getScreenMetrics() {
@@ -120,6 +126,42 @@ class PatientScene extends Phaser.Scene {
         bar.fillRoundedRect(x, y, width, height, 0);
         bar.lineStyle(style.strokeWidth, style.stroke, 1);
         bar.strokeRoundedRect(x, y, width, height, 0);
+    }
+
+    createTexts(centerX, centerY, scale) {
+        const { refCenter, instruction } = this.refPositions;
+        const minFontSize = 40 * scale;
+
+        // Testo istruzioni in alto (come infoPaziente in HospitalScene)
+        const instructionTextX = centerX + ((instruction.x - refCenter.x) * scale);
+        const instructionTextY = centerY + ((instruction.y - refCenter.y) * scale);
+        const instructionFontSize = Math.max(minFontSize, 60 * scale) * 0.8;
+        
+        this.instructionText = this.add.text(instructionTextX, instructionTextY, 
+            "Segui l'ordine corretto delle procedure", {
+            fontSize: `${instructionFontSize}px`,
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            wordWrap: {width: scale * 600},
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(this.instructionText);
+
+        // Testo in basso per messaggi (come bottomTextSpace in HospitalScene)
+        const bottomTextSpaceX = centerX;
+        const bottomTextSpaceY = centerY + ((refCenter.y - 20) * scale);
+        const bottomFontSize = Math.max(minFontSize, 40 * scale);
+        
+        this.bottomTextSpace = this.add.text(bottomTextSpaceX, bottomTextSpaceY, 
+            this.bottomText, {
+            fontSize: `${bottomFontSize}px`,
+            align: "center",
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            resolution: 2
+        }).setOrigin(0.5, 0.5);
+        this.textElements.push(this.bottomTextSpace);
     }
 
     createGameContent(centerX, centerY, scale) {
@@ -251,11 +293,24 @@ class PatientScene extends Phaser.Scene {
 
         if (this.ordCounter !== index) {
             this.ordCounter = 0;
-            this.showError(scale);
+            this.showError();
             this.setDefault();
         } else {
             this.ordCounter = index + 1;
             this.setGreen(this.answerBoxes[index], answer.x, answer.y, boxSize.width, boxSize.height);
+            
+            // Messaggi di successo
+            if (index === 0) {
+                this.showMessage("Corretto! Procedi con la prossima azione", true);
+            } else if (index === 1) {
+                this.showMessage("Perfetto! Continua con l'ultima procedura", true);
+            } else if (index === 2) {
+                // Ultima risposta corretta
+                this.showMessage("Eccellente! Hai completato tutte le procedure correttamente!", true);
+                this.time.delayedCall(3500, () => {
+                    this.scene.start("CartScene");
+                });
+            }
             
             if (index === 2) {
                 // Ultima risposta corretta
@@ -290,28 +345,55 @@ class PatientScene extends Phaser.Scene {
         });
     }
 
-    showError(scale) {
-        const { width, height, centerX, centerY } = this.getScreenMetrics();
-        const borderHeight = 1080 * scale;
-        const bottomBarHeight = 40 * scale;
-        const bottomBarCenterY = centerY + borderHeight / 2 - bottomBarHeight / 2;
+    showError() {
+        // Usa il testo fisso in basso invece di creare un testo temporaneo
+        if (this.bottomTextSpace) {
+            this.bottomTextSpace.setColor("#ff0000");
+            this.bottomTextSpace.setText("Sequenza sbagliata! Riprova seguendo l'ordine corretto");
+            this.bottomText = "Sequenza sbagliata! Riprova seguendo l'ordine corretto";
+            
+            // Ripristina il colore dopo 3 secondi
+            this.time.delayedCall(3000, () => {
+                if (this.bottomTextSpace) {
+                    this.bottomTextSpace.setColor("#000000ff");
+                    this.bottomTextSpace.setText(this.bottomText);
+                }
+            });
+        }
+    }
 
-        const errorText = this.add.text(centerX, bottomBarCenterY, "Sequenza sbagliata!", {
-            fontSize: `${Math.max(18, 40 * scale)}px`,
-            color: "#e74c3c",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-            resolution: 2
-        }).setOrigin(0.5);
-
-        this.time.delayedCall(2000, () => errorText.destroy());
+    showMessage(message, isSuccess) {
+        // Mostra messaggio nel testo in basso
+        if (this.bottomTextSpace) {
+            if (isSuccess) {
+                this.bottomTextSpace.setColor("#167e30ff");  // Verde
+            } else {
+                this.bottomTextSpace.setColor("#ff0000");  // Rosso
+            }
+            this.bottomTextSpace.setText(message);
+            this.bottomText = message;
+            
+            // Ripristina il colore dopo 2 secondi (se non è l'ultimo messaggio)
+            if (!isSuccess || !message.includes("Eccellente")) {
+                this.time.delayedCall(2000, () => {
+                    if (this.bottomTextSpace) {
+                        this.bottomTextSpace.setColor("#000000ff");
+                        this.bottomTextSpace.setText(this.bottomText);
+                    }
+                });
+            }
+        }
     }
 
     shutdown() {
         this.scale.off('resize', this.handleResize, this);
         if (this.mainContainer) {
             this.mainContainer.destroy();
+        }
+        if (this.textElements) {
+            this.textElements.forEach(el => {
+                if (el && el.destroy) el.destroy();
+            });
         }
     }
 }
