@@ -220,52 +220,52 @@ class HospitalScene extends Phaser.Scene {
 
     // Opzione 1
     const opt1Y = startOptY;
-    const optRect1 = this.add.rectangle(convBoxX, opt1Y - optHeight/2, optWidth, optHeight, 0xffffff, 1)
+    const optRect1 = this.add.rectangle(convBoxX, opt1Y, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect1.setStrokeStyle(4, 0x000000);
-    optRect1.setOrigin(0.5, 0.5);
+    optRect1.setOrigin(0.5, 1);
 
     // Opzione 2
     const opt2Y = startOptY + optSpacing;
-    const optRect2 = this.add.rectangle(convBoxX, opt2Y - optHeight/2, optWidth , optHeight, 0xffffff, 1)
+    const optRect2 = this.add.rectangle(convBoxX, opt2Y, optWidth , optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect2.setStrokeStyle(4, 0x000000);
-    optRect2.setOrigin(0.5, 0.5);
+    optRect2.setOrigin(0.5, 1);
 
     // Opzione 3
     const opt3Y = startOptY + (optSpacing * 2);
-    const optRect3 = this.add.rectangle(convBoxX, opt3Y - optHeight/2, optWidth, optHeight, 0xffffff, 1)
+    const optRect3 = this.add.rectangle(convBoxX, opt3Y, optWidth, optHeight, 0xffffff, 1)
         .setInteractive({ useHandCursor: true });
     optRect3.setStrokeStyle(4, 0x000000);
-    optRect3.setOrigin(0.5, 0.5);
+    optRect3.setOrigin(0.5, 1);
 
     // TESTI - coordinate nel container 
-    const option1Text = this.add.text(convBoxX, opt1Y, 
+    const option1Text = this.add.text(convBoxX, startOptY, 
         this.opzione1, {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2
-    }).setOrigin(0.5);
+    }).setOrigin(0.5, 0.5);
 
-    const option2Text = this.add.text(convBoxX, opt2Y, 
+    const option2Text = this.add.text(convBoxX, startOptY + optSpacing, 
         this.opzione2, {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2
-    }).setOrigin(0.5);
+    }).setOrigin(0.5, 0.5);
 
-    const option3Text = this.add.text(convBoxX, opt3Y, 
+    const option3Text = this.add.text(convBoxX, startOptY + (optSpacing * 2), 
         this.opzione3, {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2
-    }).setOrigin(0.5);
+    }).setOrigin(0.5, 0.5);
 
     // Aggiungi TUTTO al container (così viene scalato insieme)
     this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
