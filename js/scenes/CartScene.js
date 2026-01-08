@@ -24,7 +24,7 @@ class CartScene extends Phaser.Scene {
             refCenter: { x: 960, y: 540 },
             elettro: { x: 192, y: 540 },
             patientCart: { x: 864, y: 756 },
-            cart: { x: 1650, y: 918 },
+            cart: { x: 1675, y: 860 },
             instruction: { x: 960, y: 162 }  // Posizione box istruzioni
         };
     }
@@ -285,7 +285,7 @@ class CartScene extends Phaser.Scene {
             this.adrenSpawn();
             this.naclSpawn();
             this.cart.disableInteractive();
-            this.showMessage("Trascina le medicine sul paziente nell'ordine corretto", false);
+            this.showMessage("Trascina le medicine sul paziente nell'ordine corretto", true);
         });
 
         // EVENTI ADRENALINA
@@ -378,7 +378,7 @@ class CartScene extends Phaser.Scene {
         // Converti posizione container in coordinate schermo per il testo
         const adrenalineWorldPos = this.adrenalina.getWorldTransformMatrix();
         this.adrenalinaText.x = adrenalineWorldPos.tx;
-        this.adrenalinaText.y = adrenalineWorldPos.ty - (50 * this.currentScale);
+        this.adrenalinaText.y = adrenalineWorldPos.ty - (100 * this.currentScale);
     }
 
     naclSpawn() {
@@ -389,7 +389,7 @@ class CartScene extends Phaser.Scene {
         // Converti posizione container in coordinate schermo per il testo
         const naclWorldPos = this.nacl.getWorldTransformMatrix();
         this.naclText.x = naclWorldPos.tx;
-        this.naclText.y = naclWorldPos.ty - (50 * this.currentScale);
+        this.naclText.y = naclWorldPos.ty - (75 * this.currentScale);
     }
 
     clickedWrongChoice() {

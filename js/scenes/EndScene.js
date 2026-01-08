@@ -1,6 +1,14 @@
 class EndScene extends Phaser.Scene {
     constructor() {
         super({ key: "EndScene" });
+        
+        // Configurazione posizioni (riferimento 1920x1080)
+        this.refPositions = {
+            refCenter: { x: 960, y: 540 },
+            patient: { x: 960, y: 220 },
+            messageBox: { x: 960, y: 520 },
+            button: { x: 960, y: 870 }
+        };
     }
 
     preload() {
@@ -12,7 +20,7 @@ class EndScene extends Phaser.Scene {
         this.scale.on('resize', this.handleResize, this);
     }
 
-    handleResize(gameSize) {
+    handleResize() {
         this.time.delayedCall(50, () => {
             if (this.scene.isActive()) {
                 this.createContent();
@@ -22,46 +30,89 @@ class EndScene extends Phaser.Scene {
 
     createContent() {
         // Pulisci tutto
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
-        if (this.children) {
-            this.children.removeAll();
-        }
+        this.children.removeAll();
+        this.textElements = [];
 
+        const { width, height, centerX, centerY, scale } = this.getScreenMetrics();
+        const { borderWidth, borderHeight } = this.getBorderDimensions(scale);
+
+        this.createBackground(centerX, centerY, borderWidth, borderHeight);
+        this.createGameContent(centerX, centerY, scale);
+        this.createTexts(centerX, centerY, scale);
+    }
+
+    getScreenMetrics() {
         const width = this.scale.width;
         const height = this.scale.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        const scale = Math.min(width / 1920, height / 1080);
+        return {
+            width,
+            height,
+            centerX: width / 2,
+            centerY: height / 2,
+            scale
+        };
+    }
 
-        // Background
-        this.add.rectangle(centerX, centerY, width, height, 0x104D5B);
+    getBorderDimensions(scale) {
+        return {
+            borderWidth: 1920 * scale,
+            borderHeight: 1080 * scale
+        };
+    }
 
-        // Calcola scala
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY);
+    createBackground(centerX, centerY, borderWidth, borderHeight) {
+        // Background con stesso colore di MenuScene e IntroScene
+        this.sceneBorder = this.add.graphics();
+        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
+        this.sceneBorder.strokeRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight
+        );
+        this.sceneBorder.fillStyle(0x2c3e50, 1);  // Stesso colore di MenuScene/IntroScene
+        this.sceneBorder.fillRoundedRect(
+            centerX - borderWidth / 2,
+            centerY - borderHeight / 2,
+            borderWidth,
+            borderHeight,
+            0
+        );
+    }
 
-        // CONTAINER
+    createGameContent(centerX, centerY, scale) {
+        const { refCenter } = this.refPositions;
         this.mainContainer = this.add.container(0, 0);
 
-        const refCenterX = 960;
-        const refCenterY = 540;
-
-        // Posizioni di riferimento
-        const patientY = 220;   // Paziente più in alto
-        const boxY = 520;       // Box leggermente più in alto
-        const buttonY = 870;    // Bottone più in basso
-
         // Paziente felice
-        const patient = this.add.image(refCenterX, patientY, "HappyPatient");
+        const { patient } = this.refPositions;
+        const patientImg = this.add.image(patient.x, patient.y, "HappyPatient");
 
-        // Bottone
+        // Box per il messaggio (come in IntroScene)
+        const { messageBox } = this.refPositions;
+        const boxWidth = 800;
+        const boxHeight = 200;
+        const messageBoxGraphics = this.add.graphics();
+        messageBoxGraphics.fillStyle(0xecf0f1, 1);
+        messageBoxGraphics.fillRoundedRect(
+            messageBox.x - boxWidth / 2,
+            messageBox.y - boxHeight / 2,
+            boxWidth,
+            boxHeight,
+            20
+        );
+        messageBoxGraphics.lineStyle(2, 0x2c3e50, 1);
+        messageBoxGraphics.strokeRoundedRect(
+            messageBox.x - boxWidth / 2,
+            messageBox.y - boxHeight / 2,
+            boxWidth,
+            boxHeight,
+            20
+        );
+
+        // Bottone (stile MenuScene/IntroScene)
+        const { button } = this.refPositions;
         const buttonWidth = 500;
         const buttonHeight = 75;
         this.buttonGraphics = this.add.graphics();
@@ -71,103 +122,137 @@ class EndScene extends Phaser.Scene {
             this.buttonGraphics.clear();
             this.buttonGraphics.fillStyle(color, 1);
             this.buttonGraphics.fillRoundedRect(
-                refCenterX - buttonWidth / 2,
-                buttonY - buttonHeight / 2,
+                button.x - buttonWidth / 2,
+                button.y - buttonHeight / 2,
                 buttonWidth,
                 buttonHeight,
-                10
+                20
+            );
+            this.buttonGraphics.lineStyle(3, 0x000000, 1);
+            this.buttonGraphics.strokeRoundedRect(
+                button.x - buttonWidth / 2,
+                button.y - buttonHeight / 2,
+                buttonWidth,
+                buttonHeight,
+                20
             );
         };
 
-        drawButton(0x34DB6C);
+        drawButton(0x3498db);  // Stesso colore blu di MenuScene
 
         // Area interattiva bottone
-        const buttonArea = this.add.rectangle(refCenterX, buttonY, buttonWidth, buttonHeight)
+        const buttonArea = this.add.rectangle(button.x, button.y, buttonWidth, buttonHeight)
             .setInteractive({ useHandCursor: true })
             .setAlpha(0.01);
 
         // Aggiungi al container
         this.mainContainer.add([
-            patient,
+            patientImg,
+            messageBoxGraphics,
             this.buttonGraphics,
             buttonArea
         ]);
 
-        // Scala container
+        // Scala e posiziona container
         this.mainContainer.setScale(scale);
         this.mainContainer.setPosition(
-            centerX - (refCenterX * scale),
-            centerY - (refCenterY * scale)
+            centerX - (refCenter.x * scale),
+            centerY - (refCenter.y * scale)
         );
 
-        // TESTI FUORI DAL CONTAINER
-        this.textElements = [];
-        const minFontSize = 16;
+        // Salva riferimento per eventi
+        this.buttonArea = buttonArea;
+        this.drawButton = drawButton;
+    }
 
-        // Calcola posizioni reali
-        const endTextX = centerX;
-        const endTextY = centerY + ((520 - refCenterY) * scale); // Centrato nel box
+    createTexts(centerX, centerY, scale) {
+        const { refCenter, messageBox, button } = this.refPositions;
+        const minFontSize = 40 * scale;
 
-        const buttonTextX = centerX;
-        const buttonTextY = centerY + ((buttonY - refCenterY) * scale);
+        // Testo congratulazioni dentro la box
+        const messageTextX = centerX + ((messageBox.x - refCenter.x) * scale);
+        const messageTextY = centerY + ((messageBox.y - refCenter.y - 30) * scale);  // Leggermente più in alto per lo score
+        const messageFontSize = Math.max(minFontSize, 50 * scale) * 0.8;
+        
+        const messageText = this.add.text(messageTextX, messageTextY,
+            "Congratulazioni!!\nHai salvato il paziente!", {
+            fontSize: `${messageFontSize}px`,
+            color: "#2c3e50",
+            align: "center",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(messageText);
 
-        // Testo finale
-        const endFontSize = Math.max(minFontSize, 24 * scale);
-        const endText = this.add.text(endTextX, endTextY,
-            "Congratulazioni!! \n Hai salvato il paziente! \n\n  Score: " + gameState.score, {
-            fontSize: `${endFontSize * 0.7}px`,
+        // Score text dentro la box, sotto il messaggio
+        const scoreTextX = centerX + ((messageBox.x - refCenter.x) * scale);
+        const scoreTextY = centerY + ((messageBox.y - refCenter.y + 40) * scale);
+        const scoreFontSize = Math.max(minFontSize, 45 * scale) * 0.7;
+        
+        const scoreText = this.add.text(scoreTextX, scoreTextY,
+            "\n\nScore: " + gameState.score, {
+            fontSize: `${scoreFontSize}px`,
             color: "#000000",
             align: "center",
-            fontFamily: "Arial, sans-serif",
+            fontFamily: "Poppins",
             fontStyle: "bold",
-            backgroundColor: "#ffffffff",
-            padding: { x: 20, y: 5 }
+            resolution: 2
         }).setOrigin(0.5);
-        this.textElements.push(endText);
+        this.textElements.push(scoreText);
 
-        // Testo bottone
-        const buttonFontSize = Math.max(minFontSize, 28 * scale);
+        // Testo bottone (stile MenuScene/IntroScene)
+        const buttonTextX = centerX + ((button.x - refCenter.x) * scale);
+        const buttonTextY = centerY + ((button.y - refCenter.y) * scale);
+        const buttonFontSize = Math.max(minFontSize, 50 * scale);
+        
         const reviewButton = this.add.text(buttonTextX, buttonTextY,
             "Vediamo gli errori", {
             fontSize: `${buttonFontSize * 0.8}px`,
-            color: "#ffffff",
-            fontFamily: "Arial, sans-serif",
+            color: "#000000ff",
+            fontFamily: "Poppins",
             fontStyle: "bold",
-            padding: {x: 40, y: 10},
-            backgroundColor: "#26f51eff"
-        }).setOrigin(0.5);
+            resolution: 2
+        }).setOrigin(0.5)
+        .setInteractive({ useHandCursor: true });
         this.textElements.push(reviewButton);
 
-        // Eventi bottone
-        buttonArea.removeAllListeners();
-        buttonArea.on("pointerover", () => {
-            drawButton(0x2E8940);
+        // Eventi bottone (stile MenuScene/IntroScene)
+        this.buttonArea.removeAllListeners();
+        
+        reviewButton.on("pointerover", () => {
+            this.drawButton(0x5DADE2);  // Colore hover come MenuScene
             reviewButton.setScale(1.05);
         });
 
-        buttonArea.on("pointerout", () => {
-            drawButton(0x34DB6C);
+        reviewButton.on("pointerout", () => {
+            this.drawButton(0x3498db);
             reviewButton.setScale(1);
         });
 
-        buttonArea.on("pointerdown", () => {
-            drawButton(0x27ae60);
+        this.buttonArea.on("pointerover", () => {
+            this.drawButton(0x5DADE2);
+            reviewButton.setScale(1.05);
+        });
+
+        this.buttonArea.on("pointerout", () => {
+            this.drawButton(0x3498db);
+            reviewButton.setScale(1);
+        });
+
+        this.buttonArea.on("pointerdown", () => {
+            this.drawButton(0x2980b9);  // Colore click come MenuScene
             this.time.delayedCall(100, () => {
                 this.scene.start("ReviewScene");
             });
         });
 
-        const borderWidth = 1920 * scale;
-        const borderHeight = 1080 * scale;
-
-        this.sceneBorder = this.add.graphics();
-        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(
-        centerX - borderWidth / 2,
-        centerY - borderHeight / 2,
-        borderWidth,
-        borderHeight
-        );
+        reviewButton.on("pointerdown", () => {
+            this.drawButton(0x2980b9);
+            this.time.delayedCall(100, () => {
+                this.scene.start("ReviewScene");
+            });
+        });
     }
 
     shutdown() {
