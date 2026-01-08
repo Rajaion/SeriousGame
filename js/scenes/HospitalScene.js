@@ -221,26 +221,16 @@ class HospitalScene extends Phaser.Scene {
     // Opzione 1
     const opt1Y = startOptY;
     const optRect1 = this.add.graphics();
-    optRect1.fillStyle(0xecf0f1, 1);
-    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt1Y - optHeight/2, optWidth, optHeight, 0);
-    optRect1.lineStyle(2, 0x2c3e50, 1);
-    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt1Y - optHeight/2, optWidth, optHeight, 0);
-
+    this.drawAnswerBox(optRect1, convBoxX, opt1Y - optHeight/2, optWidth, optHeight);
     // Opzione 2
     const opt2Y = startOptY + optSpacing;
     const optRect2 = this.add.graphics();
-    optRect1.fillStyle(0xecf0f1, 1);
-    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt2Y - optHeight/2, optWidth, optHeight, 0);
-    optRect1.lineStyle(2, 0x2c3e50, 1);
-    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt2Y - optHeight/2, optWidth, optHeight, 0);
+    this.drawAnswerBox(optRect2, convBoxX, opt2Y - optHeight/2, optWidth, optHeight);
 
     // Opzione 3
     const opt3Y = startOptY + (optSpacing * 2);
-    const optRect3 =  this.add.graphics();
-    optRect1.fillStyle(0xecf0f1, 1);
-    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt3Y - optHeight/2, optWidth, optHeight, 0);
-    optRect1.lineStyle(2, 0x2c3e50, 1);
-    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt3Y - optHeight/2   , optWidth, optHeight, 0);
+    const optRect3 = this.add.graphics();
+    this.drawAnswerBox(optRect3, convBoxX, opt3Y - optHeight/2   , optWidth, optHeight);
 
     // TESTI - coordinate nel container 
     const option1Text = this.add.text(convBoxX, startOptY, 
@@ -306,6 +296,14 @@ class HospitalScene extends Phaser.Scene {
             this.clickedOption("Attenzione, scegliere l'opzione corretta", false);
         }
         this.deletePhoneConvo();
+    }
+
+    drawAnswerBox(box, x, y, width, height) {
+        box.clear();
+        box.fillStyle(0xffffff, 1);
+        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 5);
+        box.lineStyle(2, 0x000000, 1);
+        box.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 5);
     }
 
     clickedOption(info, win) {
