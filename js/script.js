@@ -15,6 +15,12 @@ const config = {
         width: window.innerWidth,
         height: window.innerHeight
     },
+    render: {
+        pixelArt: false,        // Importante: false per rendering smooth
+        antialias: true,         // Antialiasing per testi e immagini
+        roundPixels: false,      // Non arrotondare i pixel (causa sgranatura)
+        powerPreference: "high-performance"  // Usa GPU se disponibile
+    },
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, EndScene, ReviewScene],
 };
 
