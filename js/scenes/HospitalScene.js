@@ -220,24 +220,27 @@ class HospitalScene extends Phaser.Scene {
 
     // Opzione 1
     const opt1Y = startOptY;
-    const optRect1 = this.add.rectangle(convBoxX, opt1Y, optWidth, optHeight, 0xffffff, 1)
-        .setInteractive({ useHandCursor: true });
-    optRect1.setStrokeStyle(4, 0x000000);
-    optRect1.setOrigin(0.5, 1);
+    const optRect1 = this.add.graphics();
+    optRect1.fillStyle(0xecf0f1, 1);
+    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt1Y - optHeight/2, optWidth, optHeight, 0);
+    optRect1.lineStyle(2, 0x2c3e50, 1);
+    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt1Y - optHeight/2, optWidth, optHeight, 0);
 
     // Opzione 2
     const opt2Y = startOptY + optSpacing;
-    const optRect2 = this.add.rectangle(convBoxX, opt2Y, optWidth , optHeight, 0xffffff, 1)
-        .setInteractive({ useHandCursor: true });
-    optRect2.setStrokeStyle(4, 0x000000);
-    optRect2.setOrigin(0.5, 1);
+    const optRect2 = this.add.graphics();
+    optRect1.fillStyle(0xecf0f1, 1);
+    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt2Y - optHeight/2, optWidth, optHeight, 0);
+    optRect1.lineStyle(2, 0x2c3e50, 1);
+    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt2Y - optHeight/2, optWidth, optHeight, 0);
 
     // Opzione 3
     const opt3Y = startOptY + (optSpacing * 2);
-    const optRect3 = this.add.rectangle(convBoxX, opt3Y, optWidth, optHeight, 0xffffff, 1)
-        .setInteractive({ useHandCursor: true });
-    optRect3.setStrokeStyle(4, 0x000000);
-    optRect3.setOrigin(0.5, 1);
+    const optRect3 =  this.add.graphics();
+    optRect1.fillStyle(0xecf0f1, 1);
+    optRect1.fillRoundedRect(convBoxX - optWidth/2, opt3Y - optHeight/2, optWidth, optHeight, 0);
+    optRect1.lineStyle(2, 0x2c3e50, 1);
+    optRect1.strokeRoundedRect(convBoxX - optWidth/2, opt3Y - optHeight/2   , optWidth, optHeight, 0);
 
     // TESTI - coordinate nel container 
     const option1Text = this.add.text(convBoxX, startOptY, 
@@ -249,7 +252,7 @@ class HospitalScene extends Phaser.Scene {
         resolution: 2,
         fixedWidth: optWidth - 20,  // Larghezza fissa con padding
         fixedHeight: optHeight - 10
-    }).setOrigin(0.5, 0.5);
+    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     const option2Text = this.add.text(convBoxX, startOptY + optSpacing, 
         this.opzione2, {
@@ -260,7 +263,7 @@ class HospitalScene extends Phaser.Scene {
         resolution: 2,
         fixedWidth: optWidth - 20,  // Larghezza fissa con padding
         fixedHeight: optHeight - 10
-    }).setOrigin(0.5, 0.5);
+    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     const option3Text = this.add.text(convBoxX, startOptY + (optSpacing * 2), 
         this.opzione3, {
@@ -271,7 +274,7 @@ class HospitalScene extends Phaser.Scene {
         resolution: 2,
         fixedWidth: optWidth - 20,  // Larghezza fissa con padding
         fixedHeight: optHeight - 10
-    }).setOrigin(0.5, 0.5);
+    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     // Aggiungi TUTTO al container (così viene scalato insieme)
     this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
@@ -285,15 +288,15 @@ class HospitalScene extends Phaser.Scene {
     this.option3 = option3Text;
 
     // Eventi click
-    optRect1.on("pointerdown", () => {
+    option1Text.on("pointerdown", () => {
         this.buttonChoice(1);
     });
 
-    optRect2.on("pointerdown", () => {
+    option2Text.on("pointerdown", () => {
         this.buttonChoice(2);
     });
 
-    optRect3.on("pointerdown", () => {
+    option3Text.on("pointerdown", () => {
         this.buttonChoice(3);
     });
 }
