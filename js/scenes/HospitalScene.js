@@ -250,8 +250,6 @@ class HospitalScene extends Phaser.Scene {
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2,
-        fixedWidth: optWidth - 20,  // Larghezza fissa con padding
-        fixedHeight: optHeight - 10
     }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     const option2Text = this.add.text(convBoxX, startOptY + optSpacing, 
@@ -261,8 +259,6 @@ class HospitalScene extends Phaser.Scene {
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2,
-        fixedWidth: optWidth - 20,  // Larghezza fissa con padding
-        fixedHeight: optHeight - 10
     }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     const option3Text = this.add.text(convBoxX, startOptY + (optSpacing * 2), 
@@ -272,8 +268,6 @@ class HospitalScene extends Phaser.Scene {
         align: 'center',
         fontFamily: "Poppins",
         resolution: 2,
-        fixedWidth: optWidth - 20,  // Larghezza fissa con padding
-        fixedHeight: optHeight - 10
     }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
 
     // Aggiungi TUTTO al container (così viene scalato insieme)
