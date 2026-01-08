@@ -245,7 +245,6 @@ class HospitalScene extends Phaser.Scene {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         resolution: 2
     }).setOrigin(0.5);
@@ -255,7 +254,6 @@ class HospitalScene extends Phaser.Scene {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         resolution: 2
     }).setOrigin(0.5);
@@ -265,7 +263,6 @@ class HospitalScene extends Phaser.Scene {
         fontSize: '60px',
         color: '#2c3e50',
         align: 'center',
-        wordWrap: { width: optWidth * 0.9 },
         fontFamily: "Poppins",
         resolution: 2
     }).setOrigin(0.5);
