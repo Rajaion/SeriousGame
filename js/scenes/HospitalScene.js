@@ -182,7 +182,7 @@ class HospitalScene extends Phaser.Scene {
             }
 
             this.convOn = true;
-            this.showPhoneConvo(scale);
+            this.showPhoneConvo();
         });
 
         // EVENTI PAZIENTE
@@ -205,86 +205,87 @@ class HospitalScene extends Phaser.Scene {
         );
     }
 
-    showPhoneConvo(scale) {
-    // Aggiornare le info del testo sotto
-    this.bottomText = "Selezionare l'opzione giusta tra le 3";
-    this.bottomTextSpace.setText(this.bottomText);
-    // Posizioni di riferimento per la conversazione (coordinate 1920x1080)
-    const convBoxX = 1536;
+    showPhoneConvo() {
+        // Aggiornare le info del testo sotto
+        this.bottomText = "Selezionare l'opzione giusta tra le 3";
+        this.bottomTextSpace.setText(this.bottomText);
+        
+        // Posizioni di riferimento per la conversazione (coordinate 1920x1080)
+        const convBoxX = 1536;
+        
+        // Posizioni opzioni nel container
+        const startOptY = 700;  // Modifica questa per spostare tutto
+        const optWidth = 600;
+        const optHeight = 80;
+        const optSpacing = 95;
     
-    // Posizioni opzioni nel container
-    const startOptY = 750;
-    const optWidth = 600;
-    const optHeight = 80;
-    const optSpacing = 95;
-
-    // Opzione 1
-    const opt1Y = startOptY;
-    const optRect1 = this.add.graphics();
-    this.drawAnswerBox(optRect1, convBoxX, opt1Y + optHeight/2, optWidth, optHeight);
-    // Opzione 2
-    const opt2Y = startOptY + optSpacing;
-    const optRect2 = this.add.graphics();
-    this.drawAnswerBox(optRect2, convBoxX, opt2Y + optHeight/2, optWidth, optHeight);
-
-    // Opzione 3
-    const opt3Y = startOptY + (optSpacing * 2);
-    const optRect3 = this.add.graphics();
-    this.drawAnswerBox(optRect3, convBoxX, opt3Y + optHeight/2, optWidth, optHeight);
-
+        // Opzione 1 - CORRETTO: passa solo opt1Y, drawAnswerBox centra già
+        const opt1Y = startOptY;
+        const optRect1 = this.add.graphics();
+        this.drawAnswerBox(optRect1, convBoxX, opt1Y + optHeight/2, optWidth, optHeight);  // ✅ Rimosso + optHeight/2
+        
+        // Opzione 2
+        const opt2Y = startOptY + optSpacing;
+        const optRect2 = this.add.graphics();
+        this.drawAnswerBox(optRect2, convBoxX, opt2Y + optHeight/2, optWidth, optHeight);  // ✅ Rimosso + optHeight/2
+        
+        // Opzione 3
+        const opt3Y = startOptY + (optSpacing * 2);
+        const optRect3 = this.add.graphics();
+        this.drawAnswerBox(optRect3, convBoxX, opt3Y + optHeight/2, optWidth, optHeight);  // ✅ Rimosso + optHeight/2
+        
+        // TESTI - ALLINEATI AI RETTANGOLI (stessa Y)
+        const option1Text = this.add.text(convBoxX, startOptY, 
+            this.opzione1, {
+            fontSize: '60px',
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            resolution: 2,
+        }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
     
-    // TESTI - coordinate nel container 
-    const option1Text = this.add.text(convBoxX, startOptY, 
-        this.opzione1, {
-        fontSize: '60px',
-        color: '#2c3e50',
-        align: 'center',
-        fontFamily: "Poppins",
-        resolution: 2,
-    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
-
-    const option2Text = this.add.text(convBoxX, startOptY + optSpacing, 
-        this.opzione2, {
-        fontSize: '60px',
-        color: '#2c3e50',
-        align: 'center',
-        fontFamily: "Poppins",
-        resolution: 2,
-    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
-
-    const option3Text = this.add.text(convBoxX, startOptY + (optSpacing * 2), 
-        this.opzione3, {
-        fontSize: '60px',
-        color: '#2c3e50',
-        align: 'center',
-        fontFamily: "Poppins",
-        resolution: 2,
-    }).setOrigin(0.5, 0.5).setInteractive({ useHandCursor: true });;
-
-    // Aggiungi TUTTO al container (così viene scalato insieme)
-    this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
-
-    // Salva riferimenti per cleanup
-    this.optRect1 = optRect1;
-    this.optRect2 = optRect2;
-    this.optRect3 = optRect3;
-    this.option1 = option1Text;
-    this.option2 = option2Text;
-    this.option3 = option3Text;
-
-    // Eventi click
-    option1Text.on("pointerdown", () => {
-        this.buttonChoice(1);
-    });
-
-    option2Text.on("pointerdown", () => {
-        this.buttonChoice(2);
-    });
-
-    option3Text.on("pointerdown", () => {
-        this.buttonChoice(3);
-    });
-}
+        const option2Text = this.add.text(convBoxX, startOptY + optSpacing, 
+            this.opzione2, {
+            fontSize: '60px',
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            resolution: 2,
+        }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
+    
+        const option3Text = this.add.text(convBoxX, startOptY + (optSpacing * 2), 
+            this.opzione3, {
+            fontSize: '60px',
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            resolution: 2,
+        }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
+    
+        // Aggiungi TUTTO al container (così viene scalato insieme)
+        this.mainContainer.add([optRect1, optRect2, optRect3, option1Text, option2Text, option3Text]);
+        
+        // Salva riferimenti per cleanup
+        this.optRect1 = optRect1;
+        this.optRect2 = optRect2;
+        this.optRect3 = optRect3;
+        this.option1 = option1Text;
+        this.option2 = option2Text;
+        this.option3 = option3Text;
+    
+        // Eventi click
+        option1Text.on("pointerdown", () => {
+            this.buttonChoice(1);
+        });
+    
+        option2Text.on("pointerdown", () => {
+            this.buttonChoice(2);
+        });
+    
+        option3Text.on("pointerdown", () => {
+            this.buttonChoice(3);
+        });
+    }
 
     buttonChoice(chosenNumber) {
         if (this.correctNumber === chosenNumber) {
