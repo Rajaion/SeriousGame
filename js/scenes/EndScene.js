@@ -4,7 +4,6 @@ class EndScene extends Phaser.Scene {
         
         // Configurazione posizioni (riferimento 1920x1080)
         this.refPositions = {
-            refCenter: { x: 960, y: 540 },
             patient: { x: 960, y: 220 },
             messageBox: { x: 960, y: 520 },
             button: { x: 960, y: 870 }
@@ -17,72 +16,26 @@ class EndScene extends Phaser.Scene {
 
     create() {
         this.createContent();
-        this.scale.on('resize', this.handleResize, this);
-    }
-
-    handleResize() {
-        this.time.delayedCall(50, () => {
-            if (this.scene.isActive()) {
-                this.createContent();
-            }
-        });
     }
 
     createContent() {
-        // Pulisci tutto
         this.children.removeAll();
         this.textElements = [];
 
-        const { width, height, centerX, centerY, scale } = this.getScreenMetrics();
-        const { borderWidth, borderHeight } = this.getBorderDimensions(scale);
-
-        this.createBackground(centerX, centerY, borderWidth, borderHeight);
-        this.createGameContent(centerX, centerY, scale);
-        this.createTexts(centerX, centerY, scale);
+        this.createBackground();
+        this.createGameContent();
+        this.createTexts();
     }
 
-    getScreenMetrics() {
-        const width = this.scale.width;
-        const height = this.scale.height;
-        const scale = Math.min(width / 1920, height / 1080);
-        return {
-            width,
-            height,
-            centerX: width / 2,
-            centerY: height / 2,
-            scale
-        };
-    }
-
-    getBorderDimensions(scale) {
-        return {
-            borderWidth: 1920 * scale,
-            borderHeight: 1080 * scale
-        };
-    }
-
-    createBackground(centerX, centerY, borderWidth, borderHeight) {
-        // Background con stesso colore di MenuScene e IntroScene
+    createBackground() {
         this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(
-            centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight
-        );
-        this.sceneBorder.fillStyle(0x2c3e50, 1);  // Stesso colore di MenuScene/IntroScene
-        this.sceneBorder.fillRoundedRect(
-            centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight,
-            0
-        );
+        this.sceneBorder.strokeRect(0, 0, 1920, 1080);
+        this.sceneBorder.fillStyle(0x2c3e50, 1);
+        this.sceneBorder.fillRoundedRect(0, 0, 1920, 1080, 0);
     }
 
-    createGameContent(centerX, centerY, scale) {
-        const { refCenter } = this.refPositions;
+    createGameContent() {
         this.mainContainer = this.add.container(0, 0);
 
         // Paziente felice
@@ -153,30 +106,18 @@ class EndScene extends Phaser.Scene {
             buttonArea
         ]);
 
-        // Scala e posiziona container
-        this.mainContainer.setScale(scale);
-        this.mainContainer.setPosition(
-            centerX - (refCenter.x * scale),
-            centerY - (refCenter.y * scale)
-        );
-
         // Salva riferimento per eventi
         this.buttonArea = buttonArea;
         this.drawButton = drawButton;
     }
 
-    createTexts(centerX, centerY, scale) {
-        const { refCenter, messageBox, button } = this.refPositions;
-        const minFontSize = 40 * scale;
-
-        // Testo congratulazioni dentro la box
-        const messageTextX = centerX + ((messageBox.x - refCenter.x) * scale);
-        const messageTextY = centerY + ((messageBox.y - refCenter.y - 30) * scale);  // Leggermente più in alto per lo score
-        const messageFontSize = Math.max(minFontSize, 50 * scale) * 0.8;
+    createTexts() {
+        const { messageBox, button } = this.refPositions;
         
-        const messageText = this.add.text(messageTextX, messageTextY,
+        // Testo congratulazioni dentro la box
+        const messageText = this.add.text(messageBox.x, messageBox.y - 30,
             "Congratulazioni!!\nHai salvato il paziente!", {
-            fontSize: `${messageFontSize}px`,
+            fontSize: `40px`,
             color: "#2c3e50",
             align: "center",
             fontFamily: "Poppins",
@@ -186,13 +127,9 @@ class EndScene extends Phaser.Scene {
         this.textElements.push(messageText);
 
         // Score text dentro la box, sotto il messaggio
-        const scoreTextX = centerX + ((messageBox.x - refCenter.x) * scale);
-        const scoreTextY = centerY + ((messageBox.y - refCenter.y + 40) * scale);
-        const scoreFontSize = Math.max(minFontSize, 45 * scale) * 0.7;
-        
-        const scoreText = this.add.text(scoreTextX, scoreTextY,
+        const scoreText = this.add.text(messageBox.x, messageBox.y + 40,
             "\n\nScore: " + gameState.score, {
-            fontSize: `${scoreFontSize}px`,
+            fontSize: `32px`,
             color: "#000000",
             align: "center",
             fontFamily: "Poppins",
@@ -201,20 +138,15 @@ class EndScene extends Phaser.Scene {
         }).setOrigin(0.5);
         this.textElements.push(scoreText);
 
-        // Testo bottone (stile MenuScene/IntroScene)
-        const buttonTextX = centerX + ((button.x - refCenter.x) * scale);
-        const buttonTextY = centerY + ((button.y - refCenter.y) * scale);
-        const buttonFontSize = Math.max(minFontSize, 50 * scale);
-        
-        const reviewButton = this.add.text(buttonTextX, buttonTextY,
+        // Testo bottone
+        const reviewButton = this.add.text(button.x, button.y,
             "Vediamo gli errori", {
-            fontSize: `${buttonFontSize * 0.8}px`,
+            fontSize: `40px`,
             color: "#000000ff",
             fontFamily: "Poppins",
             fontStyle: "bold",
             resolution: 2
-        }).setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         this.textElements.push(reviewButton);
 
         // Eventi bottone (stile MenuScene/IntroScene)
@@ -256,7 +188,6 @@ class EndScene extends Phaser.Scene {
     }
 
     shutdown() {
-        this.scale.off('resize', this.handleResize, this);
         if (this.mainContainer) {
             this.mainContainer.destroy();
         }
