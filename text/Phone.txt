@@ -1,9 +1,10 @@
 Inserire dopo i rispettivi ":" le rispettive opzioni da mostrare sul telefono:
 
-#Option1: Chiamare i medici
-#Option2: Allertare l'ospedale
-#Option3: Altra opzione
+#ContextText: Dici al collega di raggiungerti immediatamente e:
+#Option1: Portare carrello emergenze e allertare 2222
+#Option2: Portare il DAE
+#Option3: Allertare il 2222
 
 Inserire qui sotto invece l'opzione corretta da scegliere per il telefono (da 1 a 3)
 
-#CorrectOption: 3
+#CorrectOption: 1

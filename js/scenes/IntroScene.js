@@ -4,151 +4,71 @@ class IntroScene extends Phaser.Scene {
         super({ key: "IntroScene" });
     }
 
-    preload() {}
-
     create() {
-        this.createContent();
-        this.scale.on("resize", this.handleResize, this);
-    }
-
-    handleResize() {
-        this.time.delayedCall(50, () => {
-            if (this.scene.isActive()) {
-                this.createContent();
-            }
-        });
-    }
-
-    createContent() {
         this.children.removeAll();
 
-        const width = this.scale.width;
-        const height = this.scale.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        // Usa dimensioni fisse del gioco (1920x1080)
+        const centerX = 960;  // 1920 / 2
+        const centerY = 540;  // 1080 / 2
 
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY);
+        const boxWidth = 1700;
+        const boxHeight = 800;
 
-        const borderWidth = 1920 * scale;
-        const borderHeight = 1080 * scale;
-
-        
-
-        const refCenterX = centerX;
-        const refCenterY = centerY;
-
-        const boxWidth = 1700 * scale;
-        const boxHeight = 800 * scale;
-
-        //Bordo della scena 
+        // Bordo della scena 
         this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
         this.sceneBorder.strokeRect(
-            centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight
+            centerX - 960,
+            centerY - 540,
+            1920,
+            1080
         );
         this.sceneBorder.fillStyle(0x2c3e50, 1);
-        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight,
-            0
-        );
+        this.sceneBorder.fillRoundedRect(centerX - 960, centerY - 540, 1920, 1080, 0);
 
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
-        box.fillRoundedRect(
-            refCenterX - boxWidth / 2,
-            refCenterY - boxHeight / 2,
-            boxWidth,
-            boxHeight,
-            20 * scale
-        );
-        box.lineStyle(2 * scale, 0x2c3e50, 1);
-        box.strokeRoundedRect(
-            refCenterX - boxWidth / 2,
-            refCenterY - boxHeight / 2,
-            boxWidth,
-            boxHeight,
-            20 * scale
-        );
-
-        this.add.text(
-            refCenterX,
-            refCenterY - boxHeight * 0.3,
-            "🚨",
-            {
-                fontSize: `${120 * scale}px`, 
-            }
-        ).setOrigin(0.5);
+        box.fillRoundedRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, 20);
+        box.lineStyle(2, 0x2c3e50, 1);
+        box.strokeRoundedRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, 20);
 
         const scenarioText =
-            "\nSei un infermiere del pronto soccorso e un paziente è appena arrivato in codice rosso.\n" +
-            "\n\nDevi agire velocemente e in modo corretto.";
+            "\nSei un infermiere in turno presso il reparto di cardiologia. \n" +
+            "\n\nTi suona il campanello, è la moglie del signor bianchi, 65 anni ricoverato per scompenso cardiaco,ti dice che non le risponde più, nemmeno se lo chiama.";
 
-        const textContent = this.add.text(
-            refCenterX - 10,
-            refCenterY,
-            scenarioText,
-            {
-                fontSize: `${70 * scale}px`,
-                fontFamily: "Poppins",
-                color: "#2c3e50",
-                wordWrap: { width: boxWidth * 0.9 },
-                lineSpacing: 4 * scale, 
-                resolution: 3
-            }
-        ).setOrigin(0.5);
+        this.add.text(centerX - 10, centerY - 40, scenarioText, {
+            fontSize: `70px`,
+            fontFamily: "Poppins",
+            color: "#2c3e50",
+            wordWrap: { width: boxWidth * 0.9 },
+            lineSpacing: 4, 
+            resolution: 3
+        }).setOrigin(0.5);
 
-        const buttonWidth = 300 * scale;
-        const buttonHeight = 70 * scale;
-        const buttonX = refCenterX - buttonWidth / 2;
-        const buttonY = refCenterY + boxHeight * 0.50 - buttonHeight / 2;
+        const buttonWidth = 300;
+        const buttonHeight = 70;
+        const buttonX = centerX - buttonWidth / 2;
+        const buttonY = centerY + boxHeight * 0.50 - buttonHeight / 2;
 
         const buttonBg = this.add.graphics();
 
         const drawButton = color => {
             buttonBg.clear();
             buttonBg.fillStyle(color, 1);
-            buttonBg.fillRoundedRect(
-                buttonX,
-                buttonY,
-                buttonWidth,
-                buttonHeight,
-                10 * scale,
-                40
-            );
+            buttonBg.fillRoundedRect(buttonX, buttonY, buttonWidth, buttonHeight, 10);
             buttonBg.lineStyle(3, 0x000000, 1);
-            buttonBg.strokeRoundedRect(
-                buttonX,
-                buttonY,
-                buttonWidth,
-                buttonHeight,
-                10 * scale,
-                40
-            );
+            buttonBg.strokeRoundedRect(buttonX, buttonY, buttonWidth, buttonHeight, 10);
         };
 
         drawButton(0x5DADE2);
 
-        const startButton = this.add.text(
-            refCenterX,
-            refCenterY + boxHeight * 0.50,
-            "Inizia",
-            {
-                fontSize: `${60 * scale}px`,
-                color: "#000000ff",
-                fontFamily: "Poppins",
-                fontStyle: "bold",
-                resolution: 2
-            }
-        )
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
+        const startButton = this.add.text(centerX, centerY + boxHeight * 0.50, "Inizia", {
+            fontSize: `60px`,
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         startButton.on("pointerover", () => {
             drawButton(0x5DADE2);
@@ -166,9 +86,5 @@ class IntroScene extends Phaser.Scene {
                 this.scene.start("HospitalScene");
             });
         });
-    }
-
-    shutdown() {
-        this.scale.off("resize", this.handleResize, this);
     }
 }

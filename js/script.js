@@ -8,38 +8,46 @@ const gameState = {
 const config = {
     type: Phaser.AUTO,
     parent: 'game-wrapper',
-    backgroundColor: '#000000' ,
+    backgroundColor: '#000000',
+    // Risoluzione fissa del gioco (design resolution)
+    width: 1920,
+    height: 1080,
     scale: {
-        mode: Phaser.Scale.RESIZE, 
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
+        mode: Phaser.Scale.FIT, // Mantiene aspect ratio, aggiunge letterboxing se necessario
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Centra sia orizzontalmente che verticalmente
+        width: 1920,
+        height: 1080,
+        // Phaser gestirà automaticamente il resize e il centraggio
     },
-    
+    // Rendering ad alta risoluzione per evitare sgranatura
+    render: {
+        antialias: true,
+        pixelArt: false,
+        roundPixels: false
+    },
     scene: [MenuScene, IntroScene, HospitalScene, PatientScene, CartScene, EndScene, ReviewScene],
 };
 
 const game = new Phaser.Game(config);
 
+// Imposta resolution basata su devicePixelRatio per rendering nitido
 if (game.renderer && game.renderer.gl) {
     const dpr = window.devicePixelRatio || 1;
-    // Forza il rendering ad alta risoluzione
-    game.renderer.resolution = dpr;
+    game.renderer.resolution = Math.min(dpr, 2); // Limita a 2x per performance
 }
 
-// Gestione resize finestra
-let resizeTimeout;
+// Gestione resize: Phaser.FIT gestisce automaticamente il resize
+// Aggiungiamo solo un refresh per sicurezza
 window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        game.scale.resize(window.innerWidth, window.innerHeight);
-    }, 100);
+    if (game.scale) {
+        game.scale.refresh();
+    }
 });
 
-// Gestione cambio orientamento (importante per mobile)
 window.addEventListener('orientationchange', () => {
     setTimeout(() => {
-        game.scale.resize(window.innerWidth, window.innerHeight);
-        game.scale.refresh();
+        if (game.scale) {
+            game.scale.refresh();
+        }
     }, 200);
 });

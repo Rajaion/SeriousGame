@@ -42,11 +42,17 @@
         height: 100%;
         width: 100%;
         position: relative;
+        background-color: #000000;
+        /* Phaser gestisce il centraggio, non interferiamo con flex */
     }
 
     canvas {
-    display: block;
-    touch-action: none;
+        display: block;
+        touch-action: none;
+        /* Rendering smooth per qualità migliore */
+        image-rendering: auto;
+        /* Phaser gestisce dimensioni e posizionamento */
+        margin: 0 auto;
     }
 
     </style>

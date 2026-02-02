@@ -1,6 +1,7 @@
 class HospitalScene extends Phaser.Scene {
     
     convOn = false;
+    contextText = "default";
     opzione1 = "default";
     opzione2 = "default";
     opzione3 = "default";
@@ -22,6 +23,12 @@ class HospitalScene extends Phaser.Scene {
             patient: { x: 768, y: 594 },
             infoBox: { x: 1550, y: 162 },
             convBox: { x: 1536, y: 0 },
+            contextBox: {
+                x: 1536,
+                y: 620,
+                width: 600,
+                height: 60
+            },
             options: {
                 y: 700,
                 spacing: 95,
@@ -239,11 +246,42 @@ class HospitalScene extends Phaser.Scene {
         const { refCenter, convBox, options } = this.refPositions;
         const { centerX, centerY } = this.getScreenMetrics();
         
+        // Crea box con testo contestuale
+        this.createContextBox(centerX, centerY, scale);
+        
         // Crea rettangoli opzioni nel container
         this.createOptionBoxes();
         
         // Crea testi opzioni FUORI dal container (come PatientScene)
         this.createOptionTexts(centerX, centerY, scale);
+    }
+
+    createContextBox(centerX, centerY, scale) {
+        const { refCenter, convBox, contextBox } = this.refPositions;
+        
+        // Crea box grafica nel container
+        this.contextBoxGraphic = this.add.graphics();
+        this.drawAnswerBox(this.contextBoxGraphic, contextBox.x, contextBox.y, contextBox.width, contextBox.height);
+        this.mainContainer.add(this.contextBoxGraphic);
+        
+        // Crea testo contestuale FUORI dal container
+        const contextTextX = centerX + ((convBox.x - refCenter.x) * scale);
+        const contextTextY = centerY + ((contextBox.y - refCenter.y) * scale);
+        const fontSize = Math.max(60 * scale, 60 * scale) * 0.85;
+        
+        const textStyle = {
+            fontSize: `${fontSize}px`,
+            color: '#2c3e50',
+            align: 'center',
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2,
+            wordWrap: { width: scale * 580 }
+        };
+        
+        this.contextTextElement = this.add.text(contextTextX, contextTextY, this.contextText, textStyle)
+            .setOrigin(0.5);
+        this.textElements.push(this.contextTextElement);
     }
 
     createOptionBoxes() {
@@ -358,12 +396,15 @@ class HospitalScene extends Phaser.Scene {
 
     getPhonetext(fullText) {
         const opzioni = fullText.split("\n");
-        let i = 4;
+        let i = 4; // Aumentato a 5 per includere il contextText
         let riga = 0;
         
         while (i != 0) {
             riga++;
-            if (opzioni[riga].substring(0, 9) === "#Option1:") {
+            if (opzioni[riga].substring(0, 12) === "#ContextText:") {
+                this.contextText = opzioni[riga].substring(13);
+                i--;
+            } else if (opzioni[riga].substring(0, 9) === "#Option1:") {
                 this.opzione1 = opzioni[riga].substring(10);
                 i--;
             } else if (opzioni[riga].substring(0, 9) === "#Option2:") {
@@ -377,10 +418,19 @@ class HospitalScene extends Phaser.Scene {
                 i--;
             }
         }
+        console.log("Context text:", this.contextText);
         console.log("Correct option:", this.correctNumber);
     }
 
     deletePhoneConvo() {
+        if (this.contextBoxGraphic) {
+            this.contextBoxGraphic.destroy();
+            this.contextBoxGraphic = null;
+        }
+        if (this.contextTextElement) {
+            this.contextTextElement.destroy();
+            this.contextTextElement = null;
+        }
         if (this.optRect1) {
             this.optRect1.destroy();
             this.optRect1 = null;

@@ -8,65 +8,31 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.createUI();
-        this.scale.on('resize', this.handleResize, this);
-    }
+        this.children.removeAll();
 
-    handleResize(gameSize) {
-        this.time.delayedCall(50, () => {
-            this.createUI();
-        });
-    }
+        // Usa dimensioni fisse del gioco (1920x1080)
+        const centerX = 960;  // 1920 / 2
+        const centerY = 540;  // 1080 / 2
 
-    createUI() {
-        // Pulisci tutto
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-            this.sceneBorder.destroy();
-        }
-
-        const width = this.scale.width;
-        const height = this.scale.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
-
-        // SCALA il container per adattarlo allo schermo
-        const scaleX = width / 1920;
-        const scaleY = height / 1080;
-        const scale = Math.min(scaleX, scaleY); // Mantieni proporzioni
-
-        const borderWidth = 1920 * scale;
-        const borderHeight = 1080 * scale;
-
+        // Bordo della scena
         this.sceneBorder = this.add.graphics();
         this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(
-            centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight
-        );
+        this.sceneBorder.strokeRect(centerX - 960, centerY - 540, 1920, 1080);
         this.sceneBorder.fillStyle(0x2c3e50, 1);
-        this.sceneBorder.fillRoundedRect(centerX - borderWidth / 2,
-            centerY - borderHeight / 2,
-            borderWidth,
-            borderHeight,
-            0
-        );
-
-        // CREA TUTTO nel container con coordinate fisse (come se fosse 1920x1080)
-        this.mainContainer = this.add.container(0, 0);
-
-        // Posizioni fisse di riferimento
-        const refCenterX = 960;  // Centro di 1920
-        const refCenterY = 540;  // Centro di 1080
+        this.sceneBorder.fillRoundedRect(centerX - 960, centerY - 540, 1920, 1080, 0);
 
         // Icona
-        const icona = this.add.image(refCenterX, refCenterY * 1, 'IconaMenu')
-            .setScale(0.7);
+        const icona = this.add.image(centerX, centerY, 'IconaMenu').setScale(0.7);
+
+        // Sfondo Titolo
+        const titleBackground = this.add.graphics();
+        titleBackground.fillStyle(0xffffff, 1);
+        titleBackground.fillRoundedRect(centerX - 310, centerY * 0.35 - 37.5, 620, 75, 20);
+        titleBackground.lineStyle(3, 0x000000, 1);
+        titleBackground.strokeRoundedRect(centerX - 310, centerY * 0.35 - 37.5, 620, 75, 20);
 
         // Titolo
-        const title = this.add.text(refCenterX, refCenterY * 0.35, 'Emergenza medica', {
+        const title = this.add.text(centerX, centerY * 0.35, 'Emergenza medica', {
             fontSize: '60px',
             color: "#ff0000ff",
             fontFamily: "Poppins",
@@ -76,37 +42,26 @@ class MenuScene extends Phaser.Scene {
         // Bottone
         const buttonGraphics = this.add.graphics();
         buttonGraphics.fillStyle(0x3498db, 1);
-        buttonGraphics.fillRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+        buttonGraphics.fillRoundedRect(centerX - 130, centerY * 1.6 - 37.5, 250, 75, 20);
         buttonGraphics.lineStyle(3, 0x000000, 1);
-        buttonGraphics.strokeRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
-
-        // Sfondo Titolo
-        const titleBackground = this.add.graphics();
-        titleBackground.fillStyle(0xffffff, 1);
-        titleBackground.fillRoundedRect(refCenterX - 310, refCenterY * 0.35 - 37.5, 620, 75, 20);
-        titleBackground.lineStyle(3, 0x000000, 1);
-        titleBackground.strokeRoundedRect(refCenterX - 310, refCenterY * 0.35 - 37.5, 620, 75, 20);
+        buttonGraphics.strokeRoundedRect(centerX - 130, centerY * 1.6 - 37.5, 250, 75, 20);
 
         const drawButton = (color) => {
             buttonGraphics.clear();
             buttonGraphics.fillStyle(color, 1);
-            buttonGraphics.fillRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+            buttonGraphics.fillRoundedRect(centerX - 130, centerY * 1.6 - 37.5, 250, 75, 20);
             buttonGraphics.lineStyle(3, 0x000000, 1);
-            buttonGraphics.strokeRoundedRect(refCenterX - 130, refCenterY * 1.6 - 37.5, 250, 75, 20);
+            buttonGraphics.strokeRoundedRect(centerX - 130, centerY * 1.6 - 37.5, 250, 75, 20);
         };
 
         // Testo bottone
-        const startText = this.add.text(refCenterX * 0.99, refCenterY * 1.6, "Start", {
+        const startText = this.add.text(centerX * 0.99, centerY * 1.6, "Start", {
             fontSize: '60px',
             color: "#000000ff",
             fontFamily: "Poppins",
             align: "center",
             resolution: 2
-        })
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
-
-        startText.removeAllListeners();
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         startText.on("pointerover", () => {
             drawButton(0x5DADE2);
@@ -124,21 +79,5 @@ class MenuScene extends Phaser.Scene {
                 this.scene.start("IntroScene");
             });
         });
-
-        // Aggiungi tutto al container
-        this.mainContainer.add([icona, buttonGraphics, titleBackground, title, startText]);
-
-        this.mainContainer.setScale(scale);
-
-        // Centra il container scalato
-        this.mainContainer.setPosition(
-            centerX - (960 * scale),
-            centerY - (540 * scale)
-        );
-
-    }
-
-    shutdown() {
-        this.scale.off('resize', this.handleResize, this);
     }
 }
