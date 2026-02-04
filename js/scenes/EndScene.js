@@ -36,8 +36,6 @@ class EndScene extends Phaser.Scene {
     }
 
     createGameContent() {
-        this.mainContainer = this.add.container(0, 0);
-
         // Paziente felice
         const { patient } = this.refPositions;
         const patientImg = this.add.image(patient.x, patient.y, "HappyPatient");
@@ -98,13 +96,7 @@ class EndScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .setAlpha(0.01);
 
-        // Aggiungi al container
-        this.mainContainer.add([
-            patientImg,
-            messageBoxGraphics,
-            this.buttonGraphics,
-            buttonArea
-        ]);
+
 
         // Salva riferimento per eventi
         this.buttonArea = buttonArea;
@@ -185,16 +177,5 @@ class EndScene extends Phaser.Scene {
                 this.scene.start("ReviewScene");
             });
         });
-    }
-
-    shutdown() {
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
     }
 }

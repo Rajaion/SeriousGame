@@ -38,8 +38,6 @@ class HospitalScene extends Phaser.Scene {
     }
 
     createBackground() {
-        this.mainContainer = this.add.container(0, 0);
-
         const ospedale = this.add.image(0, 0, "Ospedale").setOrigin(0, 0);
         ospedale.setScale(Math.max(1920 / ospedale.width, 1080 / ospedale.height));
 
@@ -56,8 +54,6 @@ class HospitalScene extends Phaser.Scene {
         this.patientArea = this.add.rectangle(768, 594, 400, 400)
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
-
-        this.mainContainer.add([ospedale, infoBox, this.telephone, this.patientArea]);
     }
 
     createTexts() {
@@ -77,11 +73,11 @@ class HospitalScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         this.textElements.push(this.bottomTextSpace);
 
-        this.textElements.push(this.add.text(1550, 162, 'Il paziente non risponde', {
-            fontSize: `48px`,
+        this.textElements.push(this.add.text(1550, 162, 'Entri in stanza: il paziente è incosciente e non ha segni di vita', {
+            fontSize: `42px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
-            wordWrap: {width: 410, height: 75},
+            wordWrap: {width: 500, height: 100},
             resolution: 2
         }).setOrigin(0.5));
 
@@ -127,7 +123,6 @@ class HospitalScene extends Phaser.Scene {
     createContextBox() {
         this.contextBoxGraphic = this.add.graphics();
         this.drawAnswerBox(this.contextBoxGraphic, 1536, 620, 600, 60);
-        this.mainContainer.add(this.contextBoxGraphic);
         
         this.contextTextElement = this.add.text(1536, 620, this.contextText, {
             fontSize: `51px`,
@@ -147,7 +142,6 @@ class HospitalScene extends Phaser.Scene {
         this.drawAnswerBox(this.optRect2, 1536, 795, 600, 80);
         this.optRect3 = this.add.graphics();
         this.drawAnswerBox(this.optRect3, 1536, 890, 600, 80);
-        this.mainContainer.add([this.optRect1, this.optRect2, this.optRect3]);
     }
 
     createOptionTexts() {
@@ -173,7 +167,7 @@ class HospitalScene extends Phaser.Scene {
 
     buttonChoice(chosenNumber) {
         if (this.correctNumber === chosenNumber) {
-            this.clickedOption("Corretto! Ora clickare sul paziente per un check-up!", true);
+            this.clickedOption("Corretto! Ora procedi con la valutazione del paziente interagendo su di lui", true);
             this.clickedCorOpt = true;
         } else {
             gameState.errors.Hospital++;
@@ -204,26 +198,39 @@ class HospitalScene extends Phaser.Scene {
 
     getPhonetext(fullText) {
         const opzioni = fullText.split("\n");
-        let i = 5, riga = 0;
-        while (i != 0) {
-            riga++;
-            if (opzioni[riga].substring(0, 12) === "#ContextText:") {
-                this.contextText = opzioni[riga].substring(13);
-                i--;
-            } else if (opzioni[riga].substring(0, 9) === "#Option1:") {
-                this.opzione1 = opzioni[riga].substring(10);
-                i--;
-            } else if (opzioni[riga].substring(0, 9) === "#Option2:") {
-                this.opzione2 = opzioni[riga].substring(10);
-                i--;
-            } else if (opzioni[riga].substring(0, 9) === "#Option3:") {
-                this.opzione3 = opzioni[riga].substring(10);
-                i--;
-            } else if (opzioni[riga].substring(0, 15) === "#CorrectOption:") {
-                this.correctNumber = Number(opzioni[riga].substring(16));
-                i--;
+        let originalOptions = [];
+        let originalCorrect = 1;
+        
+        // Cerca tutte le righe che iniziano con #
+        for (let riga = 0; riga < opzioni.length; riga++) {
+            const linea = opzioni[riga].trim();
+            if (linea.startsWith("#ContextText:")) {
+                this.contextText = linea.substring(13).trim();
+            } else if (linea.startsWith("#Option1:")) {
+                originalOptions[0] = linea.substring(10).trim();
+            } else if (linea.startsWith("#Option2:")) {
+                originalOptions[1] = linea.substring(10).trim();
+            } else if (linea.startsWith("#Option3:")) {
+                originalOptions[2] = linea.substring(10).trim();
+            } else if (linea.startsWith("#CorrectOption:")) {
+                originalCorrect = Number(linea.substring(16).trim());
             }
         }
+        
+        // Mescola le opzioni (Fisher-Yates shuffle)
+        const shuffled = [...originalOptions];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        //Trova la nuova posizione della risposta corretta
+        this.correctNumber = shuffled.indexOf(originalOptions[originalCorrect - 1]) + 1;
+        
+        //Assegna le opzioni mescolate
+        this.opzione1 = shuffled[0];
+        this.opzione2 = shuffled[1];
+        this.opzione3 = shuffled[2];
     }
 
     deletePhoneConvo() {
@@ -232,15 +239,4 @@ class HospitalScene extends Phaser.Scene {
         this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
     }
 
-    shutdown() {
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
-        this.deletePhoneConvo();
-    }
 }

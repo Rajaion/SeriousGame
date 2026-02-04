@@ -1,7 +1,7 @@
 Inserire dopo i rispettivi ":" le rispettive opzioni da mostrare sul telefono:
 
 #ContextText: Dici al collega di raggiungerti immediatamente e:
-#Option1: Portare carrello emergenze e allertare 2222
+#Option1: Portare carrello + allertare 2222
 #Option2: Portare il DAE
 #Option3: Allertare il 2222
 

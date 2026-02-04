@@ -6,6 +6,8 @@ class PatientScene extends Phaser.Scene {
         this.answerTexts = [];
         this.bottomTextSpace = null;
         this.bottomText = "Segui l'ordine corretto delle procedure";
+        // Ordine corretto: 0 (GAS), 2 (Vie aeree), 1 (Compressioni)
+        this.correctOrder = [0, 2, 1];
         this.refPositions = {
             patient: { x: 576, y: 540 },
             question: { x: 1500, y: 324 },
@@ -13,7 +15,7 @@ class PatientScene extends Phaser.Scene {
             answers: [
                 { x: 1500, y: 540, text: "Valutazione GAS" },
                 { x: 1500, y: 648, text: "Inizia le compressioni" },
-                { x: 1500, y: 756, text: "Libera le vie aeree" }
+                { x: 1500, y: 756, text: "Controlla che le vie aeree siano libere" }
             ],
             reload: { x: 1500, y: 918 }
         };
@@ -63,6 +65,15 @@ class PatientScene extends Phaser.Scene {
     }
 
     createTexts() {
+        // Score in alto
+        this.scoreText = this.add.text(960, 32, "Score: " + gameState.score, {
+            fontSize: `48px`,
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(this.scoreText);
+
         this.textElements.push(this.add.text(960, 162, "Segui l'ordine corretto delle procedure", {
             fontSize: `48px`,
             color: '#2c3e50',
@@ -81,7 +92,6 @@ class PatientScene extends Phaser.Scene {
     }
 
     createGameContent() {
-        this.mainContainer = this.add.container(0, 0);
 
         const patient = this.add.image(576, 540, "PatientCloseUp").setScale(0.65);
         const arrow = this.add.image(1500, 454, "Arrow").setScale(4);
@@ -99,15 +109,15 @@ class PatientScene extends Phaser.Scene {
         this.createAnswerBoxes();
         this.createAnswerTexts();
         this.createQuestionText();
-
-        this.mainContainer.add([arrow, patient, questionBox, ...this.answerBoxes, reloadButton]);
         this.setupEvents(reloadButton);
     }
 
     createAnswerBoxes() {
-        this.refPositions.answers.forEach((answer) => {
+        this.refPositions.answers.forEach((answer, index) => {
             const box = this.add.graphics();
-            this.drawAnswerBox(box, answer.x, answer.y, 650, 70);
+            // La terza opzione (index 2) ha un testo più lungo, quindi allargare la box
+            const width = index === 2 ? 750 : 650;
+            this.drawAnswerBox(box, answer.x, answer.y, width, 70);
             this.answerBoxes.push(box);
         });
     }
@@ -148,22 +158,26 @@ class PatientScene extends Phaser.Scene {
 
     handleAnswerClick(index) {
         const answer = this.refPositions.answers[index];
+        const expectedIndex = this.correctOrder[this.ordCounter];
 
-        if (this.ordCounter !== index) {
+        if (index !== expectedIndex) {
             this.ordCounter = 0;
             this.showError();
             this.setDefault();
         } else {
-            this.ordCounter = index + 1;
-            this.setGreen(this.answerBoxes[index], answer.x, answer.y, 650, 70);
+            this.ordCounter++;
+            // La terza opzione (index 2) ha una box più larga
+            const width = index === 2 ? 750 : 650;
+            this.setGreen(this.answerBoxes[index], answer.x, answer.y, width, 70);
             
             const messages = [
                 "Corretto! Procedi con la prossima azione",
                 "Perfetto! Continua con l'ultima procedura",
                 "Eccellente! Hai completato tutte le procedure correttamente!"
             ];
-            this.showMessage(messages[index], true);
-            if (index === 2) {
+            const messageIndex = this.ordCounter - 1;
+            this.showMessage(messages[messageIndex], true);
+            if (this.ordCounter === 3) {
                 this.time.delayedCall(3500, () => this.scene.start("CartScene"));
             }
         }
@@ -187,7 +201,9 @@ class PatientScene extends Phaser.Scene {
 
     setDefault() {
         this.refPositions.answers.forEach((answer, index) => {
-            this.drawAnswerBox(this.answerBoxes[index], answer.x, answer.y, 650, 70);
+            // La terza opzione (index 2) ha una box più larga
+            const width = index === 2 ? 750 : 650;
+            this.drawAnswerBox(this.answerBoxes[index], answer.x, answer.y, width, 70);
         });
     }
 
@@ -221,14 +237,4 @@ class PatientScene extends Phaser.Scene {
         }
     }
 
-    shutdown() {
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
-    }
 }

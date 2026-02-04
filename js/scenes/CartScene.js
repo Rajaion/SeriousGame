@@ -35,7 +35,6 @@ class CartScene extends Phaser.Scene {
     }
 
     createBackground() {
-        this.mainContainer = this.add.container(0, 0);
 
         const backGround = this.add.image(0, 0, "Sfondo").setOrigin(0, 0);
         backGround.setScale(Math.max(1920 / backGround.width, 1080 / backGround.height));
@@ -65,7 +64,6 @@ class CartScene extends Phaser.Scene {
         instructionBox.lineStyle(2, 0x2c3e50, 1);
         instructionBox.strokeRoundedRect(560, 87, 800, 150, 0);
 
-        this.mainContainer.add([backGround, elettroImg, this.patientCart, this.cart, this.adrenalina, this.nacl, instructionBox]);
     }
 
     createTopBottomBars() {
@@ -241,16 +239,5 @@ class CartScene extends Phaser.Scene {
         obj.y = this.input.y;
         text.x = this.input.x;
         text.y = this.input.y - 50;
-    }
-
-    shutdown() {
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
     }
 }

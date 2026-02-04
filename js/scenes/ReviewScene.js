@@ -37,7 +37,6 @@ class ReviewScene extends Phaser.Scene {
     }
 
     createGameContent() {
-        this.mainContainer = this.add.container(0, 0);
 
         // Box titolo
         this.createBoxInContainer(960, this.refPositions.title.y, 700, 80);
@@ -152,18 +151,6 @@ class ReviewScene extends Phaser.Scene {
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 5);
 
-        this.mainContainer.add(box);
         return box;
-    }
-
-    shutdown() {
-        if (this.mainContainer) {
-            this.mainContainer.destroy();
-        }
-        if (this.textElements) {
-            this.textElements.forEach(el => {
-                if (el && el.destroy) el.destroy();
-            });
-        }
     }
 }
