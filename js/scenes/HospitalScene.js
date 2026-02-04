@@ -74,7 +74,7 @@ class HospitalScene extends Phaser.Scene {
         this.textElements.push(this.bottomTextSpace);
 
         this.textElements.push(this.add.text(1550, 162, 'Entri in stanza: il paziente è incosciente e non ha segni di vita', {
-            fontSize: `42px`,
+            fontSize: `40px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
             wordWrap: {width: 500, height: 100},
@@ -92,8 +92,7 @@ class HospitalScene extends Phaser.Scene {
                 return;
             }
             if (this.convOn) {
-                this.deletePhoneConvo();
-                this.convOn = false;
+                // Non permettere di interagire con il telefono quando le opzioni sono visibili
                 return;
             }
             this.convOn = true;
@@ -113,6 +112,10 @@ class HospitalScene extends Phaser.Scene {
     }
 
     showPhoneConvo() {
+        // Disabilita il cursore a mano quando compaiono le opzioni
+        if (this.telephone.input) {
+            this.telephone.input.cursor = 'default';
+        }
         this.bottomText = "Selezionare l'opzione giusta tra le 3";
         this.bottomTextSpace.setText(this.bottomText);
         this.createContextBox();
@@ -122,41 +125,43 @@ class HospitalScene extends Phaser.Scene {
 
     createContextBox() {
         this.contextBoxGraphic = this.add.graphics();
-        this.drawAnswerBox(this.contextBoxGraphic, 1536, 620, 600, 60);
+        this.drawAnswerBox(this.contextBoxGraphic, 1536, 600, 750, 80);
         
-        this.contextTextElement = this.add.text(1536, 620, this.contextText, {
-            fontSize: `51px`,
+        //testo sopra le 3 opzioni da scegliere
+        this.contextTextElement = this.add.text(1536, 600, this.contextText, {
+            fontSize: `36px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
             fontStyle: "bold",
             resolution: 2,
-            wordWrap: { width: 580 }
+            wordWrap: { width: 720 }
         }).setOrigin(0.5);
         this.textElements.push(this.contextTextElement);
     }
 
     createOptionBoxes() {
         this.optRect1 = this.add.graphics();
-        this.drawAnswerBox(this.optRect1, 1536, 700, 600, 80);
+        this.drawAnswerBox(this.optRect1, 1536, 700, 720, 80);
         this.optRect2 = this.add.graphics();
-        this.drawAnswerBox(this.optRect2, 1536, 795, 600, 80);
+        this.drawAnswerBox(this.optRect2, 1536, 795, 720, 80);
         this.optRect3 = this.add.graphics();
-        this.drawAnswerBox(this.optRect3, 1536, 890, 600, 80);
+        this.drawAnswerBox(this.optRect3, 1536, 890, 720, 80);
     }
 
     createOptionTexts() {
         const textStyle = {
-            fontSize: `48px`,
+            fontSize: `40px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
-            resolution: 2
+            resolution: 2,
+            wordWrap: { width: 750 }
         };
 
-        this.option1 = this.add.text(1536, 720, this.opzione1, textStyle)
+        this.option1 = this.add.text(1536, 700, this.opzione1, textStyle)
             .setOrigin(0.5).setInteractive({ useHandCursor: true });
-        this.option2 = this.add.text(1536, 815, this.opzione2, textStyle)
+        this.option2 = this.add.text(1536, 795, this.opzione2, textStyle)
             .setOrigin(0.5).setInteractive({ useHandCursor: true });
-        this.option3 = this.add.text(1536, 910, this.opzione3, textStyle)
+        this.option3 = this.add.text(1536, 890, this.opzione3, textStyle)
             .setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         this.textElements.push(this.option1, this.option2, this.option3);
@@ -166,6 +171,7 @@ class HospitalScene extends Phaser.Scene {
     }
 
     buttonChoice(chosenNumber) {
+        this.telephone.setInteractive({ useHandCursor: true });
         if (this.correctNumber === chosenNumber) {
             this.clickedOption("Corretto! Ora procedi con la valutazione del paziente interagendo su di lui", true);
             this.clickedCorOpt = true;

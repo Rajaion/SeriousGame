@@ -66,8 +66,8 @@ class PatientScene extends Phaser.Scene {
 
     createTexts() {
         // Score in alto
-        this.scoreText = this.add.text(960, 32, "Score: " + gameState.score, {
-            fontSize: `48px`,
+        this.scoreText = this.add.text(960, 25, "Score: " + gameState.score, {
+            fontSize: `40px`,
             color: "#000000ff",
             fontFamily: "Poppins",
             resolution: 2
@@ -102,7 +102,7 @@ class PatientScene extends Phaser.Scene {
         questionBox.lineStyle(2, 0x2c3e50, 1);
         questionBox.strokeRoundedRect(1100, 254, 800, 140, 5);
 
-        const reloadButton = this.add.image(1500, 918, "ReloadButton")
+        const reloadButton = this.add.image(70, 975, "ReloadButton")
             .setScale(0.5)
             .setInteractive({ useHandCursor: true });
 
@@ -116,7 +116,7 @@ class PatientScene extends Phaser.Scene {
         this.refPositions.answers.forEach((answer, index) => {
             const box = this.add.graphics();
             // La terza opzione (index 2) ha un testo più lungo, quindi allargare la box
-            const width = index === 2 ? 750 : 650;
+            const width = 800;
             this.drawAnswerBox(box, answer.x, answer.y, width, 70);
             this.answerBoxes.push(box);
         });
@@ -167,7 +167,7 @@ class PatientScene extends Phaser.Scene {
         } else {
             this.ordCounter++;
             // La terza opzione (index 2) ha una box più larga
-            const width = index === 2 ? 750 : 650;
+            const width = 800;
             this.setGreen(this.answerBoxes[index], answer.x, answer.y, width, 70);
             
             const messages = [
@@ -202,7 +202,7 @@ class PatientScene extends Phaser.Scene {
     setDefault() {
         this.refPositions.answers.forEach((answer, index) => {
             // La terza opzione (index 2) ha una box più larga
-            const width = index === 2 ? 750 : 650;
+            const width = 800;
             this.drawAnswerBox(this.answerBoxes[index], answer.x, answer.y, width, 70);
         });
     }

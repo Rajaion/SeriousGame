@@ -1,0 +1,6 @@
+Inserire dopo i rispettivi ":" le rispettive opzioni da interagire:
+
+#ContextText: Segui l'ordine corretto delle procedure:
+#Option1: Valutazione GAS
+#Option2: Inizia le compressioni
+#Option3: Controlla che le vie aeree siano libere
