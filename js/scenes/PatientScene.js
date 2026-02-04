@@ -2,20 +2,25 @@ class PatientScene extends Phaser.Scene {
     constructor() {
         super({ key: "PatientScene" });
         this.ordCounter = 0;
+        this.opzione1 = "default";
+        this.opzione2 = "default";
+        this.opzione3 = "default";
         this.answerBoxes = [];
         this.answerTexts = [];
         this.bottomTextSpace = null;
         this.bottomText = "Segui l'ordine corretto delle procedure";
-        // Ordine corretto: 0 (GAS), 2 (Vie aeree), 1 (Compressioni)
-        this.correctOrder = [0, 2, 1];
+        // L'ordine corretto sarà calcolato dopo lo shuffle
+        // L'ordine nel file è: Option1 (prima), Option3 (seconda), Option2 (terza)
+        // Quindi gli indici originali sono: 0, 2, 1
+        this.correctOrder = [];
         this.refPositions = {
             patient: { x: 576, y: 540 },
             question: { x: 1500, y: 324 },
             instruction: { x: 960, y: 162 },
             answers: [
-                { x: 1500, y: 540, text: "Valutazione GAS" },
-                { x: 1500, y: 648, text: "Inizia le compressioni" },
-                { x: 1500, y: 756, text: "Controlla che le vie aeree siano libere" }
+                { x: 1500, y: 540, text: "default" },
+                { x: 1500, y: 648, text: "default" },
+                { x: 1500, y: 756, text: "default" }
             ],
             reload: { x: 1500, y: 918 }
         };
@@ -25,6 +30,7 @@ class PatientScene extends Phaser.Scene {
         this.load.image("ReloadButton", "img/ReloadButton.png");
         this.load.image("PatientCloseUp", "img/PatientCloseUp.jpeg");
         this.load.image("Arrow", "img/Arrow.png");
+        this.load.text("PatientOptions", "text/Patient.txt");
     }
     
     create() {
@@ -37,6 +43,9 @@ class PatientScene extends Phaser.Scene {
         this.answerBoxes = [];
         this.answerTexts = [];
         this.textElements = [];
+
+        // Carica le opzioni PRIMA di creare il contenuto
+        this.getPhonetext(this.cache.text.get("PatientOptions"));
 
         this.createBackground();
         this.createTopBottomBars();
@@ -130,8 +139,11 @@ class PatientScene extends Phaser.Scene {
             resolution: 2
         };
 
-        this.refPositions.answers.forEach((answer) => {
-            this.answerTexts.push(this.add.text(answer.x, answer.y, answer.text, textStyle)
+        // Usa le opzioni mescolate invece dei testi hardcoded
+        const textsToShow = [this.opzione1, this.opzione2, this.opzione3];
+        this.refPositions.answers.forEach((answer, index) => {
+            const textToShow = textsToShow[index] || answer.text;
+            this.answerTexts.push(this.add.text(answer.x, answer.y, textToShow, textStyle)
                 .setOrigin(0.5).setInteractive({ useHandCursor: true }));
         });
     }
@@ -178,7 +190,7 @@ class PatientScene extends Phaser.Scene {
             const messageIndex = this.ordCounter - 1;
             this.showMessage(messages[messageIndex], true);
             if (this.ordCounter === 3) {
-                this.time.delayedCall(3500, () => this.scene.start("CartScene"));
+                this.time.delayedCall(3500, () => this.scene.start("PatientToCart"));
             }
         }
     }
@@ -235,6 +247,46 @@ class PatientScene extends Phaser.Scene {
                 });
             }
         }
+    }
+
+    getPhonetext(fullText) {
+        const opzioni = fullText.split("\n");
+        let originalOptions = [];
+        
+        // Cerca tutte le righe che iniziano con #
+        for (let riga = 0; riga < opzioni.length; riga++) {
+            const linea = opzioni[riga].trim();
+            if (linea.startsWith("#ContextText:")) {
+                this.contextText = linea.substring(13).trim();
+            } else if (linea.startsWith("#Option1:")) {
+                originalOptions[0] = linea.substring(10).trim();
+            } else if (linea.startsWith("#Option2:")) {
+                originalOptions[1] = linea.substring(10).trim();
+            } else if (linea.startsWith("#Option3:")) {
+                originalOptions[2] = linea.substring(10).trim();
+            }
+        }
+        
+        // Mescola le opzioni (Fisher-Yates shuffle)
+        const shuffled = [...originalOptions];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        // Assegna le opzioni mescolate
+        this.opzione1 = shuffled[0];
+        this.opzione2 = shuffled[1];
+        this.opzione3 = shuffled[2];
+        
+        // Calcola l'ordine corretto: l'ordine nel file è dall'alto al basso
+        // L'ordine corretto reale è: Option1 (prima), Option3 (seconda), Option2 (terza)
+        // Quindi gli indici originali sono: 0, 2, 1
+        // Dopo lo shuffle, troviamo dove si trovano queste opzioni
+        const originalOrder = [0, 2, 1]; // GAS, Vie aeree, Compressioni
+        this.correctOrder = originalOrder.map(originalIndex => 
+            shuffled.indexOf(originalOptions[originalIndex])
+        );
     }
 
 }

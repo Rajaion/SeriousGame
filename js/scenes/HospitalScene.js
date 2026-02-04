@@ -37,6 +37,7 @@ class HospitalScene extends Phaser.Scene {
         this.createTexts();
     }
 
+    //crea il background dell'ospedale
     createBackground() {
         const ospedale = this.add.image(0, 0, "Ospedale").setOrigin(0, 0);
         ospedale.setScale(Math.max(1920 / ospedale.width, 1080 / ospedale.height));
@@ -51,12 +52,15 @@ class HospitalScene extends Phaser.Scene {
             .setScale(0.4)
             .setInteractive({ useHandCursor: true });
 
+        //area del paziente interagibile
         this.patientArea = this.add.rectangle(768, 594, 400, 400)
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
     }
 
+    //crea il testo del score e del testo in basso
     createTexts() {
+        //testo del score
         this.scoreText = this.add.text(960, 32, "Score: " + gameState.score, {
             fontSize: `50px`,
             color: "#000000ff",
@@ -65,6 +69,7 @@ class HospitalScene extends Phaser.Scene {
         }).setOrigin(0.5);
         this.textElements.push(this.scoreText);
 
+        //testo in basso
         this.bottomTextSpace = this.add.text(960, 1042, this.bottomText, {
             fontSize: `50px`,
             color: "#000000ff",
@@ -73,6 +78,7 @@ class HospitalScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         this.textElements.push(this.bottomTextSpace);
 
+        //testo con le informazioni del paziente in alto a destra
         this.textElements.push(this.add.text(1550, 162, 'Entri in stanza: il paziente è incosciente e non ha segni di vita', {
             fontSize: `40px`,
             color: '#2c3e50',
@@ -81,10 +87,13 @@ class HospitalScene extends Phaser.Scene {
             resolution: 2
         }).setOrigin(0.5));
 
+        //carica le opzioni del telefono
         this.getPhonetext(this.cache.text.get("phoneOptions"));
     }
 
+    //imposta gli eventi per il telefono e l'area del paziente
     setupEvents() {
+        //telefono
         this.telephone.removeAllListeners();
         this.telephone.on("pointerdown", () => {
             if (this.clickedCorOpt) {
@@ -92,7 +101,7 @@ class HospitalScene extends Phaser.Scene {
                 return;
             }
             if (this.convOn) {
-                // Non permettere di interagire con il telefono quando le opzioni sono visibili
+                //non permettere di interagire con il telefono quando le opzioni sono visibili
                 return;
             }
             this.convOn = true;
@@ -111,8 +120,9 @@ class HospitalScene extends Phaser.Scene {
         });
     }
 
+    //mostra la conversazione del telefono
     showPhoneConvo() {
-        // Disabilita il cursore a mano quando compaiono le opzioni
+        //disabilita il cursore a mano quando compaiono le opzioni
         if (this.telephone.input) {
             this.telephone.input.cursor = 'default';
         }
@@ -123,11 +133,12 @@ class HospitalScene extends Phaser.Scene {
         this.createOptionTexts();
     }
 
+    //crea la box per il testo sopra le 3 opzioni da scegliere
     createContextBox() {
         this.contextBoxGraphic = this.add.graphics();
         this.drawAnswerBox(this.contextBoxGraphic, 1536, 600, 750, 80);
         
-        //testo sopra le 3 opzioni da scegliere
+        //testo informativo sopra le 3 opzioni da scegliere
         this.contextTextElement = this.add.text(1536, 600, this.contextText, {
             fontSize: `36px`,
             color: '#2c3e50',
@@ -139,6 +150,7 @@ class HospitalScene extends Phaser.Scene {
         this.textElements.push(this.contextTextElement);
     }
 
+    //funzione per creare le box per le 3 opzioni da scegliere
     createOptionBoxes() {
         this.optRect1 = this.add.graphics();
         this.drawAnswerBox(this.optRect1, 1536, 700, 720, 80);
@@ -148,6 +160,7 @@ class HospitalScene extends Phaser.Scene {
         this.drawAnswerBox(this.optRect3, 1536, 890, 720, 80);
     }
 
+    //funzione per creare il testo delle 3 opzioni da scegliere
     createOptionTexts() {
         const textStyle = {
             fontSize: `40px`,
@@ -170,6 +183,7 @@ class HospitalScene extends Phaser.Scene {
         });
     }
 
+    //funzione per gestire la scelta dell'utente relativamente alla risposta scelta e la gestione del punteggio
     buttonChoice(chosenNumber) {
         this.telephone.setInteractive({ useHandCursor: true });
         if (this.correctNumber === chosenNumber) {
@@ -182,16 +196,16 @@ class HospitalScene extends Phaser.Scene {
             this.clickedOption("Attenzione, scegliere l'opzione corretta", false);
         }
         this.deletePhoneConvo();
+    }   
+
+    //funzione per eliminare la conversazione del telefono
+    deletePhoneConvo() {
+        [this.contextBoxGraphic, this.contextTextElement, this.optRect1, this.optRect2, this.optRect3, this.option1, this.option2, this.option3]
+            .forEach(el => { if (el) { el.destroy(); } });
+        this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
     }
 
-    drawAnswerBox(box, x, y, width, height) {
-        box.clear();
-        box.fillStyle(0xffffff, 1);
-        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 5);
-        box.lineStyle(2, 0x000000, 1);
-        box.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 5);
-    }
-
+    //funzione per gestire la scelta dell'utente relativamente alla risposta scelta
     clickedOption(info, win) {
         if (win) {
             this.bottomTextSpace.setColor("#167e30ff");   
@@ -202,6 +216,17 @@ class HospitalScene extends Phaser.Scene {
         this.bottomText = info;
     }
 
+    //funzione per creare la box di background per il testo delle 3 opzioni da scegliere
+    drawAnswerBox(box, x, y, width, height) {
+        box.clear();
+        box.fillStyle(0xffffff, 1);
+        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 5);
+        box.lineStyle(2, 0x000000, 1);
+        box.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 5);
+    }
+
+
+    //funzione per ottenere le opzioni del telefono
     getPhonetext(fullText) {
         const opzioni = fullText.split("\n");
         let originalOptions = [];
@@ -239,10 +264,6 @@ class HospitalScene extends Phaser.Scene {
         this.opzione3 = shuffled[2];
     }
 
-    deletePhoneConvo() {
-        [this.contextBoxGraphic, this.contextTextElement, this.optRect1, this.optRect2, this.optRect3, this.option1, this.option2, this.option3]
-            .forEach(el => { if (el) { el.destroy(); } });
-        this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
-    }
+    
 
 }
