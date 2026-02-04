@@ -19,7 +19,7 @@ class PatientToCart extends Phaser.Scene {
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(110, 140, 1700, 800, 20);
 
-        this.add.text(950, 500, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\n\n Tempo di inserirsi in campo", {
+        this.add.text(950, 500, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
             fontSize: `70px`,
             fontFamily: "Poppins",
             color: "#2c3e50",
