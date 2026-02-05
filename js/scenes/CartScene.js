@@ -14,26 +14,43 @@ class CartScene extends Phaser.Scene {
         this.load.image("Adrenalina", "img/Adrenalina.png");
         this.load.image("Nacl", "img/Nacl.png");
         this.load.image("Sfondo", "img/Mattone.png");
+        this.load.image("soluzione", "img/soluzione_glucosata.png");
+        this.load.image("amiodarone", "img/amiodarone.png");
+
     }
 
     create() {
-        this.createContent();
+        this.createContent(Math.random(0, 1));
     }
 
-    createContent() {
+    createContent(random) {
         this.children.removeAll();
         this.textElements = [];
         this.gameEnded = false;
         this.pickedNacl = false;
         this.pickedAdrenaline = false;
         this.usedItems = 2;
-
         this.createBackground();
         this.createTopBottomBars();
         this.createGameContent();
         this.createTexts();
+        this.setupEvents(random);
     }
 
+    //0 per non-shockable 1 per shockable
+    setupEvents(random) {
+        if (random){
+            setupShockable();
+        } else {
+            setupNonShockable();
+        }
+    }
+
+    setupShockable() {
+
+
+
+    }
     createBackground() {
 
         const backGround = this.add.image(0, 0, "Sfondo").setOrigin(0, 0);
@@ -55,6 +72,14 @@ class CartScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
 
         this.nacl = this.add.image(-550, -550, "Nacl")
+            .setScale(0.15)
+            .setInteractive({ useHandCursor: true });
+
+        this.amiodarone = this.add.image(-550, -550, "amiodarone")
+            .setScale(0.15)
+            .setInteractive({ useHandCursor: true });
+
+        this.soluzione = this.add.image(-550, -550, "soluzione")
             .setScale(0.15)
             .setInteractive({ useHandCursor: true });
 
