@@ -13,6 +13,14 @@ class CartScene extends Phaser.Scene {
         this.ecgOffsetX = 0; // Per animare la traccia che scorre
         this.ecgArea = null; // Area dove disegnare il cardiogramma
         this.rhythmType = null; // Tipo specifico: 'VF', 'VT', 'PEA', 'Asystole'
+        this.medicationSet = null; // 'adrenaline_nacl' o 'amiodarone_glucose'
+        this.pickedAmiodarone = false;
+        this.pickedSoluzione = false;
+        this.currentCycle = 1; // Ciclo corrente (1, 2, 3)
+        this.maxCycles = 3; // Numero massimo di cicli
+        this.shockDelivered = false; // Se lo shock è stato erogato nel ciclo corrente
+        this.medicationsGiven = false; // Se i farmaci sono stati somministrati nel ciclo corrente
+        this.heartBeatTimer = null; // Timer per ripetere il singolo beep del battito (se carichi heartBeep)
     }
 
     preload() {
@@ -25,10 +33,10 @@ class CartScene extends Phaser.Scene {
         this.load.image("amiodarone", "img/amiodarone.png");
         this.load.image("defibrillatore", "img/Defibrillatore.png");
         
-        // Carica i suoni (se hai i file audio, decommenta queste righe)
-        // this.load.audio("compressionSound", "audio/compression.mp3");
-        // this.load.audio("defibShock", "audio/defibrillator_shock.mp3");
-        // this.load.audio("heartBeep", "audio/heart_monitor_beep.mp3");
+        // Carica i suoni (se hai i file audio, decommenta)
+        // Singolo battito/beep del monitor (si ripete a intervalli): ideale per simulare il monitor
+        this.load.audio("heartBeep", "audio/heart_beep.mp3");
+        this.load.audio("defibShock", "audio/defibrillator.mp3");
     }
 
     create() {
@@ -45,10 +53,15 @@ class CartScene extends Phaser.Scene {
         this.gameEnded = false;
         this.pickedNacl = false;
         this.pickedAdrenaline = false;
+        this.pickedAmiodarone = false;
+        this.pickedSoluzione = false;
         this.usedItems = 2;
+        this.shockDelivered = false;
+        this.medicationsGiven = false;
         this.createBackground();
         this.createTopBottomBars();
         this.createTexts();
+        this.setupEvents();
         
         // Chiama direttamente la funzione corretta (1 = shockable, 0 = non-shockable)
         if (isShockable) {
@@ -58,6 +71,9 @@ class CartScene extends Phaser.Scene {
             console.log("Chiamando setupNonShockable");
             this.setupNonShockable();
         }
+
+        // Opzionale: singolo battito del cuore ripetuto (decommenta quando carichi audio/heart_beep.mp3)
+        // this.heartBeatTimer = this.time.addEvent({ delay: 1000, callback: () => { if (this.sound && this.sound.get("heartBeep")) this.sound.play("heartBeep"); }, loop: true });
     }
 
     setupShockable() {
@@ -68,6 +84,10 @@ class CartScene extends Phaser.Scene {
         // Scegli randomicamente tra VF (Fibrillazione Ventricolare) o VT (Tachicardia Ventricolare)
         this.rhythmType = Math.random() > 0.5 ? 'VF' : 'VT';
         console.log("Rhythm type:", this.rhythmType);
+        
+        // Scegli randomicamente il set di farmaci: Adrenalina+NaCl o Amiodarone+SG5%
+        this.medicationSet = Math.random() > 0.5 ? 'adrenaline_nacl' : 'amiodarone_glucose';
+        console.log("Medication set:", this.medicationSet);
         
         // Usa time.delayedCall per assicurarsi che getBounds() funzioni
         this.time.delayedCall(100, () => {
@@ -114,14 +134,35 @@ class CartScene extends Phaser.Scene {
         this.rhythmType = Math.random() > 0.5 ? 'PEA' : 'Asystole';
         console.log("Rhythm type:", this.rhythmType);
         
-        // Nascondi il defibrillatore (non serve per ritmi non-shockable)
-        if (this.defibrillator) {
-            this.defibrillator.setVisible(false);
-            this.defibrillator.disableInteractive();
-        }
+        // Per ritmi non-shockable usa sempre Adrenalina+NaCl
+        this.medicationSet = 'adrenaline_nacl';
+        console.log("Medication set:", this.medicationSet);
         
         // Usa time.delayedCall per assicurarsi che getBounds() funzioni
         this.time.delayedCall(100, () => {
+            // Mostra il defibrillatore ma sarà punito se usato
+            if (!this.monitorImg) {
+                console.error("monitorImg non è definito!");
+                return;
+            }
+            const monitorBounds = this.monitorImg.getBounds();
+            
+            if (!this.defibrillator) {
+                console.error("defibrillator non è definito!");
+                return;
+            }
+            // Mostra il defibrillatore anche se non serve (per testare l'utente)
+            this.defibrillator.setVisible(true);
+            this.defibrillator.x = monitorBounds.right + 80;
+            this.defibrillator.y = monitorBounds.centerY;
+            this.defibrillator.setInteractive({ useHandCursor: true });
+            
+            // Aggiungi evento click al defibrillatore (verrà punito se usato)
+            this.defibrillator.removeAllListeners();
+            this.defibrillator.on("pointerdown", () => {
+                this.deliverShock();
+            });
+            
             // Crea la traccia ECG per ritmi non-shockable
             this.createECGTrace();
             console.log("ECG Area creata:", this.ecgArea);
@@ -206,11 +247,23 @@ class CartScene extends Phaser.Scene {
         }).setOrigin(0.5);
         this.textElements.push(this.pointsText);
 
-        this.textElements.push(this.add.text(960, 162, "Somministra le medicine nell'ordine corretto", {
-            fontSize: `48px`,
+        // Indicatore del ciclo: chiarisce che bisogna ripetere la stessa sequenza
+        this.cycleText = this.add.text(100, 20, `Ciclo ${this.currentCycle}/${this.maxCycles} – Ripeti la stessa sequenza`, {
+            fontSize: `36px`,
+            color: "#000000ff",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2,
+            wordWrap: { width: 500 }
+        }).setOrigin(0, 0.5);
+        this.textElements.push(this.cycleText);
+
+        // Indicazione che le compressioni sono in corso (avvengono mentre il giocatore agisce)
+        this.textElements.push(this.add.text(960, 162, "Le compressioni toraciche sono in corso. Valuta il ritmo, agisci (shock/farmaci), poi ripeti.", {
+            fontSize: `38px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
-            wordWrap: {width: 600},
+            wordWrap: { width: 1400 },
             resolution: 2
         }).setOrigin(0.5));
 
@@ -239,28 +292,72 @@ class CartScene extends Phaser.Scene {
             resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(this.naclText);
+
+        this.amiodaroneText = this.add.text(-550, -550, "Amiodarone", {
+            fontSize: `22px`,
+            color: "#2c3e50",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(this.amiodaroneText);
+
+        this.soluzioneText = this.add.text(-550, -550, "SG 5%", {
+            fontSize: `22px`,
+            color: "#2c3e50",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
+        this.textElements.push(this.soluzioneText);
     }
 
     setupEvents() {
         this.cart.removeAllListeners();
         this.cart.on("pointerdown", () => {
-            this.adrenSpawn();
-            this.naclSpawn();
+            // Per ritmi shockable, verifica che lo shock sia stato erogato prima
+            if (this.currentRhythm === 'shockable' && !this.shockDelivered) {
+                this.showMessage("Prima devi erogare lo shock con il DAE!", false);
+                return;
+            }
+            
+            // Mostra i farmaci corretti in base al medicationSet
+            if (this.medicationSet === 'adrenaline_nacl') {
+                this.adrenSpawn();
+                this.naclSpawn();
+            } else if (this.medicationSet === 'amiodarone_glucose') {
+                this.amiodaroneSpawn();
+                this.soluzioneSpawn();
+            }
             this.cart.disableInteractive();
             this.showMessage("Trascina le medicine sul paziente nell'ordine corretto", true);
         });
 
+        // Eventi per Adrenalina
         this.adrenalina.removeAllListeners();
         this.adrenalina.on("pointerdown", () => { this.pickedAdrenaline = true; });
         this.adrenalina.on("pointerup", () => { this.pickedAdrenaline = false; });
 
+        // Eventi per NaCl
         this.nacl.removeAllListeners();
         this.nacl.on("pointerdown", () => { this.pickedNacl = true; });
         this.nacl.on("pointerup", () => { this.pickedNacl = false; });
 
+        // Eventi per Amiodarone
+        this.amiodarone.removeAllListeners();
+        this.amiodarone.on("pointerdown", () => { this.pickedAmiodarone = true; });
+        this.amiodarone.on("pointerup", () => { this.pickedAmiodarone = false; });
+
+        // Eventi per Soluzione Glucosata
+        this.soluzione.removeAllListeners();
+        this.soluzione.on("pointerdown", () => { this.pickedSoluzione = true; });
+        this.soluzione.on("pointerup", () => { this.pickedSoluzione = false; });
+
         this.input.on('pointerup', () => {
             this.pickedAdrenaline = false;
             this.pickedNacl = false;
+            this.pickedAmiodarone = false;
+            this.pickedSoluzione = false;
         });
     }
 
@@ -270,46 +367,131 @@ class CartScene extends Phaser.Scene {
             this.updateECGTrace();
         }
         
-        if (!this.gameEnded && this.usedItems === 0) {
-            this.gameEnded = true;
-            this.scene.start("EndScene");
+        if (!this.gameEnded && this.usedItems === 0 && this.medicationsGiven === false) {
+            this.medicationsGiven = true;
+            this.completeCycle();
         }
 
-        if (!this.gameEnded && this.pickedAdrenaline && this.checkCollision(this.adrenalina, this.patientCart)) {
-            this.pickedAdrenaline = false;
-            this.adrenalina.destroy();
-            this.adrenalinaText.destroy();
-            gameState.score += 20;
-            this.pointsText.setText("Score: " + gameState.score);
-            this.usedItems--;
-            this.showMessage("Corretto! Ora somministra la seconda medicina", true);
-        }
+        // Gestione per set Adrenalina + NaCl
+        if (this.medicationSet === 'adrenaline_nacl') {
+            if (!this.gameEnded && this.pickedAdrenaline && this.checkCollision(this.adrenalina, this.patientCart)) {
+                this.pickedAdrenaline = false;
+                // Nascondi invece di distruggere per riutilizzarli nei cicli successivi
+                this.adrenalina.x = -550;
+                this.adrenalina.y = -550;
+                this.adrenalinaText.x = -550;
+                this.adrenalinaText.y = -550;
+                gameState.score += 20;
+                this.pointsText.setText("Score: " + gameState.score);
+                this.usedItems--;
+                this.showMessage("Corretto! Ora somministra la seconda medicina", true);
+            }
 
-        if (!this.gameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)) {
-            if (this.usedItems === 2) {
+            if (!this.gameEnded && this.pickedNacl && this.checkCollision(this.nacl, this.patientCart)) {
+                if (this.usedItems === 2) {
+                    this.pickedNacl = false;
+                    this.naclSpawn();
+                    this.clickedWrongChoice();
+                    gameState.score -= 20;
+                    gameState.errors.Cart++;
+                    this.pointsText.setText("Score: " + gameState.score);
+                    return;
+                }
                 this.pickedNacl = false;
-                this.naclSpawn();
-                this.clickedWrongChoice();
-                gameState.score -= 20;
+                // Nascondi invece di distruggere per riutilizzarli nei cicli successivi
+                this.nacl.x = -550;
+                this.nacl.y = -550;
+                this.naclText.x = -550;
+                this.naclText.y = -550;
+                gameState.score += 20;
+                this.pointsText.setText("Score: " + gameState.score);
+                this.usedItems--;
+                if (this.currentCycle < this.maxCycles) {
+                    this.showMessage("Perfetto! Ciclo completato. Procedi con il prossimo ciclo", true);
+                } else {
+                    this.showMessage("Perfetto! Hai completato tutte le somministrazioni!", true);
+                }
+            }
+
+            // Punizione se prova a usare farmaci sbagliati
+            if (!this.gameEnded && (this.pickedAmiodarone || this.pickedSoluzione) && 
+                (this.checkCollision(this.amiodarone, this.patientCart) || this.checkCollision(this.soluzione, this.patientCart))) {
+                this.showMessage("Errore! Questi farmaci non sono corretti per questo caso", false);
+                gameState.score -= 10;
                 gameState.errors.Cart++;
                 this.pointsText.setText("Score: " + gameState.score);
-                return;
+                this.pickedAmiodarone = false;
+                this.pickedSoluzione = false;
             }
-            this.pickedNacl = false;
-            this.nacl.destroy();
-            this.naclText.destroy();
-            gameState.score += 20;
-            this.pointsText.setText("Score: " + gameState.score);
-            this.usedItems--;
-            this.showMessage("Perfetto! Hai completato tutte le somministrazioni!", true);
+
+            if (this.pickedAdrenaline) {
+                this.moveObjAndText(this.adrenalina, this.adrenalinaText);
+            }
+
+            if (this.pickedNacl) {
+                this.moveObjAndText(this.nacl, this.naclText);
+            }
         }
 
-        if (this.pickedAdrenaline) {
-            this.moveObjAndText(this.adrenalina, this.adrenalinaText);
-        }
+        // Gestione per set Amiodarone + Soluzione Glucosata
+        if (this.medicationSet === 'amiodarone_glucose') {
+            if (!this.gameEnded && this.pickedAmiodarone && this.checkCollision(this.amiodarone, this.patientCart)) {
+                this.pickedAmiodarone = false;
+                // Nascondi invece di distruggere per riutilizzarli nei cicli successivi
+                this.amiodarone.x = -550;
+                this.amiodarone.y = -550;
+                this.amiodaroneText.x = -550;
+                this.amiodaroneText.y = -550;
+                gameState.score += 20;
+                this.pointsText.setText("Score: " + gameState.score);
+                this.usedItems--;
+                this.showMessage("Corretto! Ora somministra la seconda medicina", true);
+            }
 
-        if (this.pickedNacl) {
-            this.moveObjAndText(this.nacl, this.naclText);
+            if (!this.gameEnded && this.pickedSoluzione && this.checkCollision(this.soluzione, this.patientCart)) {
+                if (this.usedItems === 2) {
+                    this.pickedSoluzione = false;
+                    this.soluzioneSpawn();
+                    this.clickedWrongChoice();
+                    gameState.score -= 20;
+                    gameState.errors.Cart++;
+                    this.pointsText.setText("Score: " + gameState.score);
+                    return;
+                }
+                this.pickedSoluzione = false;
+                // Nascondi invece di distruggere per riutilizzarli nei cicli successivi
+                this.soluzione.x = -550;
+                this.soluzione.y = -550;
+                this.soluzioneText.x = -550;
+                this.soluzioneText.y = -550;
+                gameState.score += 20;
+                this.pointsText.setText("Score: " + gameState.score);
+                this.usedItems--;
+                if (this.currentCycle < this.maxCycles) {
+                    this.showMessage("Perfetto! Ciclo completato. Procedi con il prossimo ciclo", true);
+                } else {
+                    this.showMessage("Perfetto! Hai completato tutte le somministrazioni!", true);
+                }
+            }
+
+            // Punizione se prova a usare farmaci sbagliati
+            if (!this.gameEnded && (this.pickedAdrenaline || this.pickedNacl) && 
+                (this.checkCollision(this.adrenalina, this.patientCart) || this.checkCollision(this.nacl, this.patientCart))) {
+                this.showMessage("Errore! Questi farmaci non sono corretti per questo caso", false);
+                gameState.score -= 10;
+                gameState.errors.Cart++;
+                this.pointsText.setText("Score: " + gameState.score);
+                this.pickedAdrenaline = false;
+                this.pickedNacl = false;
+            }
+
+            if (this.pickedAmiodarone) {
+                this.moveObjAndText(this.amiodarone, this.amiodaroneText);
+            }
+
+            if (this.pickedSoluzione) {
+                this.moveObjAndText(this.soluzione, this.soluzioneText);
+            }
         }
     }
 
@@ -333,8 +515,28 @@ class CartScene extends Phaser.Scene {
         this.naclText.y = pos.ty - 75;
     }
 
+    amiodaroneSpawn() {
+        this.amiodarone.x = this.cart.x + 30;
+        this.amiodarone.y = this.cart.y;
+        const pos = this.amiodarone.getWorldTransformMatrix();
+        this.amiodaroneText.x = pos.tx;
+        this.amiodaroneText.y = pos.ty - 100;
+    }
+
+    soluzioneSpawn() {
+        this.soluzione.x = this.cart.x - 30;
+        this.soluzione.y = this.cart.y;
+        const pos = this.soluzione.getWorldTransformMatrix();
+        this.soluzioneText.x = pos.tx;
+        this.soluzioneText.y = pos.ty - 75;
+    }
+
     clickedWrongChoice() {
-        this.showMessage("Attenzione! Le medicine devono essere date in ordine: prima Adrenalina, poi Nacl", false);
+        if (this.medicationSet === 'adrenaline_nacl') {
+            this.showMessage("Attenzione! Le medicine devono essere date in ordine: prima Adrenalina, poi Nacl", false);
+        } else if (this.medicationSet === 'amiodarone_glucose') {
+            this.showMessage("Attenzione! Le medicine devono essere date in ordine: prima Amiodarone, poi Soluzione Glucosata", false);
+        }
     }
 
     showMessage(message, isSuccess) {
@@ -374,12 +576,12 @@ class CartScene extends Phaser.Scene {
         console.log("Monitor bounds:", monitorBounds);
         console.log("Monitor center:", monitorCenterX, monitorCenterY);
         
-        // Area del cardiogramma (centrata nel monitor, con margini)
+        // Area del cardiogramma (leggermente in alto e leggermente più larga per uscire dal monitor)
         // Lo schermo del monitor è circa il 70% dell'immagine totale
-        const ecgAreaWidth = monitorBounds.width * 0.7;
+        const ecgAreaWidth = monitorBounds.width * 0.65; // Ridotto per non uscire troppo
         const ecgAreaHeight = monitorBounds.height * 0.4;
         const ecgAreaX = monitorCenterX - ecgAreaWidth / 2;
-        const ecgAreaY = monitorCenterY - ecgAreaHeight / 2;
+        const ecgAreaY = monitorCenterY - ecgAreaHeight / 2 - 30; // Spostato 30 pixel più in alto
         
         // Salva le informazioni per l'animazione
         this.ecgArea = {
@@ -479,6 +681,7 @@ class CartScene extends Phaser.Scene {
         }
         
         // Shock corretto
+        this.shockDelivered = true;
         this.showMessage("Shock erogato correttamente! Procedi con i farmaci", true);
         gameState.score += 20;
         if (this.pointsText) {
@@ -496,5 +699,82 @@ class CartScene extends Phaser.Scene {
             duration: 200,
             onComplete: () => flash.destroy()
         });
+    }
+
+    completeCycle() {
+        console.log("Ciclo completato:", this.currentCycle);
+        
+        // Se siamo all'ultimo ciclo, termina
+        if (this.currentCycle >= this.maxCycles) {
+            this.time.delayedCall(2000, () => {
+                this.gameEnded = true;
+                this.scene.start("EndScene");
+            });
+            return;
+        }
+        
+        // Passa al ciclo successivo
+        this.currentCycle++;
+        console.log("Passaggio al ciclo:", this.currentCycle);
+        
+        // Aggiorna l'indicatore del ciclo
+        if (this.cycleText) {
+            this.cycleText.setText(`Ciclo ${this.currentCycle}/${this.maxCycles} – Ripeti la stessa sequenza`);
+        }
+        
+        // Reset dello stato per il nuovo ciclo
+        this.time.delayedCall(2000, () => {
+            this.resetCycleState();
+        });
+    }
+
+    resetCycleState() {
+        console.log("Reset stato ciclo");
+        
+        // Reset variabili
+        this.usedItems = 2;
+        this.shockDelivered = false;
+        this.medicationsGiven = false;
+        this.pickedAdrenaline = false;
+        this.pickedNacl = false;
+        this.pickedAmiodarone = false;
+        this.pickedSoluzione = false;
+        
+        // Riabilita il carrello
+        this.cart.setInteractive({ useHandCursor: true });
+        
+        // Riabilita il defibrillatore se necessario
+        if (this.currentRhythm === 'shockable' && this.defibrillator) {
+            this.defibrillator.setInteractive({ useHandCursor: true });
+        }
+        
+        // Reset farmaci (li nasconde)
+        this.adrenalina.x = -550;
+        this.adrenalina.y = -550;
+        this.adrenalinaText.x = -550;
+        this.adrenalinaText.y = -550;
+        
+        this.nacl.x = -550;
+        this.nacl.y = -550;
+        this.naclText.x = -550;
+        this.naclText.y = -550;
+        
+        this.amiodarone.x = -550;
+        this.amiodarone.y = -550;
+        this.amiodaroneText.x = -550;
+        this.amiodaroneText.y = -550;
+        
+        this.soluzione.x = -550;
+        this.soluzione.y = -550;
+        this.soluzioneText.x = -550;
+        this.soluzioneText.y = -550;
+        
+        // Aggiorna il messaggio
+        if (this.currentRhythm === 'shockable') {
+            this.bottomText = "Ripeti: valuta il ritmo, se shockable eroga lo shock, poi clicca il carrello e somministra i farmaci.";
+        } else {
+            this.bottomText = "Ripeti: valuta il ritmo (non-shockable), clicca il carrello e somministra Adrenalina e Nacl.";
+        }
+        this.showMessage("Ciclo " + this.currentCycle + " – " + this.bottomText, false);
     }
 }

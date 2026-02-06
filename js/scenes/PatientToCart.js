@@ -4,6 +4,10 @@ class PatientToCart extends Phaser.Scene {
         super({ key: "PatientToCart" });
     }
 
+    preload() {
+        this.load.image("LettoSimbolo", "img/SimboloLetto.png");
+    }
+
     create() {
         this.children.removeAll();
 
@@ -18,6 +22,8 @@ class PatientToCart extends Phaser.Scene {
         box.fillRoundedRect(110, 140, 1700, 800, 20);
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(110, 140, 1700, 800, 20);
+
+        this.add.image(960, 120, "LettoSimbolo").setScale(0.4);
 
         this.add.text(950, 500, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
             fontSize: `70px`,
