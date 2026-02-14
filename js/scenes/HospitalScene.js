@@ -203,6 +203,7 @@ class HospitalScene extends Phaser.Scene {
         [this.contextBoxGraphic, this.contextTextElement, this.optRect1, this.optRect2, this.optRect3, this.option1, this.option2, this.option3]
             .forEach(el => { if (el) { el.destroy(); } });
         this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
+        this.convOn = false;
     }
 
     //funzione per gestire la scelta dell'utente relativamente alla risposta scelta

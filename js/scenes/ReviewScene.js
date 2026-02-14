@@ -16,6 +16,7 @@ class ReviewScene extends Phaser.Scene {
     }
 
     create() {
+        this.gameOver();
         this.createContent();
     }
 
@@ -153,4 +154,21 @@ class ReviewScene extends Phaser.Scene {
 
         return box;
     }
-}
+
+    gameOver() {
+        const sessionId = gameState.sessionId || this.generateSessionId();
+        const email = gameState.playerEmail || "player@example.com";
+        const score = gameState.score;
+
+        // Invia lo score a Firebase (funzione esposta da firebase-handler.js)
+        if (typeof window.saveScore === 'function') {
+            window.saveScore(sessionId, email, score);
+        } else {
+            console.warn('saveScore non disponibile (Firebase non caricato?)');
+        }
+    }
+      
+      generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      }
+}   

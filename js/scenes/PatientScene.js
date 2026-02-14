@@ -181,7 +181,7 @@ class PatientScene extends Phaser.Scene {
             // La terza opzione (index 2) ha una box più larga
             const width = 800;
             this.setGreen(this.answerBoxes[index], answer.x, answer.y, width, 70);
-            
+
             const messages = [
                 "Corretto! Procedi con la prossima azione",
                 "Perfetto! Continua con l'ultima procedura",
