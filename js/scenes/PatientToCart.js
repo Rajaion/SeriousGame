@@ -5,7 +5,7 @@ class PatientToCart extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("LettoSimbolo", "img/SimboloLetto.png");
+        this.load.image("croce_rossa", "img/RedCross.png");
     }
 
     create() {
@@ -23,7 +23,7 @@ class PatientToCart extends Phaser.Scene {
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(110, 140, 1700, 800, 20);
 
-        this.add.image(960, 120, "LettoSimbolo").setScale(0.4);
+        this.add.image(960, 120, "croce_rossa").setScale(0.3);
 
         this.add.text(950, 500, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
             fontSize: `70px`,

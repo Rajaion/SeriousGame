@@ -1,9 +1,17 @@
 const gameState = {
   score: 0,
   maxScore: 100,
-  errors: {Hospital: 0, Patient: 0, Cart: 0},
+  errors: { Hospital: 0, Patient: 0, Cart: 0 },
+  errorLog: [], // ogni errore: { scene, description }
   currentChoice: null,
+};
+
+// Registra un errore (incrementa il contatore e aggiunge a errorLog per Firebase)
+function logGameError(scene, description) {
+  if (gameState.errors[scene] !== undefined) gameState.errors[scene]++;
+  gameState.errorLog.push({ scene: scene, description: description || scene });
 }
+window.logGameError = logGameError;
 
 const config = {
     type: Phaser.AUTO,

@@ -29,7 +29,6 @@ class PatientScene extends Phaser.Scene {
     preload() {
         this.load.image("ReloadButton", "img/ReloadButton.png");
         this.load.image("PatientCloseUp", "img/PatientCloseUp.jpeg");
-        this.load.image("Arrow", "img/Arrow.png");
         this.load.text("PatientOptions", "text/Patient.txt");
     }
     
@@ -103,7 +102,26 @@ class PatientScene extends Phaser.Scene {
     createGameContent() {
 
         const patient = this.add.image(576, 540, "PatientCloseUp").setScale(0.65);
-        const arrow = this.add.image(1500, 454, "Arrow").setScale(4);
+
+        // Freccia sopra le risposte (stile CartScene/HospitalScene: triangolo rosso che punta in basso, animata)
+        this.answersArrowHint = this.add.graphics();
+        this.answersArrowBaseX = 1500;
+        this.answersArrowBaseY = 540 - 90;
+        this.answersArrowHint.fillStyle(0xe74c3c, 0.95);
+        this.answersArrowHint.lineStyle(2, 0xc0392b, 1);
+        this.answersArrowHint.fillTriangle(0, 20, -24, -20, 24, -20);
+        this.answersArrowHint.strokeTriangle(0, 20, -24, -20, 24, -20);
+        this.answersArrowHint.x = this.answersArrowBaseX;
+        this.answersArrowHint.y = this.answersArrowBaseY;
+        this.answersArrowHint.setDepth(10);
+        this.answersArrowBobTween = this.tweens.add({
+            targets: this.answersArrowHint,
+            y: this.answersArrowBaseY + 16,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: "Sine.easeInOut"
+        });
 
         const questionBox = this.add.graphics();
         questionBox.fillStyle(0xecf0f1, 1);
@@ -174,6 +192,9 @@ class PatientScene extends Phaser.Scene {
 
         if (index !== expectedIndex) {
             this.ordCounter = 0;
+            if (typeof window.logGameError === "function") window.logGameError("Patient", "Sequenza GAS sbagliata");
+            gameState.score -= 10;
+            if (this.scoreText) this.scoreText.setText("Score: " + gameState.score);
             this.showError();
             this.setDefault();
         } else {
@@ -190,6 +211,8 @@ class PatientScene extends Phaser.Scene {
             const messageIndex = this.ordCounter - 1;
             this.showMessage(messages[messageIndex], true);
             if (this.ordCounter === 3) {
+                gameState.score += 30;
+                if (this.scoreText) this.scoreText.setText("Score: " + gameState.score);
                 this.time.delayedCall(3500, () => this.scene.start("PatientToCart"));
             }
         }

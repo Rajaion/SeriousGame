@@ -33,5 +33,31 @@ function saveScore(sessionId, email, score) {
   });
 }
 
-// Esponi saveScore globalmente così è disponibile in ReviewScene e ovunque
+// Salva tutti i dati di gioco (sessionId, email facoltativa, score, errors, errorLog)
+function saveGameResults(sessionId, email, score, errors, errorLog) {
+  var db = getDatabase();
+  if (!db) {
+    console.warn('Firebase non disponibile, risultati non inviati.');
+    return;
+  }
+  var ref = db.ref('gameResults');
+  var newRef = ref.push();
+  newRef.set({
+    sessionId: sessionId,
+    email: email || '',
+    score: score,
+    errors: errors || {},
+    errorLog: errorLog || [],
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  })
+  .then(function () {
+    console.log('Risultati salvati su Firebase.');
+  })
+  .catch(function (err) {
+    console.error('Errore nel salvare i risultati:', err);
+  });
+}
+
+// Esponi funzioni globalmente
 window.saveScore = saveScore;
+window.saveGameResults = saveGameResults;

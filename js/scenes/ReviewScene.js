@@ -1,32 +1,15 @@
 class ReviewScene extends Phaser.Scene {
     constructor() {
         super({ key: "ReviewScene" });
-        
-        // Configurazione posizioni (riferimento 1920x1080)
-        this.refPositions = {
-            title: { x: 960, y: 150 },
-            box1: { x: 960, y: 340 },
-            box2: { x: 960, y: 500 },
-            box3: { x: 960, y: 660 }
-        };
     }
 
-    preload() {
-        // Carica risorse se necessario
-    }
+    preload() {}
 
     create() {
-        this.gameOver();
-        this.createContent();
-    }
-
-    createContent() {
-        this.children.removeAll();
-        this.textElements = [];
-
         this.createBackground();
-        this.createGameContent();
-        this.createTexts();
+        this.createTitle();
+        this.createEmailInput();
+        this.createButton();
     }
 
     createBackground() {
@@ -37,138 +20,118 @@ class ReviewScene extends Phaser.Scene {
         this.sceneBorder.fillRoundedRect(0, 0, 1920, 1080, 0);
     }
 
-    createGameContent() {
+    createTitle() {
+        this.add.text(960, 280, "Salva i risultati (facoltativo)", {
+            fontSize: "52px",
+            color: "#ecf0f1",
+            align: "center",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
 
-        // Box titolo
-        this.createBoxInContainer(960, this.refPositions.title.y, 700, 80);
-
-        // Box Ospedale
-        this.createBoxInContainer(960, this.refPositions.box1.y, 900, 140);
-
-        // Box Paziente
-        this.createBoxInContainer(960, this.refPositions.box2.y, 900, 140);
-
-        // Box Carro
-        this.createBoxInContainer(960, this.refPositions.box3.y, 900, 140);
+        this.add.text(960, 360, "Inserisci la tua email per inviare punteggio e dati di sessione al database.", {
+            fontSize: "32px",
+            color: "#bdc3c7",
+            align: "center",
+            wordWrap: { width: 800 },
+            fontFamily: "Poppins",
+            resolution: 2
+        }).setOrigin(0.5);
     }
 
-    createTexts() {
-        const { title, box1, box2, box3 } = this.refPositions;
+    createEmailInput() {
+        var wrapper = document.getElementById("game-wrapper");
+        if (!wrapper) wrapper = document.body;
 
-        // Titolo principale
-        const titleText = this.add.text(title.x, title.y, "Vediamo gli errori fatti:", {
-            fontSize: `54px`,
+        this.emailInput = document.createElement("input");
+        this.emailInput.type = "email";
+        this.emailInput.placeholder = "email@esempio.com (facoltativo)";
+        this.emailInput.id = "review-email-input";
+        this.emailInput.style.cssText = [
+            "position:absolute",
+            "left:50%",
+            "top:46%",
+            "transform:translate(-50%,-50%)",
+            "width:420px",
+            "padding:14px 18px",
+            "font-size:22px",
+            "font-family:Poppins,sans-serif",
+            "border:2px solid #2c3e50",
+            "border-radius:8px",
+            "outline:none",
+            "box-sizing:border-box"
+        ].join(";");
+        wrapper.style.position = "relative";
+        wrapper.appendChild(this.emailInput);
+    }
+
+    createButton() {
+        var self = this;
+        this.reviewBtnBg = this.add.graphics();
+        var btnW = 420;
+        var btnH = 70;
+        var btnX = 960 - btnW / 2;
+        var btnY = 620;
+        var drawBtn = function (color) {
+            self.reviewBtnBg.clear();
+            self.reviewBtnBg.fillStyle(color, 1);
+            self.reviewBtnBg.fillRoundedRect(btnX, btnY, btnW, btnH, 10);
+            self.reviewBtnBg.lineStyle(3, 0x000000, 1);
+            self.reviewBtnBg.strokeRoundedRect(btnX, btnY, btnW, btnH, 10);
+        };
+
+        drawBtn(0x3498db);
+
+        this.reviewBtnText = this.add.text(960, btnY + btnH / 2, "Conferma ed invia", {
+            fontSize: "42px",
             color: "#000000",
-            align: "center",
             fontFamily: "Poppins",
             fontStyle: "bold",
             resolution: 2
-        }).setOrigin(0.5);
-        this.textElements.push(titleText);
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        // OSPEDALE - Header
-        const ospedaleHeader = this.add.text(box1.x, box1.y - 15, "📞 Ospedale:\n", {
-            fontSize: `44px`,
-            color: "#e22222",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-            resolution: 2
-        }).setOrigin(0.5);
-        this.textElements.push(ospedaleHeader);
-
-        // OSPEDALE - Body
-        const ospedaleBody = this.add.text(box1.x, box1.y + 10,
-            gameState.errors.Hospital === 0
-                ? "\nNon hai compiuto errori in ospedale\nnella sala del paziente, bravo!"
-                : "\nAttento, dovevi prima scegliere la opzione corretta da telefono\nper poi cliccare sul paziente",
-            {
-                fontSize: `32px`,
-                color: "#000000",
-                align: "center",
-                wordWrap: { width: 800 },
-                fontFamily: "Poppins",
-                resolution: 2
-            }).setOrigin(0.5);
-        this.textElements.push(ospedaleBody);
-
-        // PAZIENTE - Header
-        const patientHeader = this.add.text(box2.x, box2.y - 15, "👤 Paziente:\n", {
-            fontSize: `44px`,
-            color: "#e22222",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-            resolution: 2
-        }).setOrigin(0.5);
-        this.textElements.push(patientHeader);
-
-        // PAZIENTE - Body
-        const patientBody = this.add.text(box2.x, box2.y + 10,
-            gameState.errors.Patient === 0
-                ? "\nHai selezionato la sequenza corretta, good job!"
-                : "\nLa sequenza corretta è x, altrimenti (spiegare qui motivo ecc...)",
-            {
-                fontSize: `32px`,
-                color: "#000000",
-                align: "center",
-                wordWrap: { width: 800 },
-                fontFamily: "Poppins",
-                resolution: 2
-            }).setOrigin(0.5);
-        this.textElements.push(patientBody);
-
-        // CARRO - Header
-        const cartHeader = this.add.text(box3.x, box3.y - 15, "🚑 Carro:\n", {
-            fontSize: `44px`,
-            color: "#e22222",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-            resolution: 2
-        }).setOrigin(0.5);
-        this.textElements.push(cartHeader);
-
-        // CARRO - Body
-        const cartBody = this.add.text(box3.x, box3.y + 10,
-            gameState.errors.Cart === 0
-                ? "\nCorretto devi dare al paziente in ordine:\nadrenalina e poi Nacl per X motivi"
-                : "\nSbagliato, l'ordine corretto era Adrenalina → Nacl",
-            {
-                fontSize: `32px`,
-                color: "#000000",
-                align: "center",
-                wordWrap: { width: 800 },
-                fontFamily: "Poppins",
-                resolution: 2
-            }).setOrigin(0.5);
-        this.textElements.push(cartBody);
+        this.reviewBtnText.on("pointerover", function () { drawBtn(0x5DADE2); self.reviewBtnText.setScale(1.05); });
+        this.reviewBtnText.on("pointerout", function () { drawBtn(0x3498db); self.reviewBtnText.setScale(1); });
+        this.reviewBtnText.on("pointerdown", function () {
+            drawBtn(0x5DADE2);
+            self.submitAndContinue();
+        });
     }
 
-    createBoxInContainer(x, y, width, height) {
-        const box = this.add.graphics();
-        box.fillStyle(0xecf0f1, 1);
-        box.fillRoundedRect(x - width / 2, y - height / 2, width, height, 5);
-        box.lineStyle(2, 0x2c3e50, 1);
-        box.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 5);
+    submitAndContinue() {
+        var email = "";
+        if (this.emailInput && this.emailInput.value) {
+            email = this.emailInput.value.trim();
+        }
 
-        return box;
+        var sessionId = gameState.sessionId || ("session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+        var score = gameState.score || 0;
+        var errors = gameState.errors || { Hospital: 0, Patient: 0, Cart: 0 };
+        var errorLog = gameState.errorLog || [];
+
+        if (typeof window.saveGameResults === "function") {
+            window.saveGameResults(sessionId, email, score, errors, errorLog);
+        }
+
+        this.reviewBtnBg.setVisible(false);
+        this.reviewBtnText.setVisible(false);
+        if (this.emailInput && this.emailInput.parentNode) {
+            this.emailInput.style.display = "none";
+        }
+        this.add.text(960, 580, "Grazie per le informazioni inviate.", {
+            fontSize: "44px",
+            color: "#ecf0f1",
+            align: "center",
+            fontFamily: "Poppins",
+            fontStyle: "bold",
+            resolution: 2
+        }).setOrigin(0.5);
     }
 
-    gameOver() {
-        const sessionId = gameState.sessionId || this.generateSessionId();
-        const email = gameState.playerEmail || "player@example.com";
-        const score = gameState.score;
-
-        // Invia lo score a Firebase (funzione esposta da firebase-handler.js)
-        if (typeof window.saveScore === 'function') {
-            window.saveScore(sessionId, email, score);
-        } else {
-            console.warn('saveScore non disponibile (Firebase non caricato?)');
+    shutdown() {
+        if (this.emailInput && this.emailInput.parentNode) {
+            this.emailInput.parentNode.removeChild(this.emailInput);
         }
     }
-      
-      generateSessionId() {
-        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      }
-}   
+}

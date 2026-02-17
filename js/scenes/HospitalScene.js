@@ -56,6 +56,19 @@ class HospitalScene extends Phaser.Scene {
         this.patientArea = this.add.rectangle(768, 594, 400, 400)
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
+
+        // Freccia sopra il paziente (mostrata dopo risposta corretta al telefono)
+        this.patientArrowHint = this.add.graphics();
+        this.patientArrowBaseX = 768;
+        this.patientArrowBaseY = 594 - 250;
+        this.patientArrowHint.fillStyle(0xe74c3c, 0.95);
+        this.patientArrowHint.lineStyle(2, 0xc0392b, 1);
+        this.patientArrowHint.fillTriangle(0, 20, -24, -20, 24, -20);
+        this.patientArrowHint.strokeTriangle(0, 20, -24, -20, 24, -20);
+        this.patientArrowHint.x = this.patientArrowBaseX;
+        this.patientArrowHint.y = this.patientArrowBaseY;
+        this.patientArrowHint.setVisible(false).setDepth(10);
+        this.patientArrowBobTween = null;
     }
 
     //crea il testo del score e del testo in basso
@@ -111,6 +124,7 @@ class HospitalScene extends Phaser.Scene {
         this.patientArea.removeAllListeners();
         this.patientArea.on("pointerdown", () => {
             if (this.clickedCorOpt) {
+                this.hidePatientHint();
                 this.scene.start("PatientScene");
             } else {
                 gameState.score -= 5;
@@ -187,10 +201,13 @@ class HospitalScene extends Phaser.Scene {
     buttonChoice(chosenNumber) {
         this.telephone.setInteractive({ useHandCursor: true });
         if (this.correctNumber === chosenNumber) {
+            gameState.score += 15;
+            this.scoreText.setText("Score: " + gameState.score);
             this.clickedOption("Corretto! Ora procedi con la valutazione del paziente interagendo su di lui", true);
             this.clickedCorOpt = true;
+            this.showPatientHint();
         } else {
-            gameState.errors.Hospital++;
+            if (typeof window.logGameError === "function") window.logGameError("Hospital", "Opzione telefono sbagliata");
             gameState.score -= 5;
             this.scoreText.setText("Score: " + gameState.score);
             this.clickedOption("Attenzione, scegliere l'opzione corretta", false);
@@ -204,6 +221,29 @@ class HospitalScene extends Phaser.Scene {
             .forEach(el => { if (el) { el.destroy(); } });
         this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
         this.convOn = false;
+    }
+
+    showPatientHint() {
+        this.patientArrowHint.setVisible(true);
+        this.patientArrowHint.x = this.patientArrowBaseX;
+        this.patientArrowHint.y = this.patientArrowBaseY;
+        if (this.patientArrowBobTween) this.patientArrowBobTween.remove();
+        this.patientArrowBobTween = this.tweens.add({
+            targets: this.patientArrowHint,
+            y: this.patientArrowBaseY + 16,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: "Sine.easeInOut"
+        });
+    }
+
+    hidePatientHint() {
+        this.patientArrowHint.setVisible(false);
+        if (this.patientArrowBobTween) {
+            this.patientArrowBobTween.remove();
+            this.patientArrowBobTween = null;
+        }
     }
 
     //funzione per gestire la scelta dell'utente relativamente alla risposta scelta
