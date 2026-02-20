@@ -60,20 +60,42 @@ var CartECG = {
         var prevIdx = (leftIdx - 1 + len) % len;
         var prevValue = pattern[prevIdx];
         var maxVal = Math.max.apply(null, pattern);
-        var peakThreshold = Math.max(0.01, maxVal * 0.28);
+        // Soglia per ritmo: PEA solo sui GRANDI rialzi (QRS ~0.6); VF solo picchi principali; VT standard
+        var peakThreshold = (scene.rhythmType === 'PEA') ? 0.45
+            : (scene.rhythmType === 'VF') ? 0.38
+            : Math.max(0.01, maxVal * 0.28);
         var resetThreshold = Math.min(0, peakThreshold * 0.5) - 0.01;
         scene.ecgLastValue = peakValue;
         var risingEdge = peakValue > peakThreshold && prevValue <= peakThreshold;
-        if (risingEdge) {
-            try { if (scene.sound && scene.scene.isActive()) scene.sound.play("heartBeep"); } catch (e) {}
+        var justEntered = (scene.ecgLastLeftIdx === undefined || leftIdx !== scene.ecgLastLeftIdx);
+        scene.ecgLastLeftIdx = leftIdx;
+        if (justEntered && risingEdge && scene.sound && scene.scene.isActive()) {
+            try { scene.sound.play("heartBeep", { volume: 0.7 }); } catch (e) {}
             scene.ecgLastWasPeak = true;
         }
         if (peakValue < resetThreshold) scene.ecgLastWasPeak = false;
     },
+    /** Beep a intervalli fissi (BPM) per ritmo. Più affidabile del rilevamento picchi dallo scroll. */
+    updateBeepTimer: function (scene, dt) {
+        if (!scene.rhythmType || !scene.sound || !scene.scene.isActive()) return;
+        if (scene.ecgLastBeepRhythm !== scene.rhythmType) {
+            scene.ecgLastBeepRhythm = scene.rhythmType;
+            scene.ecgBeepAccumulator = 0;
+        }
+        var bpmMap = { 'VT': 100, 'VF': 110, 'PEA': 55, 'Asystole': 0 };
+        var bpm = bpmMap[scene.rhythmType];
+        if (!bpm || bpm <= 0) return;
+        var intervalSec = 60 / bpm;
+        scene.ecgBeepAccumulator = (scene.ecgBeepAccumulator || 0) + dt;
+        if (scene.ecgBeepAccumulator >= intervalSec) {
+            scene.ecgBeepAccumulator -= intervalSec;
+            try { scene.sound.play("heartBeep", { volume: 0.7 }); } catch (e) {}
+        }
+    },
     getPattern: function (scene) {
         var t = scene.rhythmType;
         if (t === 'VF') return [0, 0.4, -0.3, 0.5, -0.4, 0.3, -0.5, 0.6, -0.3, 0.4, -0.4, 0.5, -0.2, 0.3, -0.6, 0.4, -0.3, 0.5, -0.4, 0];
-        if (t === 'VT') return [0, 0.05, 0.9, -0.65, 0.15, 0, 0, 0, 0.05, 0.9, -0.65, 0.15, 0, 0, 0, 0.05, 0.9, -0.65, 0.15, 0];
+        if (t === 'VT') return [0, 0.05, 0.9, -0.32, 0.15, 0, 0, 0, 0.05, 0.7, -0.32, 0.15, 0, 0, 0, 0.05, 0.7, -0.32, 0.15, 0];
         if (t === 'PEA') return [0, 0.08, 0.06, 0, 0.6, -0.25, 0.05, 0.12, 0.08, 0, 0, 0, 0.08, 0.06, 0, 0.6, -0.25, 0.05, 0.12, 0];
         if (t === 'Asystole') return [0, 0, 0.01, 0, -0.01, 0, 0, 0.01, 0, 0, -0.01, 0, 0, 0.01, -0.01, 0, 0, 0, 0.01, 0];
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

@@ -44,6 +44,7 @@ class CartScene extends Phaser.Scene {
         this.ecgTransitionT = 999; // tempo trascorso nella transizione (sec)
         this.ecgTransitionDuration = 1.8; // durata transizione in secondi
         this.ecgLastWasPeak = false; // per beep sincronizzato al picco del cardiogramma
+        this.heartBeepLastTime = 0;  // cooldown per evitare beep sovrapposti (gracchio)
     }
 
     preload() {
@@ -703,6 +704,7 @@ class CartScene extends Phaser.Scene {
         this.ecgTransitionT = 0;
         this.ecgLastWasPeak = false;
         this.ecgLastValue = undefined;
+        this.ecgLastLeftIdx = undefined;  // reset per beep a ogni gradino
 
         this.usedItems = 2;
         this.shockDelivered = false;
