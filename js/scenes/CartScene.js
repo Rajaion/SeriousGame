@@ -54,8 +54,8 @@ class CartScene extends Phaser.Scene {
         this.load.image("Nacl", "img/Nacl.png");
         this.load.image("Sfondo", "img/Mattone.png");
         this.load.image("soluzione", "img/soluzione_glucosata.png");
-        this.load.image("amiodarone", "img/amiodarone.png");
-        this.load.image("defibrillatore", "img/Defibrillatore.png");
+        this.load.image("amiodarone", "img/Amiodarone.png");
+        this.load.image("defibrillatore", "img/defibrillatore.png");
         
         // Carica i suoni (percorso relativo alla pagina che carica il gioco, es. index.html)
         this.load.audio("heartBeep", "audio/heart_beep.mp3");
@@ -696,7 +696,9 @@ class CartScene extends Phaser.Scene {
     }
 
     resetCycleState() {
-        console.log("Reset stato ciclo (ramo invariato:", this.currentRhythm, ")");
+        // Passaggio randomico tra ritmo defibrillabile e non
+        this.currentRhythm = Math.random() > 0.5 ? 'shockable' : 'non-shockable';
+        console.log("Reset stato ciclo (ramo:", this.currentRhythm, ")");
 
         this.ecgPatternPrev = this.getRhythmPattern().slice();
         this.pickNewRhythmForCycle();

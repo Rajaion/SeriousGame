@@ -132,7 +132,7 @@ class EndScene extends Phaser.Scene {
 
         // Testo bottone
         const reviewButton = this.add.text(button.x, button.y,
-            "Vediamo gli errori", {
+            "Invia il risultato", {
             fontSize: `40px`,
             color: "#000000ff",
             fontFamily: "Poppins",

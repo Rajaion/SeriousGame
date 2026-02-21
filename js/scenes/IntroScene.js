@@ -29,11 +29,11 @@ class IntroScene extends Phaser.Scene {
 
         this.add.text(950, 500, "\nSei un infermiere in turno presso il reparto di cardiologia. \n\n\nTi suona il campanello, è la moglie del signor Bianchi, 65 anni ricoverato per scompenso cardiaco, ti dice che non le risponde più, nemmeno se lo chiama.", {
             fontSize: `70px`,
-            fontFamily: "Poppins",
+            fontFamily: "Poppins, sans-serif",
             color: "#2c3e50",
-            wordWrap: { width: 1530 },
-            lineSpacing: 4, 
-            resolution: 3
+            wordWrap: { width: 1200 },
+            lineSpacing: 4,
+            resolution: 1
         }).setOrigin(0.5);
 
         const btnBg = this.add.graphics();
@@ -50,9 +50,9 @@ class IntroScene extends Phaser.Scene {
         const startBtn = this.add.text(960, 975, "Inizia", {
             fontSize: `60px`,
             color: "#000000ff",
-            fontFamily: "Poppins",
+            fontFamily: "Poppins, sans-serif",
             fontStyle: "bold",
-            resolution: 2
+            resolution: 1
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         startBtn.on("pointerover", () => { drawBtn(0x5DADE2); startBtn.setScale(1.05); });
