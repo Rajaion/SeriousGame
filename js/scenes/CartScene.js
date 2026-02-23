@@ -48,7 +48,6 @@ class CartScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("Cart", "img/Cart.png");
         this.load.image("Monitor", "img/Monitor.png");
         this.load.image("Adrenalina", "img/Adrenalina.png");
         this.load.image("Nacl", "img/Nacl.png");
@@ -136,7 +135,7 @@ class CartScene extends Phaser.Scene {
             }
             this.defibrillator.setVisible(true);
             this.defibrillator.x = monitorBounds.right + 80; // 80 pixel a destra del monitor
-            this.defibrillator.y = monitorBounds.centerY;
+            this.defibrillator.y = monitorBounds.centerY - 100;
             this.defibrillator.disableInteractive();
             this.createShockButton(this.defibrillator.x, this.defibrillator.y);
             console.log("Defibrillatore posizionato a:", this.defibrillator.x, this.defibrillator.y);
@@ -179,7 +178,7 @@ class CartScene extends Phaser.Scene {
             }
             this.defibrillator.setVisible(true);
             this.defibrillator.x = monitorBounds.right + 80;
-            this.defibrillator.y = monitorBounds.centerY;
+            this.defibrillator.y = monitorBounds.centerY - 100;
             this.defibrillator.disableInteractive();
             this.createShockButton(this.defibrillator.x, this.defibrillator.y);
             
@@ -210,8 +209,8 @@ class CartScene extends Phaser.Scene {
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
 
-        this.cart = this.add.image(1675, 860, "Cart")
-            .setScale(0.5)
+        this.cart = this.add.rectangle(1675, 790, 400, 400)
+            .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
 
         this.adrenalina = this.add.image(-550, -550, "Adrenalina")
@@ -263,7 +262,7 @@ class CartScene extends Phaser.Scene {
         // Freccia sopra il carrello che punta in basso (più grande)
         this.cartArrowHint = this.add.graphics();
         this.cartArrowBaseX = this.cart.x;
-        this.cartArrowBaseY = this.cart.y - 320;
+        this.cartArrowBaseY = this.cart.y - 290;
         this.cartHintVisible = false;
         this.arrowBobTween = null;
         this.updateCartArrowGraphics();

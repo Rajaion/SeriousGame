@@ -150,7 +150,7 @@ class HospitalScene extends Phaser.Scene {
     //crea la box per il testo sopra le 3 opzioni da scegliere
     createContextBox() {
         this.contextBoxGraphic = this.add.graphics();
-        this.drawAnswerBox(this.contextBoxGraphic, 1536, 600, 750, 80);
+        this.drawAnswerBox(this.contextBoxGraphic, 1536, 600, 750, 100);
         
         //testo informativo sopra le 3 opzioni da scegliere
         this.contextTextElement = this.add.text(1536, 600, this.contextText, {

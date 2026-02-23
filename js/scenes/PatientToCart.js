@@ -23,9 +23,9 @@ class PatientToCart extends Phaser.Scene {
         box.lineStyle(2, 0x2c3e50, 1);
         box.strokeRoundedRect(110, 140, 1700, 800, 20);
 
-        this.add.image(960, 120, "croce_rossa").setScale(0.3);
+        this.add.image(960, 120, "croce_rossa").setScale(0.4);
 
-        this.add.text(850, 520, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
+        this.add.text(960, 540, "Il collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\nTempo di inserirsi in campo", {
             fontSize: `60px`,
             fontFamily: "Poppins, sans-serif",
             color: "#2c3e50",
@@ -48,9 +48,9 @@ class PatientToCart extends Phaser.Scene {
         const startBtn = this.add.text(960, 975, "Inizia", {
             fontSize: `60px`,
             color: "#000000ff",
-            fontFamily: "Poppins",
+            fontFamily: "Poppins, sans-serif",
             fontStyle: "bold",
-            resolution: 2
+            resolution: 1
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         startBtn.on("pointerover", () => { drawBtn(0x5DADE2); startBtn.setScale(1.05); });
