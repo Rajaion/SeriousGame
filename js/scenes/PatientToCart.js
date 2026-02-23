@@ -25,13 +25,13 @@ class PatientToCart extends Phaser.Scene {
 
         this.add.image(960, 120, "croce_rossa").setScale(0.3);
 
-        this.add.text(950, 500, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
-            fontSize: `70px`,
-            fontFamily: "Poppins",
+        this.add.text(850, 520, "\nIl collega è arrivato con il carrello, ha attaccato le piastre, acceso il DAE e ti ha dato il cambio alle compressioni.\n\nUn altro operatore si occupa delle ventilazioni.\n\n\n Tempo di inserirsi in campo", {
+            fontSize: `60px`,
+            fontFamily: "Poppins, sans-serif",
             color: "#2c3e50",
-            wordWrap: { width: 1530 },
-            lineSpacing: 4, 
-            resolution: 3
+            wordWrap: { width: 1500 },
+            lineSpacing: 4,
+            resolution: 1
         }).setOrigin(0.5);
 
         const btnBg = this.add.graphics();

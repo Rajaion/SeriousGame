@@ -17,8 +17,6 @@ class IntroScene extends Phaser.Scene {
         this.sceneBorder.fillStyle(0x2c3e50, 1);
         this.sceneBorder.fillRoundedRect(0, 0, 1920, 1080, 0);
 
-        
-
         const box = this.add.graphics();
         box.fillStyle(0xecf0f1, 1);
         box.fillRoundedRect(110, 140, 1700, 800, 20);
@@ -27,11 +25,11 @@ class IntroScene extends Phaser.Scene {
 
         this.add.image(960, 120, "CroceRossa").setScale(0.4);
 
-        this.add.text(950, 500, "\nSei un infermiere in turno presso il reparto di cardiologia. \n\n\nTi suona il campanello, è la moglie del signor Bianchi, 65 anni ricoverato per scompenso cardiaco, ti dice che non le risponde più, nemmeno se lo chiama.", {
-            fontSize: `70px`,
+        this.add.text(850, 520, "Sei un infermiere in turno presso il reparto di cardiologia. \n\nTi suona il campanello, è la moglie del signor Bianchi, 65 anni ricoverato per scompenso cardiaco, ti dice che non le risponde più, nemmeno se lo chiama.", {
+            fontSize: `60px`,
             fontFamily: "Poppins, sans-serif",
             color: "#2c3e50",
-            wordWrap: { width: 1200 },
+            wordWrap: { width: 1500 },
             lineSpacing: 4,
             resolution: 1
         }).setOrigin(0.5);
