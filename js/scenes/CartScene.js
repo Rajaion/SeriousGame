@@ -1,15 +1,10 @@
 /**
- * PROTOCOLLO ALS (secondo indicazioni):
- * All'avvio viene scelto un ramo (ritmi defibrillabili VT/VF oppure non defibrillabili PEA/Asistolia).
+ * PROTOCOLLO ALS (secondo PDF):
  *
- * RITMI DEFIBRILLABILI (VT/VF):
- * - Shock → 2 min compressioni (bottone "Compressioni") → rivalutazione.
- * - Cicli 1, 2, 3: solo Shock + Compressioni (nessun farmaco).
- * - Dopo il 3° shock (dal ciclo 4): Adrenalina+NaCl (ogni 2 cicli) oppure Amiodarone+SG 5% (una volta o ripetuto).
- *
- * RITMI NON DEFIBRILLABILI (PEA/Asistolia):
- * - NO shock → solo compressioni per 2 min. Adrenalina+NaCl subito (ogni 2 cicli).
- * - MAI Amiodarone nei ritmi non defibrillabili.
+ * VT (Tachicardia Ventricolare): Shock sempre. Adrenalina + Amiodarone solo se VT presente 3 volte di fila.
+ * VF (Fibrillazione Ventricolare): Shock sempre. Adrenalina + Amiodarone solo se VF presente 3 volte di fila.
+ * PEA: NO shock. Adrenalina solo a cicli dispari (1, 3, 5).
+ * Asistolia: Solo compressioni (nessun farmaco per ora).
  *
  * L'avanzamento al ciclo successivo avviene solo premendo il bottone "Compressioni".
  */
@@ -45,6 +40,9 @@ class CartScene extends Phaser.Scene {
         this.ecgTransitionDuration = 1.8; // durata transizione in secondi
         this.ecgLastWasPeak = false; // per beep sincronizzato al picco del cardiogramma
         this.heartBeepLastTime = 0;  // cooldown per evitare beep sovrapposti (gracchio)
+        this.consecutiveVTCount = 0; // VT presente N volte di fila
+        this.consecutiveVFCount = 0; // VF presente N volte di fila
+        this.medsRequiredThisCycle = false; // true se il carrello è visibile e servono farmaci prima di Compressioni
     }
 
     preload() {
@@ -67,14 +65,10 @@ class CartScene extends Phaser.Scene {
     }
 
     create() {
-        // Scegli randomicamente tra shockable (1) e non-shockable (0)
-        const isShockable = Math.random() > 0.5 ? 1 : 0;
-        console.log("create() chiamato, isShockable:", isShockable);
-        this.createContent(isShockable);
+        this.createContent();
     }
 
-    createContent(isShockable) {
-        console.log("createContent chiamato con isShockable:", isShockable);
+    createContent() {
         this.children.removeAll();
         this.textElements = [];
         this.gameEnded = false;
@@ -85,17 +79,18 @@ class CartScene extends Phaser.Scene {
         this.usedItems = 2;
         this.shockDelivered = false;
         this.medicationsGiven = false;
+        this.medsRequiredThisCycle = false;
+        this.consecutiveVTCount = 0;
+        this.consecutiveVFCount = 0;
         this.createBackground();
         this.createTopBottomBars();
         this.createTexts();
         this.setupEvents();
         
-        // Chiama direttamente la funzione corretta (1 = shockable, 0 = non-shockable)
-        if (isShockable) {
-            console.log("Chiamando setupShockable");
+        this.pickNewRhythmForCycle();
+        if (this.currentRhythm === 'shockable') {
             this.setupShockable();
         } else {
-            console.log("Chiamando setupNonShockable");
             this.setupNonShockable();
         }
 
@@ -104,20 +99,7 @@ class CartScene extends Phaser.Scene {
     }
 
     setupShockable() {
-        console.log("Setup Shockable chiamato");
-        // Imposta il tipo di ritmo corrente
-        this.currentRhythm = 'shockable';
-        
-        // Scegli randomicamente tra VF (Fibrillazione Ventricolare) o VT (Tachicardia Ventricolare)
-        this.rhythmType = Math.random() > 0.5 ? 'VF' : 'VT';
-        console.log("Rhythm type:", this.rhythmType);
-        
-        // Set farmaci scelto UNA SOLA VOLTA per tutta la partita (stessi farmaci nei cicli 2 e 3)
-        if (this.initialMedicationSet == null) {
-            this.initialMedicationSet = Math.random() > 0.5 ? 'adrenaline_nacl' : 'amiodarone_glucose';
-        }
-        this.medicationSet = this.initialMedicationSet;
-        console.log("Medication set (fisso per partita):", this.medicationSet);
+        console.log("Setup Shockable chiamato, rhythm:", this.rhythmType);
         
         // Usa time.delayedCall per assicurarsi che getBounds() funzioni
         this.time.delayedCall(100, () => {
@@ -145,19 +127,14 @@ class CartScene extends Phaser.Scene {
             console.log("ECG Area creata:", this.ecgArea);
         });
         
-        this.bottomText = this.currentCycle <= 3 ? "Ritmo defibrillabile" : "Procedi secondo protocollo";
+        this.bottomText = "Shock con DAE, poi Compressioni";
         if (this.cycleText) this.cycleText.setText(this.getCycleLabel());
+        this.hideCartHint(true);
         this.showMessage(this.getRhythmLabel() + " – " + this.bottomText, false);
     }
 
     setupNonShockable() {
-        console.log("Setup Non-Shockable chiamato");
-        // Imposta il tipo di ritmo corrente
-        this.currentRhythm = 'non-shockable';
-        
-        // Scegli randomicamente tra PEA (Pulseless Electrical Activity) o Asystole
-        this.rhythmType = Math.random() > 0.5 ? 'PEA' : 'Asystole';
-        console.log("Rhythm type:", this.rhythmType);
+        console.log("Setup Non-Shockable chiamato, rhythm:", this.rhythmType);
         
         // Per ritmi non-shockable usa sempre Adrenalina+NaCl
         this.medicationSet = 'adrenaline_nacl';
@@ -185,9 +162,9 @@ class CartScene extends Phaser.Scene {
             this.createECGTrace();
             console.log("ECG Area creata:", this.ecgArea);
         });
-        this.medicationSet = 'adrenaline_nacl'; // Non-shockable: solo Adrenalina+NaCl, MAI Amiodarone
         this.bottomText = "Ritmo non defibrillabile";
         if (this.cycleText) this.cycleText.setText(this.getCycleLabel());
+        this.updateCartHintForNonShockable();
         this.showMessage(this.getRhythmLabel() + " – " + this.bottomText, false);
     }
 
@@ -416,27 +393,45 @@ class CartScene extends Phaser.Scene {
         // Carrello: disponibile in base al ramo e al ciclo (protocollo ALS)
         this.cart.on("pointerdown", () => {
             if (this.currentRhythm === 'shockable') {
-                if (this.currentCycle <= 3) {
-                    this.showMessage("Farmaci in seguito", false);
-                    return;
-                }
                 if (!this.shockDelivered) {
                     this.showMessage("Eroga prima lo shock", false);
                     return;
                 }
+                if (this.rhythmType === 'VT' && this.consecutiveVTCount < 3) {
+                    this.showMessage("Adrenalina e Amiodarone solo dopo VT 3 volte di fila", false);
+                    return;
+                }
+                if (this.rhythmType === 'VF' && this.consecutiveVFCount < 3) {
+                    this.showMessage("Adrenalina e Amiodarone solo dopo VF 3 volte di fila", false);
+                    return;
+                }
             } else {
-                // Non-shockable: solo Adrenalina+NaCl, ogni 2 cicli (2, 4, 6)
-                if (this.currentCycle % 2 !== 0) {
-                    this.showMessage("Farmaci ai cicli pari", false);
+                if (this.rhythmType === 'PEA') {
+                if (this.currentCycle % 2 === 0) {
+                    this.showMessage("Solo Adrenalina a cicli dispari (1, 3, 5)", false);
+                        return;
+                    }
+                } else if (this.rhythmType === 'Asystole') {
+                    this.showMessage("Asistolia: solo compressioni", false);
                     return;
                 }
             }
-            if (this.medicationSet === 'adrenaline_nacl') {
+            if (this.medicationSet === 'adrenaline_only') {
+                this.adrenSpawn();
+                this.naclSpawn();
+                this.usedItems = 1;
+            } else if (this.medicationSet === 'adrenaline_nacl') {
                 this.adrenSpawn();
                 this.naclSpawn();
             } else if (this.medicationSet === 'amiodarone_glucose') {
                 this.amiodaroneSpawn();
                 this.soluzioneSpawn();
+            } else if (this.medicationSet === 'adrenaline_and_amiodarone') {
+                this.adrenSpawn();
+                this.naclSpawn();
+                this.amiodaroneSpawn();
+                this.soluzioneSpawn();
+                this.usedItems = 4;
             }
             this.cart.disableInteractive();
             this.hideCartHint();
@@ -496,6 +491,8 @@ class CartScene extends Phaser.Scene {
     }
 
     showCartHint() {
+        if (!this.cartArrowHint) return;
+        this.medsRequiredThisCycle = true;
         this.cartHintVisible = true;
         this.cartArrowHint.setVisible(true);
         this.cartArrowHint.x = this.cartArrowBaseX;
@@ -511,7 +508,9 @@ class CartScene extends Phaser.Scene {
         });
     }
 
-    hideCartHint() {
+    hideCartHint(clearMedsRequired = false) {
+        if (!this.cartArrowHint) return;
+        if (clearMedsRequired) this.medsRequiredThisCycle = false;
         this.cartHintVisible = false;
         this.cartArrowHint.setVisible(false);
         if (this.arrowBobTween) {
@@ -520,13 +519,33 @@ class CartScene extends Phaser.Scene {
         }
     }
 
+    updateCartHintForNonShockable() {
+        if (this.rhythmType === 'PEA') {
+            if (this.currentCycle % 2 === 1) {
+                this.medicationSet = 'adrenaline_only';
+                this.bottomText = "PEA. Solo Adrenalina a cicli dispari. Clicca sul carrello.";
+                this.showCartHint();
+            } else {
+                this.hideCartHint(true);
+                this.bottomText = "PEA. Solo Adrenalina a cicli dispari (1, 3, 5).";
+            }
+        } else if (this.rhythmType === 'Asystole') {
+            this.hideCartHint(true);
+            this.bottomText = "Asistolia: solo compressioni.";
+        }
+    }
+
     /** Clic sul bottone Compressioni: avanza al ciclo successivo (dopo shock nei cicli 1-3 shockable). */
     onCompressioniClick() {
         this.drawCompressioniBtn(0x3498db);
         this.compressioniText.setScale(1);
         if (this.gameEnded) return;
-        if (this.currentRhythm === 'shockable' && this.currentCycle <= 3 && !this.shockDelivered) {
+        if (this.currentRhythm === 'shockable' && !this.shockDelivered) {
             this.showMessage("Eroga lo shock, poi compressioni", false);
+            return;
+        }
+        if (this.medsRequiredThisCycle && !this.medicationsGiven) {
+            this.showMessage("Somministra prima i farmaci dal carrello", false);
             return;
         }
         this.completeCycle();
@@ -650,7 +669,17 @@ class CartScene extends Phaser.Scene {
     }
 
     completeCycle() {
-        console.log("Ciclo completato:", this.currentCycle);
+        console.log("Ciclo completato:", this.currentCycle, "ritmo:", this.rhythmType);
+        if (this.rhythmType === 'VT') {
+            this.consecutiveVTCount++;
+            this.consecutiveVFCount = 0;
+        } else if (this.rhythmType === 'VF') {
+            this.consecutiveVFCount++;
+            this.consecutiveVTCount = 0;
+        } else {
+            this.consecutiveVTCount = 0;
+            this.consecutiveVFCount = 0;
+        }
         
         // Se siamo all'ultimo ciclo, termina
         if (this.currentCycle >= this.maxCycles) {
@@ -675,13 +704,11 @@ class CartScene extends Phaser.Scene {
         });
     }
 
-    // Cambia il ritmo (battito) a ogni nuovo ciclo
+    // Cambia il ritmo (battito) a ogni nuovo ciclo - completamente random tra VT, VF, PEA, Asystole
     pickNewRhythmForCycle() {
-        if (this.currentRhythm === 'shockable') {
-            this.rhythmType = Math.random() > 0.5 ? 'VF' : 'VT';
-        } else {
-            this.rhythmType = Math.random() > 0.5 ? 'PEA' : 'Asystole';
-        }
+        const rhythms = ['VT', 'VF', 'PEA', 'Asystole'];
+        this.rhythmType = rhythms[Math.floor(Math.random() * rhythms.length)];
+        this.currentRhythm = (this.rhythmType === 'VT' || this.rhythmType === 'VF') ? 'shockable' : 'non-shockable';
         console.log("Nuovo ritmo per ciclo:", this.rhythmType);
     }
 
@@ -695,13 +722,10 @@ class CartScene extends Phaser.Scene {
     }
 
     resetCycleState() {
-        // Passaggio randomico tra ritmo defibrillabile e non
-        this.currentRhythm = Math.random() > 0.5 ? 'shockable' : 'non-shockable';
-        console.log("Reset stato ciclo (ramo:", this.currentRhythm, ")");
-
         this.ecgPatternPrev = this.getRhythmPattern().slice();
         this.pickNewRhythmForCycle();
         this.ecgPatternTarget = this.getRhythmPattern().slice();
+        console.log("Reset stato ciclo (ritmo:", this.rhythmType, ", ciclo:", this.currentCycle, ")");
         this.ecgTransitionT = 0;
         this.ecgLastWasPeak = false;
         this.ecgLastValue = undefined;
@@ -746,22 +770,17 @@ class CartScene extends Phaser.Scene {
         this.soluzioneText.y = -550;
 
         if (this.currentRhythm === 'shockable') {
-            if (this.currentCycle <= 3) {
-                this.bottomText = "Ritmo defibrillabile: shock con DAE, poi Compressioni";
-                this.hideCartHint();
-            } else {
-                // Dal ciclo 4: alterna set farmaci per usare sia Adrenalina+NaCl sia Amiodarone+SG 5%
-                this.medicationSet = (this.currentCycle % 2 === 1)
-                    ? this.initialMedicationSet
-                    : (this.initialMedicationSet === 'adrenaline_nacl' ? 'amiodarone_glucose' : 'adrenaline_nacl');
+            this.bottomText = "Shock con DAE, poi Compressioni";
+            if ((this.rhythmType === 'VT' && this.consecutiveVTCount >= 3) ||
+                (this.rhythmType === 'VF' && this.consecutiveVFCount >= 3)) {
+                this.medicationSet = 'adrenaline_and_amiodarone';
                 this.bottomText = "Shock, farmaci (carrello), poi Compressioni";
                 this.showCartHint();
+            } else {
+                this.hideCartHint(true);
             }
         } else {
-            this.medicationSet = 'adrenaline_nacl';
-            this.bottomText = "Ritmo non defibrillabile";
-            if (this.currentCycle % 2 === 0) this.showCartHint();
-            else this.hideCartHint();
+            this.updateCartHintForNonShockable();
         }
         this.showMessage(this.getRhythmLabel() + " – " + this.bottomText, false);
     }

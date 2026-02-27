@@ -9,7 +9,7 @@ class HospitalScene extends Phaser.Scene {
     correctNumber = 1;
     scoreText = null;
     bottomTextSpace = null;
-    bottomText = "Interagire con il telefono";
+    bottomText = "";
     
     constructor() {
         super({ key: "HospitalScene" });
@@ -35,6 +35,9 @@ class HospitalScene extends Phaser.Scene {
         this.createBackground();
         this.setupEvents();
         this.createTexts();
+        this.time.delayedCall(50, () => {
+            if (!this.clickedCorOpt && this.phoneArrowHint) this.showPhoneHint();
+        });
     }
 
     //crea il background dell'ospedale
@@ -51,6 +54,19 @@ class HospitalScene extends Phaser.Scene {
         this.telephone = this.add.image(1632, 432, "Phone")
             .setScale(0.4)
             .setInteractive({ useHandCursor: true });
+
+        // Freccia che punta al telefono (a sinistra del telefono, punta a destra)
+        this.phoneArrowHint = this.add.graphics();
+        this.phoneArrowBaseX = 1632 - 180 + 50;
+        this.phoneArrowBaseY = 432 - 50;
+        this.phoneArrowHint.fillStyle(0xe74c3c, 0.95);
+        this.phoneArrowHint.lineStyle(2, 0xc0392b, 1);
+        this.phoneArrowHint.fillTriangle(20, 0, -20, -24, -20, 24);
+        this.phoneArrowHint.strokeTriangle(20, 0, -20, -24, -20, 24);
+        this.phoneArrowHint.x = this.phoneArrowBaseX;
+        this.phoneArrowHint.y = this.phoneArrowBaseY;
+        this.phoneArrowHint.setVisible(true).setDepth(10);
+        this.phoneArrowBobTween = null;
 
         //area del paziente interagibile
         this.patientArea = this.add.rectangle(768, 594, 400, 400)
@@ -69,11 +85,82 @@ class HospitalScene extends Phaser.Scene {
         this.patientArrowHint.y = this.patientArrowBaseY;
         this.patientArrowHint.setVisible(false).setDepth(10);
         this.patientArrowBobTween = null;
+
+        // Avvia animazione freccia: telefono se non ha ancora risposto, paziente se ritorna da PatientScene
+        if (this.clickedCorOpt) {
+            this.hidePhoneHint();
+            this.showPatientHint();
+        }
+    }
+
+    showPhoneHint() {
+        if (!this.phoneArrowHint) return;
+        this.phoneArrowHint.setVisible(true);
+        this.phoneArrowHint.x = this.phoneArrowBaseX;
+        this.phoneArrowHint.y = this.phoneArrowBaseY;
+        if (this.phoneArrowBobTween) this.phoneArrowBobTween.remove();
+        this.phoneArrowBobTween = this.tweens.add({
+            targets: this.phoneArrowHint,
+            x: this.phoneArrowBaseX + 16,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: "Sine.easeInOut"
+        });
+    }
+
+    hidePhoneHint() {
+        if (!this.phoneArrowHint) return;
+        this.phoneArrowHint.setVisible(false);
+        if (this.phoneArrowBobTween) {
+            this.phoneArrowBobTween.remove();
+            this.phoneArrowBobTween = null;
+        }
+    }
+
+    showOptionsHint() {
+        this.hidePhoneHint();
+        const baseX = 1100;
+        const optY = [700, 795, 890];
+        this.optionArrows = [];
+        this.optionArrowTweens = [];
+        for (let i = 0; i < 3; i++) {
+            const arr = this.add.graphics();
+            arr.fillStyle(0xe74c3c, 0.95);
+            arr.lineStyle(2, 0xc0392b, 1);
+            arr.fillTriangle(20, 0, -20, -24, -20, 24);
+            arr.strokeTriangle(20, 0, -20, -24, -20, 24);
+            arr.x = baseX;
+            arr.y = optY[i];
+            arr.setDepth(10);
+            this.optionArrows.push(arr);
+            const t = this.tweens.add({
+                targets: arr,
+                x: baseX + 16,
+                duration: 700,
+                yoyo: true,
+                repeat: -1,
+                ease: "Sine.easeInOut"
+            });
+            this.optionArrowTweens.push(t);
+        }
+    }
+
+    hideOptionsHint() {
+        if (this.optionArrows) {
+            this.optionArrows.forEach(a => { if (a) a.destroy(); });
+            this.optionArrows = null;
+        }
+        if (this.optionArrowTweens) {
+            this.optionArrowTweens.forEach(t => { if (t) t.remove(); });
+            this.optionArrowTweens = null;
+        }
     }
 
     //crea il testo del score e del testo in basso
     createTexts() {
         //testo del score
+            this.hidePhoneHint();
         this.scoreText = this.add.text(960, 32, "Score: " + gameState.score, {
             fontSize: `50px`,
             color: "#000000ff",
@@ -140,11 +227,12 @@ class HospitalScene extends Phaser.Scene {
         if (this.telephone.input) {
             this.telephone.input.cursor = 'default';
         }
-        this.bottomText = "Selezionare l'opzione giusta tra le 3";
+        this.bottomText = "";
         this.bottomTextSpace.setText(this.bottomText);
         this.createContextBox();
         this.createOptionBoxes();
         this.createOptionTexts();
+        this.showOptionsHint();
     }
 
     //crea la box per il testo sopra le 3 opzioni da scegliere
@@ -203,20 +291,31 @@ class HospitalScene extends Phaser.Scene {
         if (this.correctNumber === chosenNumber) {
             gameState.score += 15;
             this.scoreText.setText("Score: " + gameState.score);
-            this.clickedOption("Corretto! Ora procedi con la valutazione del paziente interagendo su di lui", true);
+            this.bottomText = "";
+            this.bottomTextSpace.setColor("#167e30ff");
+            this.bottomTextSpace.setText("Corretto");
             this.clickedCorOpt = true;
+            this.hidePhoneHint();
             this.showPatientHint();
+            this.time.delayedCall(2000, () => {
+                if (this.bottomTextSpace) {
+                    this.bottomTextSpace.setColor("#000000ff");
+                    this.bottomTextSpace.setText("");
+                }
+            });
         } else {
             if (typeof window.logGameError === "function") window.logGameError("Hospital", "Opzione telefono sbagliata");
             gameState.score -= 5;
             this.scoreText.setText("Score: " + gameState.score);
             this.clickedOption("Attenzione, scegliere l'opzione corretta", false);
+            this.showPhoneHint();
         }
         this.deletePhoneConvo();
     }   
 
     //funzione per eliminare la conversazione del telefono
     deletePhoneConvo() {
+        this.hideOptionsHint();
         [this.contextBoxGraphic, this.contextTextElement, this.optRect1, this.optRect2, this.optRect3, this.option1, this.option2, this.option3]
             .forEach(el => { if (el) { el.destroy(); } });
         this.contextBoxGraphic = this.contextTextElement = this.optRect1 = this.optRect2 = this.optRect3 = this.option1 = this.option2 = this.option3 = null;
@@ -246,15 +345,16 @@ class HospitalScene extends Phaser.Scene {
         }
     }
 
-    //funzione per gestire la scelta dell'utente relativamente alla risposta scelta
-    clickedOption(info, win) {
-        if (win) {
-            this.bottomTextSpace.setColor("#167e30ff");   
+    //funzione per gestire la scelta dell'utente (solo per errori nella barra sotto)
+    clickedOption(info, isSuccess) {
+        if (isSuccess) {
+            this.bottomText = "";
+            this.bottomTextSpace.setText("");
         } else {
             this.bottomTextSpace.setColor("#ff0000");
+            this.bottomTextSpace.setText(info);
+            this.bottomText = info;
         }
-        this.bottomTextSpace.setText(info);
-        this.bottomText = info;
     }
 
     //funzione per creare la box di background per il testo delle 3 opzioni da scegliere

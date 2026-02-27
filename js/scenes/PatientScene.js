@@ -29,7 +29,7 @@ class PatientScene extends Phaser.Scene {
     preload() {
         this.load.image("ReloadButton", "img/ReloadButton.png");
         this.load.image("PatientCloseUp", "img/PatientCloseUp.jpeg");
-        this.load.text("PatientOptions", "text/Patient.txt");
+        this.load.text("PatientOptions", "text/Patient.txt?v=" + Date.now());
     }
     
     create() {
@@ -45,7 +45,6 @@ class PatientScene extends Phaser.Scene {
 
         // Carica le opzioni PRIMA di creare il contenuto
         this.getPhonetext(this.cache.text.get("PatientOptions"));
-
         this.createBackground();
         this.createTopBottomBars();
         this.createGameContent();
@@ -167,10 +166,12 @@ class PatientScene extends Phaser.Scene {
     }
 
     createQuestionText() {
-        this.add.text(1500, 324, "Il paziente non risponde\nCome procedi?", {
+        this.add.text(1500, 324, this.questionText, {
             fontSize: `49px`,
             color: "#000000",
-            fontFamily: "Poppins"
+            fontFamily: "Poppins",
+            wordWrap: {width: 800},
+            resolution: 2
         }).setOrigin(0.5);
     }
 
@@ -280,7 +281,7 @@ class PatientScene extends Phaser.Scene {
         for (let riga = 0; riga < opzioni.length; riga++) {
             const linea = opzioni[riga].trim();
             if (linea.startsWith("#ContextText:")) {
-                this.contextText = linea.substring(13).trim();
+                this.questionText = linea.substring(13).trim();
             } else if (linea.startsWith("#Option1:")) {
                 originalOptions[0] = linea.substring(10).trim();
             } else if (linea.startsWith("#Option2:")) {
@@ -303,10 +304,8 @@ class PatientScene extends Phaser.Scene {
         this.opzione3 = shuffled[2];
         
         // Calcola l'ordine corretto: l'ordine nel file è dall'alto al basso
-        // L'ordine corretto reale è: Option1 (prima), Option3 (seconda), Option2 (terza)
-        // Quindi gli indici originali sono: 0, 2, 1
         // Dopo lo shuffle, troviamo dove si trovano queste opzioni
-        const originalOrder = [0, 2, 1]; // GAS, Vie aeree, Compressioni
+        const originalOrder = [0, 1, 2]; // vie Aree, gas, compressioni
         this.correctOrder = originalOrder.map(originalIndex => 
             shuffled.indexOf(originalOptions[originalIndex])
         );

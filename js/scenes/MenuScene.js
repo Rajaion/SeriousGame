@@ -4,45 +4,27 @@ class MenuScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("IconaMenu", "img/Menu.jpg");
+        this.load.image("IconaMenu", "img/Menu.png");
     }
 
     create() {
         this.children.removeAll();
 
-        this.sceneBorder = this.add.graphics();
-        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(0, 0, 1920, 1080);
-        this.sceneBorder.fillStyle(0x2c3e50, 1);
-        this.sceneBorder.fillRoundedRect(0, 0, 1920, 1080, 0);
-
-        this.add.image(960, 540, 'IconaMenu').setScale(0.7);
-
-        const titleBg = this.add.graphics();
-        titleBg.fillStyle(0xffffff, 1);
-        titleBg.fillRoundedRect(650, 152, 620, 75, 20);
-        titleBg.lineStyle(3, 0x000000, 1);
-        titleBg.strokeRoundedRect(650, 152, 620, 75, 20);
-
-        this.add.text(960, 189, 'Emergenza medica', {
-            fontSize: '60px',
-            color: "#ff0000ff",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-        }).setOrigin(0.5);
+        const icona = this.add.image(960, 540, 'IconaMenu').setOrigin(0.5, 0.5);
+        icona.setScale(Math.min(1920 / icona.width, 1080 / icona.height));
 
         const btnGraphics = this.add.graphics();
         const drawBtn = (color) => {
             btnGraphics.clear();
             btnGraphics.fillStyle(color, 1);
-            btnGraphics.fillRoundedRect(830, 826, 250, 75, 20);
+            btnGraphics.fillRoundedRect(820, 900, 250, 75, 20);
             btnGraphics.lineStyle(3, 0x000000, 1);
-            btnGraphics.strokeRoundedRect(830, 826, 250, 75, 20);
+            btnGraphics.strokeRoundedRect(820, 900, 250, 75, 20);
         };
 
         drawBtn(0x3498db);
 
-        const startText = this.add.text(950, 864, "Start", {
+        const startText = this.add.text(945, 938, "Start", {
             fontSize: '60px',
             color: "#000000ff",
             fontFamily: "Poppins",

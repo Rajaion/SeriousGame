@@ -28,39 +28,13 @@ class EndScene extends Phaser.Scene {
     }
 
     createBackground() {
-        this.sceneBorder = this.add.graphics();
-        this.sceneBorder.lineStyle(1, 0xffffff, 0.8);
-        this.sceneBorder.strokeRect(0, 0, 1920, 1080);
-        this.sceneBorder.fillStyle(0x2c3e50, 1);
-        this.sceneBorder.fillRoundedRect(0, 0, 1920, 1080, 0);
+        const happyPatient = this.add.image(960, 540, "HappyPatient").setOrigin(0.5, 0.5);
+        happyPatient.setScale(Math.min(1920 / happyPatient.width, 1080 / happyPatient.height));
     }
 
     createGameContent() {
-        // Paziente felice
-        const { patient } = this.refPositions;
-        const patientImg = this.add.image(patient.x, patient.y, "HappyPatient");
 
-        // Box per il messaggio (come in IntroScene)
-        const { messageBox } = this.refPositions;
-        const boxWidth = 800;
-        const boxHeight = 200;
-        const messageBoxGraphics = this.add.graphics();
-        messageBoxGraphics.fillStyle(0xecf0f1, 1);
-        messageBoxGraphics.fillRoundedRect(
-            messageBox.x - boxWidth / 2,
-            messageBox.y - boxHeight / 2,
-            boxWidth,
-            boxHeight,
-            20
-        );
-        messageBoxGraphics.lineStyle(2, 0x2c3e50, 1);
-        messageBoxGraphics.strokeRoundedRect(
-            messageBox.x - boxWidth / 2,
-            messageBox.y - boxHeight / 2,
-            boxWidth,
-            boxHeight,
-            20
-        );
+
 
         // Bottone (stile MenuScene/IntroScene)
         const { button } = this.refPositions;
@@ -106,20 +80,9 @@ class EndScene extends Phaser.Scene {
     createTexts() {
         const { messageBox, button } = this.refPositions;
         
-        // Testo congratulazioni dentro la box
-        const messageText = this.add.text(messageBox.x, messageBox.y - 30,
-            "Congratulazioni!!\nHai salvato il paziente!", {
-            fontSize: `40px`,
-            color: "#2c3e50",
-            align: "center",
-            fontFamily: "Poppins",
-            fontStyle: "bold",
-            resolution: 2
-        }).setOrigin(0.5);
-        this.textElements.push(messageText);
 
         // Score text dentro la box, sotto il messaggio
-        const scoreText = this.add.text(messageBox.x, messageBox.y + 40,
+        const scoreText = this.add.text(960, 900,
             "\n\nScore: " + gameState.score, {
             fontSize: `32px`,
             color: "#000000",
