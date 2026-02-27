@@ -8,7 +8,7 @@ class PatientScene extends Phaser.Scene {
         this.answerBoxes = [];
         this.answerTexts = [];
         this.bottomTextSpace = null;
-        this.bottomText = "Segui l'ordine corretto delle procedure";
+        this.bottomText = "";
         // L'ordine corretto sarà calcolato dopo lo shuffle
         // L'ordine nel file è: Option1 (prima), Option3 (seconda), Option2 (terza)
         // Quindi gli indici originali sono: 0, 2, 1
@@ -214,7 +214,7 @@ class PatientScene extends Phaser.Scene {
             if (this.ordCounter === 3) {
                 gameState.score += 30;
                 if (this.scoreText) this.scoreText.setText("Score: " + gameState.score);
-                this.time.delayedCall(3500, () => this.scene.start("PatientToCart"));
+                this.time.delayedCall(1500, () => this.scene.start("PatientToCart"));
             }
         }
     }
