@@ -24,7 +24,7 @@ class MenuScene extends Phaser.Scene {
 
         drawBtn(0x3498db);
 
-        const startText = this.add.text(945, 938, "Start", {
+        const startText = this.add.text(945, 938, "Inizia", {
             fontSize: '60px',
             color: "#000000ff",
             fontFamily: "Poppins",
