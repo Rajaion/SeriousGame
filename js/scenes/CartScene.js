@@ -38,6 +38,7 @@ class CartScene extends Phaser.Scene {
         this.consecutiveVFCount = 0; // VF presente N volte di fila
         this.medsRequiredThisCycle = false; // true se il carrello è visibile e servono farmaci prima di Compressioni
         this.medicationPhase = 1; // Per VT/VF 3x: 1=Adr+NaCl, 2=Amiodarone+SG 5%
+        this.compressionsInProgress = false; // true durante la pausa 2s tra cicli (blocca spam)
     }
 
     preload() {
@@ -83,6 +84,7 @@ class CartScene extends Phaser.Scene {
         this.consecutiveVTCount = 0;
         this.consecutiveVFCount = 0;
         this.medicationPhase = 1;
+        this.compressionsInProgress = false;
         this.createBackground();
         this.createTopBottomBars();
         this.createTexts();
@@ -473,6 +475,7 @@ class CartScene extends Phaser.Scene {
         this.drawCompressioniBtn(0x3498db);
         this.compressioniText.setScale(1);
         if (this.gameEnded) return;
+        if (this.compressionsInProgress) return; // Blocca spam durante la pausa tra cicli
         if (this.currentRhythm === 'shockable' && !this.shockDelivered) {
             this.showMessage("Eroga lo shock, poi compressioni", false);
             return;
@@ -635,6 +638,7 @@ class CartScene extends Phaser.Scene {
     }
 
     completeCycle() {
+        this.compressionsInProgress = true;
         if (this.rhythmType === 'VT') {
             this.consecutiveVTCount++;
             this.consecutiveVFCount = 0;
@@ -651,6 +655,7 @@ class CartScene extends Phaser.Scene {
             gameState.score += 20;
             if (this.pointsText) this.pointsText.setText("Score: " + gameState.score);
             this.time.delayedCall(2000, () => {
+                this.compressionsInProgress = false;
                 this.gameEnded = true;
                 this.scene.start("EndScene");
             });
@@ -668,6 +673,7 @@ class CartScene extends Phaser.Scene {
         
         // Reset dello stato per il nuovo ciclo
         this.time.delayedCall(2000, () => {
+            this.compressionsInProgress = false;
             this.resetCycleState();
         });
     }
