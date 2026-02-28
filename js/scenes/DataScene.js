@@ -1,6 +1,6 @@
-class ReviewScene extends Phaser.Scene {
+class DataScene extends Phaser.Scene {
     constructor() {
-        super({ key: "ReviewScene" });
+        super({ key: "DataScene" });
     }
 
     preload() {}
@@ -47,7 +47,7 @@ class ReviewScene extends Phaser.Scene {
         this.emailInput = document.createElement("input");
         this.emailInput.type = "email";
         this.emailInput.placeholder = "email@esempio.com (facoltativo)";
-        this.emailInput.id = "review-email-input";
+        this.emailInput.id = "data-email-input";
         this.emailInput.style.cssText = [
             "position:absolute",
             "left:50%",
@@ -69,22 +69,22 @@ class ReviewScene extends Phaser.Scene {
 
     createButton() {
         var self = this;
-        this.reviewBtnBg = this.add.graphics();
+        this.dataBtnBg = this.add.graphics();
         var btnW = 420;
         var btnH = 70;
         var btnX = 960 - btnW / 2;
         var btnY = 620;
         var drawBtn = function (color) {
-            self.reviewBtnBg.clear();
-            self.reviewBtnBg.fillStyle(color, 1);
-            self.reviewBtnBg.fillRoundedRect(btnX, btnY, btnW, btnH, 10);
-            self.reviewBtnBg.lineStyle(3, 0x000000, 1);
-            self.reviewBtnBg.strokeRoundedRect(btnX, btnY, btnW, btnH, 10);
+            self.dataBtnBg.clear();
+            self.dataBtnBg.fillStyle(color, 1);
+            self.dataBtnBg.fillRoundedRect(btnX, btnY, btnW, btnH, 10);
+            self.dataBtnBg.lineStyle(3, 0x000000, 1);
+            self.dataBtnBg.strokeRoundedRect(btnX, btnY, btnW, btnH, 10);
         };
 
         drawBtn(0x3498db);
 
-        this.reviewBtnText = this.add.text(960, btnY + btnH / 2, "Conferma ed invia", {
+        this.dataBtnText = this.add.text(960, btnY + btnH / 2, "Conferma ed invia", {
             fontSize: "42px",
             color: "#000000",
             fontFamily: "Poppins",
@@ -92,9 +92,9 @@ class ReviewScene extends Phaser.Scene {
             resolution: 2
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        this.reviewBtnText.on("pointerover", function () { drawBtn(0x5DADE2); self.reviewBtnText.setScale(1.05); });
-        this.reviewBtnText.on("pointerout", function () { drawBtn(0x3498db); self.reviewBtnText.setScale(1); });
-        this.reviewBtnText.on("pointerdown", function () {
+        this.dataBtnText.on("pointerover", function () { drawBtn(0x5DADE2); self.dataBtnText.setScale(1.05); });
+        this.dataBtnText.on("pointerout", function () { drawBtn(0x3498db); self.dataBtnText.setScale(1); });
+        this.dataBtnText.on("pointerdown", function () {
             drawBtn(0x5DADE2);
             self.submitAndContinue();
         });
@@ -115,8 +115,8 @@ class ReviewScene extends Phaser.Scene {
             window.saveGameResults(sessionId, email, score, errors, errorLog);
         }
 
-        this.reviewBtnBg.setVisible(false);
-        this.reviewBtnText.setVisible(false);
+        this.dataBtnBg.setVisible(false);
+        this.dataBtnText.setVisible(false);
         if (this.emailInput && this.emailInput.parentNode) {
             this.emailInput.style.display = "none";
         }

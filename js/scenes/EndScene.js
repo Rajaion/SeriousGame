@@ -130,14 +130,14 @@ class EndScene extends Phaser.Scene {
         this.buttonArea.on("pointerdown", () => {
             this.drawButton(0x2980b9);  // Colore click come MenuScene
             this.time.delayedCall(100, () => {
-                this.scene.start("ReviewScene");
+                this.scene.start("DataScene");
             });
         });
 
         reviewButton.on("pointerdown", () => {
             this.drawButton(0x2980b9);
             this.time.delayedCall(100, () => {
-                this.scene.start("ReviewScene");
+                this.scene.start("DataScene");
             });
         });
     }

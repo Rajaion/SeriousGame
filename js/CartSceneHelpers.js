@@ -23,13 +23,13 @@ var CartMedications = {
                     scene.pickedAdrenaline = false;
                     hide(scene.adrenalina, scene.adrenalinaText);
                     scene.usedItems--;
-                    scene.showMessage("Corretto! Prosegui con NaCl", true);
+                    scene.showMessage("Corretto", true);
                 }
                 if (!scene.gameEnded && scene.pickedNacl && check(scene.nacl, scene.patientCart)) {
                     if (scene.usedItems === 2) {
                         scene.pickedNacl = false;
                         scene.naclSpawn();
-                        scene.showMessage("Ordine: prima Adrenalina, poi NaCl", false);
+                        scene.clickedWrongChoice();
                         gameState.score -= 20;
                         logErr("Ordine farmaci sbagliato: NaCl prima di Adrenalina");
                         if (scene.pointsText) scene.pointsText.setText("Score: " + gameState.score);
@@ -38,7 +38,7 @@ var CartMedications = {
                     scene.pickedNacl = false;
                     hide(scene.nacl, scene.naclText);
                     scene.usedItems--;
-                    scene.showMessage("Corretto! Ora Amiodarone e SG 5%", true);
+                    scene.showMessage("Corretto", true);
                     scene.medicationPhase = 2;
                     scene.amiodaroneSpawn();
                     scene.soluzioneSpawn();
@@ -46,7 +46,7 @@ var CartMedications = {
                 }
                 if (!scene.gameEnded && (scene.pickedAmiodarone || scene.pickedSoluzione) &&
                     (check(scene.amiodarone, scene.patientCart) || check(scene.soluzione, scene.patientCart))) {
-                    scene.showMessage("Ordine: prima Adrenalina+NaCl, poi Amiodarone+SG 5%", false);
+                    scene.showMessage("Ordine sbagliato", false);
                     gameState.score -= 10;
                     logErr("Ordine farmaci sbagliato: Amiodarone/SG prima di Adrenalina/NaCl");
                     if (scene.pointsText) scene.pointsText.setText("Score: " + gameState.score);
@@ -62,7 +62,7 @@ var CartMedications = {
                     scene.pickedAmiodarone = false;
                     hide(scene.amiodarone, scene.amiodaroneText);
                     scene.usedItems--;
-                    scene.showMessage(scene.usedItems === 1 ? "Corretto! Ultima: SG 5%" : "Corretto! Prosegui", true);
+                    scene.showMessage("Corretto", true);
                 }
                 if (!scene.gameEnded && scene.pickedSoluzione && check(scene.soluzione, scene.patientCart)) {
                     if (scene.usedItems === 2) {
@@ -78,7 +78,7 @@ var CartMedications = {
                     hide(scene.soluzione, scene.soluzioneText);
                     scene.usedItems--;
                     if (scene.usedItems === 0) scene.medicationsGiven = true;
-                    scene.showMessage("Ok. Continua.", true);
+                    scene.showMessage("Corretto", true);
                 }
                 if (scene.pickedAdrenaline) move(scene.adrenalina, scene.adrenalinaText);
                 if (scene.pickedNacl) move(scene.nacl, scene.naclText);
@@ -93,7 +93,7 @@ var CartMedications = {
                 scene.pickedAdrenaline = false;
                 hide(scene.adrenalina, scene.adrenalinaText);
                 scene.usedItems--;
-                scene.showMessage("Corretto! Seconda medicina", true);
+                scene.showMessage("Corretto", true);
             }
             if (!scene.gameEnded && scene.pickedNacl && check(scene.nacl, scene.patientCart)) {
                 if (scene.usedItems === 2) {
@@ -109,11 +109,11 @@ var CartMedications = {
                 hide(scene.nacl, scene.naclText);
                 scene.usedItems--;
                 if (scene.usedItems === 0) scene.medicationsGiven = true;
-                scene.showMessage("Ok. Continua.", true);
+                scene.showMessage("Corretto", true);
             }
             if (!scene.gameEnded && (scene.pickedAmiodarone || scene.pickedSoluzione) &&
                 (check(scene.amiodarone, scene.patientCart) || check(scene.soluzione, scene.patientCart))) {
-                scene.showMessage("Farmaci non corretti", false);
+                scene.showMessage("Sbagliato", false);
                 gameState.score -= 10;
                 logErr("Farmaci non corretti (set Adrenalina/NaCl)");
                 if (scene.pointsText) scene.pointsText.setText("Score: " + gameState.score);
@@ -129,7 +129,7 @@ var CartMedications = {
                 scene.pickedAmiodarone = false;
                 hide(scene.amiodarone, scene.amiodaroneText);
                 scene.usedItems--;
-                scene.showMessage("Corretto! Seconda medicina", true);
+                scene.showMessage("Corretto", true);
             }
             if (!scene.gameEnded && scene.pickedSoluzione && check(scene.soluzione, scene.patientCart)) {
                 if (scene.usedItems === 2) {
@@ -145,11 +145,11 @@ var CartMedications = {
                 hide(scene.soluzione, scene.soluzioneText);
                 scene.usedItems--;
                 if (scene.usedItems === 0) scene.medicationsGiven = true;
-                scene.showMessage("Ok. Continua.", true);
+                scene.showMessage("Corretto", true);
             }
             if (!scene.gameEnded && (scene.pickedAdrenaline || scene.pickedNacl) &&
                 (check(scene.adrenalina, scene.patientCart) || check(scene.nacl, scene.patientCart))) {
-                scene.showMessage("Farmaci non corretti", false);
+                scene.showMessage("Sbagliato", false);
                 gameState.score -= 10;
                 logErr("Farmaci non corretti (set Amiodarone/SG 5%)");
                 if (scene.pointsText) scene.pointsText.setText("Score: " + gameState.score);

@@ -33,7 +33,7 @@ const config = {
         pixelArt: false,
         roundPixels: false
     },
-    scene: [MenuScene, IntroScene, HospitalScene, PatientScene, PatientToCart, CartScene, EndScene, ReviewScene],
+    scene: [MenuScene, IntroScene, HospitalScene, PatientScene, PatientToCart, CartScene, EndScene, DataScene],
 };
 
 const game = new Phaser.Game(config);
