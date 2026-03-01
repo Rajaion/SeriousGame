@@ -38,7 +38,8 @@ class CartScene extends Phaser.Scene {
         this.medsRequiredThisCycle = false; // true se il carrello è visibile e servono farmaci prima di Compressioni
         this.medicationPhase = 1; // Per VT/VF 3x: 1=Adr+NaCl, 2=Amiodarone+SG 5%
         this.compressionsInProgress = false; // true durante la pausa 2s tra cicli (blocca spam)
-        this.peaOrAsystoleAppearanceCount = 0; // Contatore apparizioni PEA/Asystole: farmaci a 1ª, 3ª, 5ª... (cicli alterni)
+        this.peaOrAsystoleAppearanceCount = 0;
+        this.medsTaken = false; // true se farmaci già prelevati dal bottone in questo ciclo
     }
 
     preload() {
@@ -86,6 +87,7 @@ class CartScene extends Phaser.Scene {
         this.medicationPhase = 1;
         this.compressionsInProgress = false;
         this.peaOrAsystoleAppearanceCount = 0;
+        this.medsTaken = false;
         this.createBackground();
         this.createTopBottomBars();
         this.createTexts();
@@ -139,9 +141,11 @@ class CartScene extends Phaser.Scene {
             .setAlpha(0.01)
             .setInteractive({ useHandCursor: true });
 
-        this.cart = this.add.rectangle(1675, 790, 400, 400)
-            .setAlpha(0.01)
-            .setInteractive({ useHandCursor: true });
+        // Posizione bottone Farmaci (+30px a destra: 1525+30=1555)
+        this.medsAreaX = 1580;
+        this.medsAreaY = 760;
+        // Spawn medicine (+50px sotto: 790+50=840)
+        this.medsSpawnY = 500;
 
         this.adrenalina = this.add.image(-550, -550, "Adrenalina")
             .setScale(0.15)
@@ -189,17 +193,17 @@ class CartScene extends Phaser.Scene {
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         this.textElements.push(this.compressioniText);
 
-        // Freccia sopra il carrello che punta in basso (più grande)
+        // Freccia sotto il bottone Farmaci che punta verso l'alto (al bottone)
         this.cartArrowHint = this.add.graphics();
-        this.cartArrowBaseX = this.cart.x;
-        this.cartArrowBaseY = this.cart.y - 290;
+        this.cartArrowBaseX = this.medsAreaX;
+        this.cartArrowBaseY = this.medsAreaY - 25;
         this.cartHintVisible = false;
         this.arrowBobTween = null;
         this.updateCartArrowGraphics();
         this.cartArrowHint.setVisible(false).setDepth(10);
 
         const instructionBox = this.add.graphics();
-        const boxW = 950, boxX = 960 - boxW / 2; // box più larga (~+150), centrata
+        const boxW = 1100, boxX = 960 - boxW / 2; // box InfoBattito: +150px in orizzontale
         instructionBox.fillStyle(0xecf0f1, 1);
         instructionBox.fillRoundedRect(boxX, 87, boxW, 150, 0);
         instructionBox.lineStyle(2, 0x2c3e50, 1);
@@ -222,21 +226,21 @@ class CartScene extends Phaser.Scene {
         // Bottone "Farmaci" visibile (come Compressioni e Shock) - identifica dove interagire per i farmaci
         this.farmaciBtnW = 200;
         this.farmaciBtnH = 60;
-        this.farmaciBtnX = this.cart.x - this.farmaciBtnW / 2;
-        this.farmaciBtnY = this.cart.y - 120;
+        this.farmaciBtnX = this.medsAreaX - this.farmaciBtnW / 2;
+        this.farmaciBtnY = this.medsAreaY - 120;
         this.farmaciButton = this.add.graphics();
-        const drawFarmaciBtn = (color, alpha) => {
+        const drawFarmaciBtn = (color) => {
             this.farmaciButton.clear();
-            this.farmaciButton.fillStyle(color, alpha !== undefined ? alpha : 1);
+            this.farmaciButton.fillStyle(color, 1);
             this.farmaciButton.fillRoundedRect(this.farmaciBtnX, this.farmaciBtnY, this.farmaciBtnW, this.farmaciBtnH, 10);
             this.farmaciButton.lineStyle(3, 0x000000, 1);
             this.farmaciButton.strokeRoundedRect(this.farmaciBtnX, this.farmaciBtnY, this.farmaciBtnW, this.farmaciBtnH, 10);
         };
         drawFarmaciBtn(0x3498db);
         this.drawFarmaciBtn = drawFarmaciBtn;
-        this.farmaciBtnZone = this.add.rectangle(this.cart.x, this.farmaciBtnY + this.farmaciBtnH / 2, this.farmaciBtnW, this.farmaciBtnH)
+        this.farmaciBtnZone = this.add.rectangle(this.medsAreaX, this.farmaciBtnY + this.farmaciBtnH / 2, this.farmaciBtnW, this.farmaciBtnH)
             .setInteractive({ useHandCursor: true });
-        this.farmaciBtnText = this.add.text(this.cart.x, this.farmaciBtnY + this.farmaciBtnH / 2, "Farmaci", {
+        this.farmaciBtnText = this.add.text(this.medsAreaX, this.farmaciBtnY + this.farmaciBtnH / 2, "Farmaci", {
             fontSize: "28px",
             color: "#000000",
             fontFamily: "Poppins",
@@ -319,7 +323,7 @@ class CartScene extends Phaser.Scene {
             fontSize: `38px`,
             color: '#2c3e50',
             fontFamily: "Poppins",
-            wordWrap: { width: 1400 },
+            wordWrap: { width: 1050 },
             resolution: 2
         }).setOrigin(0.5);
         this.textElements.push(this.infoBattitoText);
@@ -370,17 +374,15 @@ class CartScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        var onCartOrFarmaciClick = () => this.onCartOrFarmaciClick();
-        this.cart.removeAllListeners();
-        this.cart.on("pointerdown", onCartOrFarmaciClick);
+        var onFarmaciClick = () => this.onFarmaciClick();
 
-        // Pulsante Farmaci: stesso comportamento del carrello
+        // Pulsante Farmaci: unico punto di interazione per prelevare i farmaci
         this.farmaciBtnZone.removeAllListeners();
         this.farmaciBtnText.removeAllListeners();
-        var farmaciOver = () => { if (this.medsRequiredThisCycle && this.cart.input) { this.drawFarmaciBtn(0x5DADE2); this.farmaciBtnText.setScale(1.05); } };
+        var farmaciOver = () => { if (this.medsRequiredThisCycle && !this.medsTaken) { this.drawFarmaciBtn(0x5DADE2); this.farmaciBtnText.setScale(1.05); } };
         var farmaciOut = () => { this.updateFarmaciButtonState(); this.farmaciBtnText.setScale(1); };
-        this.farmaciBtnZone.on("pointerover", farmaciOver).on("pointerout", farmaciOut).on("pointerdown", onCartOrFarmaciClick);
-        this.farmaciBtnText.on("pointerover", farmaciOver).on("pointerout", farmaciOut).on("pointerdown", onCartOrFarmaciClick);
+        this.farmaciBtnZone.on("pointerover", farmaciOver).on("pointerout", farmaciOut).on("pointerdown", onFarmaciClick);
+        this.farmaciBtnText.on("pointerover", farmaciOver).on("pointerout", farmaciOut).on("pointerdown", onFarmaciClick);
 
         this.compressioniZone.removeAllListeners();
         this.compressioniText.removeAllListeners();
@@ -439,9 +441,9 @@ class CartScene extends Phaser.Scene {
         this.cartArrowHint.clear();
         this.cartArrowHint.fillStyle(0xe74c3c, 0.95);
         this.cartArrowHint.lineStyle(2, 0xc0392b, 1);
-        // Triangolo verso il basso (punta al carrello), più grande: punta (0,20), base (-24,-20) e (24,-20)
-        this.cartArrowHint.fillTriangle(0, 20, -24, -20, 24, -20);
-        this.cartArrowHint.strokeTriangle(0, 20, -24, -20, 24, -20);
+        // Triangolo verso l'alto (punta al bottone Farmaci): punta (0,-20), base (-24,20) e (24,20)
+        this.cartArrowHint.fillTriangle(0, -20, -24, 20, 24, 20);
+        this.cartArrowHint.strokeTriangle(0, -20, -24, 20, 24, 20);
     }
 
     showCartHint() {
@@ -455,7 +457,7 @@ class CartScene extends Phaser.Scene {
         if (this.arrowBobTween) this.arrowBobTween.remove();
         this.arrowBobTween = this.tweens.add({
             targets: this.cartArrowHint,
-            y: this.cartArrowBaseY + 16,
+            y: this.cartArrowBaseY - 16,
             duration: 700,
             yoyo: true,
             repeat: -1,
@@ -477,17 +479,17 @@ class CartScene extends Phaser.Scene {
 
     updateFarmaciButtonState() {
         if (!this.farmaciButton || !this.farmaciBtnZone) return;
-        var canUse = this.medsRequiredThisCycle && this.cart.input !== null;
+        var canUse = this.medsRequiredThisCycle && !this.medsTaken;
         if (canUse) {
             this.farmaciButton.setVisible(true).setAlpha(1);
             this.farmaciBtnZone.setInteractive({ useHandCursor: true }).setAlpha(1);
             this.farmaciBtnText.setInteractive({ useHandCursor: true }).setAlpha(1);
             this.drawFarmaciBtn(0x3498db);
         } else {
-            this.farmaciButton.setVisible(true).setAlpha(0.5);
-            this.farmaciBtnZone.setAlpha(0.5);
-            this.farmaciBtnText.setAlpha(0.5);
-            this.drawFarmaciBtn(0x95a5a6, 0.5);
+            this.farmaciButton.setVisible(true).setAlpha(1);
+            this.farmaciBtnZone.setAlpha(1);
+            this.farmaciBtnText.setAlpha(1);
+            this.drawFarmaciBtn(0x3498db);
         }
     }
 
@@ -499,8 +501,8 @@ class CartScene extends Phaser.Scene {
         }
     }
 
-    onCartOrFarmaciClick() {
-        if (this.cart.input === null) return; // Carrello già usato
+    onFarmaciClick() {
+        if (this.medsTaken) return; // Farmaci già prelevati
         if (this.currentRhythm === 'shockable') {
             if (!this.shockDelivered) {
                 this.showMessage("Azione non possibile", false);
@@ -526,7 +528,8 @@ class CartScene extends Phaser.Scene {
             this.naclSpawn();
             this.usedItems = 2;
         }
-        this.cart.disableInteractive();
+        this.medsTaken = true;
+        this.updateFarmaciButtonState();
         this.hideCartHint();
     }
 
@@ -550,8 +553,8 @@ class CartScene extends Phaser.Scene {
     adrenSpawn() {
         this.adrenalina.setDepth(15);
         this.adrenalinaText.setDepth(15);
-        this.adrenalina.x = this.cart.x + 30;
-        this.adrenalina.y = this.cart.y;
+        this.adrenalina.x = this.medsAreaX + 70;
+        this.adrenalina.y = this.medsSpawnY;
         const pos = this.adrenalina.getWorldTransformMatrix();
         this.adrenalinaText.x = pos.tx;
         this.adrenalinaText.y = pos.ty - 100;
@@ -560,8 +563,8 @@ class CartScene extends Phaser.Scene {
     naclSpawn() {
         this.nacl.setDepth(15);
         this.naclText.setDepth(15);
-        this.nacl.x = this.cart.x - 30;
-        this.nacl.y = this.cart.y;
+        this.nacl.x = this.medsAreaX - 20;
+        this.nacl.y = this.medsSpawnY;
         const pos = this.nacl.getWorldTransformMatrix();
         this.naclText.x = pos.tx;
         this.naclText.y = pos.ty - 75;
@@ -570,8 +573,8 @@ class CartScene extends Phaser.Scene {
     amiodaroneSpawn() {
         this.amiodarone.setDepth(15);
         this.amiodaroneText.setDepth(15);
-        this.amiodarone.x = this.cart.x + 30;
-        this.amiodarone.y = this.cart.y;
+        this.amiodarone.x = this.medsAreaX + 30;
+        this.amiodarone.y = this.medsSpawnY;
         const pos = this.amiodarone.getWorldTransformMatrix();
         this.amiodaroneText.x = pos.tx;
         this.amiodaroneText.y = pos.ty - 100;
@@ -580,8 +583,8 @@ class CartScene extends Phaser.Scene {
     soluzioneSpawn() {
         this.soluzione.setDepth(15);
         this.soluzioneText.setDepth(15);
-        this.soluzione.x = this.cart.x - 30;
-        this.soluzione.y = this.cart.y;
+        this.soluzione.x = this.medsAreaX - 30;
+        this.soluzione.y = this.medsSpawnY;
         const pos = this.soluzione.getWorldTransformMatrix();
         this.soluzioneText.x = pos.tx;
         this.soluzioneText.y = pos.ty - 75;
@@ -609,8 +612,8 @@ class CartScene extends Phaser.Scene {
         if (!this.monitorImg || !this.defibrillator) return;
         var b = this.monitorImg.getBounds();
         this.defibrillator.setVisible(true);
-        this.defibrillator.x = b.right + 80;
-        this.defibrillator.y = b.centerY - 150;
+        this.defibrillator.x = b.right + 110;
+        this.defibrillator.y = b.centerY - 180;
         this.defibrillator.disableInteractive();
         this.createShockButton(this.defibrillator.x, this.defibrillator.y);
         this.createECGImage();
@@ -764,7 +767,7 @@ class CartScene extends Phaser.Scene {
         this.pickedAmiodarone = false;
         this.pickedSoluzione = false;
 
-        this.cart.setInteractive({ useHandCursor: true });
+        this.medsTaken = false;
 
         if (this.defibrillator) {
             this.defibrillator.setVisible(true);

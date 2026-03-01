@@ -191,6 +191,11 @@ class PatientScene extends Phaser.Scene {
         const answer = this.refPositions.answers[index];
         const expectedIndex = this.correctOrder[this.ordCounter];
 
+        // Re-click su una risposta già corretta: ignora (evita bug che cancella la selezione)
+        if (this.ordCounter > 0 && this.correctOrder.slice(0, this.ordCounter).includes(index)) {
+            return;
+        }
+
         if (index !== expectedIndex) {
             this.ordCounter = 0;
             if (typeof window.logGameError === "function") window.logGameError("Patient", "Sequenza GAS sbagliata");
