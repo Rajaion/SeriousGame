@@ -20,6 +20,7 @@ var CartMedications = {
             scene.pickedAdrenaline = false;
             hide(scene.adrenalina, scene.adrenalinaText);
             scene.usedItems--;
+            if (scene.updateInfoBattito) scene.updateInfoBattito();
             scene.showMessage("Corretto", true);
         }
         if (!scene.gameEnded && scene.pickedNacl && check(scene.nacl, scene.patientCart)) {
@@ -36,6 +37,7 @@ var CartMedications = {
             hide(scene.nacl, scene.naclText);
             scene.usedItems--;
             if (scene.usedItems === 0) scene.medicationsGiven = true;
+            if (scene.updateInfoBattito) scene.updateInfoBattito();
             scene.showMessage("Corretto", true);
         }
         if (scene.pickedAdrenaline) move(scene.adrenalina, scene.adrenalinaText);

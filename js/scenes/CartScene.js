@@ -100,7 +100,8 @@ class CartScene extends Phaser.Scene {
     updateInfoBattito() {
         if (this.infoBattitoText && this.rhythmType) {
             var label = this.getRhythmLabel();
-            this.infoBattitoText.setText("Battito: " + label + " - decidere come agire");
+            var suffix = (this.medsTaken && this.usedItems > 0) ? " - trascina le medicine sul paziente" : " - decidere come agire";
+            this.infoBattitoText.setText("Battito: " + label + suffix);
         }
     }
 
@@ -478,6 +479,7 @@ class CartScene extends Phaser.Scene {
         this.medsTaken = true;
         this.updateFarmaciButtonState();
         this.hideCartHint();
+        this.updateInfoBattito();
     }
 
     /** Clic sul bottone Compressioni: avanza al ciclo successivo (dopo shock nei cicli 1-3 shockable). */
