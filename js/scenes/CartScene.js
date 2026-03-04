@@ -39,6 +39,7 @@ class CartScene extends Phaser.Scene {
         this.compressionsInProgress = false;
         this.peaOrAsystoleAppearanceCount = 0;
         this.firstNonShockableMedsCycle = null; // primo ciclo in cui compare PEA/Asistolia e servono farmaci → poi a cicli alterni
+        this.previousCycleRhythmType = null; // ritmo del ciclo appena completato (per riavviare alternanza quando PEA/Asistolia si ripresentano dopo TV/FV)
         this.medsTaken = false;
     }
 
@@ -452,12 +453,13 @@ class CartScene extends Phaser.Scene {
     }
 
     updateCartHintForNonShockable() {
-        // PEA/Asystole: farmaci dalla prima volta che compare (questo ciclo), poi a cicli alterni (es. compare al 2 → farmaci al 2 e al 4)
+        // PEA/Asystole: appena si ripresenta (dopo TV/FV o prima volta) l'algoritmo (ri)parte a cicli alterni
         if (this.rhythmType !== 'PEA' && this.rhythmType !== 'Asystole') {
             this.hideCartHint(true);
             return;
         }
-        if (this.firstNonShockableMedsCycle === null) {
+        var reappeared = this.previousCycleRhythmType === 'VT' || this.previousCycleRhythmType === 'VF';
+        if (reappeared || this.firstNonShockableMedsCycle === null) {
             this.firstNonShockableMedsCycle = this.currentCycle;
         }
         var stepsFromFirst = this.currentCycle - this.firstNonShockableMedsCycle;
@@ -692,6 +694,7 @@ class CartScene extends Phaser.Scene {
     }
 
     resetCycleState() {
+        this.previousCycleRhythmType = this.rhythmType;
         this.pickNewRhythmForCycle();
         if (this.rhythmType === 'PEA' || this.rhythmType === 'Asystole') {
             this.peaOrAsystoleAppearanceCount++;
