@@ -5,7 +5,12 @@
  * PEA/Asistolia (non-shockable): NO shock. Adrenalina + NaCl dalla prima comparsa, poi a cicli alterni.
  *
  * L'avanzamento al ciclo successivo avviene solo premendo il bottone "Compressioni".
+ *
+ * Battiti: usare sempre i codici VT, VF, PEA, Asystole (chiavi texture ECG_VT, ECG_VF, ...).
+ * In italiano: TV = Tachicardia Ventricolare (VT), FV = Fibrillazione Ventricolare (VF).
  */
+var RHYTHM_TYPES = { VT: "VT", VF: "VF", PEA: "PEA", Asystole: "Asystole" };
+
 class CartScene extends Phaser.Scene {
     constructor() {
         super({ key: "CartScene" });
@@ -18,7 +23,7 @@ class CartScene extends Phaser.Scene {
         this.ecgImage = null;
         this.defibrillator = null;
         this.currentRhythm = null; // 'shockable' o 'non-shockable'
-        this.rhythmType = null; // 'VF', 'VT', 'PEA', 'Asystole'
+        this.rhythmType = null; // solo: VT, VF, PEA, Asystole (mai TV/FV nel codice)
         this.currentCycle = 1;
         this.maxCycles = 5;
         this.shockDelivered = false;
@@ -39,7 +44,7 @@ class CartScene extends Phaser.Scene {
 
     preload() {
         this.load.image("Monitor", "img/Monitor.png");
-        // ECG: ECG_TV, ECG_FV, ECG_PEA, ECG_Asystole
+        // Texture key = ECG_VT/ECG_VF (codice); file = ECG_TV/ECG_FV (sigla italiana)
         this.load.image("ECG_VT", "img/ECG_TV.png");
         this.load.image("ECG_VF", "img/ECG_FV.png");
         this.load.image("ECG_PEA", "img/ECG_PEA.png");
@@ -666,13 +671,19 @@ class CartScene extends Phaser.Scene {
 
     // Cambia il ritmo (battito) a ogni nuovo ciclo - completamente random tra VT, VF, PEA, Asystole
     pickNewRhythmForCycle() {
-        const rhythms = ['VT', 'VF', 'PEA', 'Asystole'];
+        const rhythms = Object.keys(RHYTHM_TYPES);
         this.rhythmType = rhythms[Math.floor(Math.random() * rhythms.length)];
         this.currentRhythm = (this.rhythmType === 'VT' || this.rhythmType === 'VF') ? 'shockable' : 'non-shockable';
     }
 
     getRhythmLabel() {
-        const labels = { VF: "Fibrillazione ventricolare (VF)", VT: "Tachicardia ventricolare (VT)", PEA: "PEA", Asystole: "Asistolia" };
+        // Codice interno VT/VF; etichetta con sigla italiana TV/FV
+        const labels = {
+            VT: "Tachicardia ventricolare (TV)",
+            VF: "Fibrillazione ventricolare (FV)",
+            PEA: "PEA",
+            Asystole: "Asistolia"
+        };
         return labels[this.rhythmType] || this.rhythmType || "";
     }
 
